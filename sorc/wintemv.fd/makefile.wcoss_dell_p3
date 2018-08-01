@@ -28,9 +28,11 @@ SHELL=/bin/sh
 # parameter.  The new modules are not limited to fortran, but may be C, YACC,
 # LEX, or CAL.  An explicit rule will need to be added for PASCAL modules.
 #
-SRCS=   fbwndgfs.f
+SRCS=   BLOCKDATA001.f VALKEY.f XTRACT.f la2la.f readgrib.f \
+        w3fc00.f wintemv.f
 
-OBJS=   fbwndgfs.o
+OBJS=   BLOCKDATA001.o VALKEY.o XTRACT.o la2la.o readgrib.o \
+        w3fc00.o wintemv.o
 
 # Tunable parameters
 #
@@ -42,15 +44,16 @@ OBJS=   fbwndgfs.o
 #
 FC =	        ifort
 LDFLAGS =	
-LIBS = ${W3NCO_LIB8} ${W3EMC_LIB8} ${BACIO_LIB8} ${IP_LIB8} ${SP_LIB8}
-CMD =		fbwndgfs
+LIBS= ${W3NCO_LIB8} ${W3EMC_LIB8} ${BACIO_LIB8}
+
+CMD =           wintemv
 PROFLIB =	-lprof
 
 # To perform the default compilation, use the first line
 # To compile with flowtracing turned on, use the second line
 # To compile giving profile additonal information, use the third line
 # WARNING:  SIMULTANEOUSLY PROFILING AND FLOWTRACING IS NOT RECOMMENDED 
-FFLAGS =        -O3  -g -assume byterecl -convert big_endian -r8 -i8 
+FFLAGS =        -O3  -g -assume byterecl -assume noold_ldout_format -convert big_endian -r8 -i8 -axCORE-AVX2
 #FFLAGS =	 -F
 #FFLAGS =	 -Wf"-ez"
 
@@ -61,12 +64,15 @@ all:		$(CMD)
 
 $(CMD):		$(OBJS)
 	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(LIBS)
-	rm -f $(OBJS)
 
 # Make the profiled version of the command and call it a.out.prof
 #
 $(CMD).prof:	$(OBJS)
 	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(PROFLIB) $(LIBS)
+
+install:
+	mkdir -p ../../exec
+	cp -p $(CMD) ../../exec
 
 clean:
 	-rm -f $(OBJS)
