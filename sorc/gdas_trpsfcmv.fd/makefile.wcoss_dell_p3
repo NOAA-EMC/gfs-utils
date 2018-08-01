@@ -13,14 +13,13 @@ LDFLAGS =  -L$(NCARG_LIB) \
 LIBS     = $(IP_LIB4) \
 	$(SP_LIB4) \
 	$(BACIO_LIB4) \
-	$(W3EMC_LIB4) \
 	$(W3NCO_LIB4) \
 	$(BUFR_LIB4)
 
 CMD =     gdas_trpsfcmv 
 PROFLIB =       -lprof
 
-FFLAGS = -O -g -traceback -C -openmp -assume byterecl -convert big_endian -assume nobscc -assume noold_ldout_format -warn usage
+FFLAGS = -O -g -traceback -C -qopenmp -assume byterecl -convert big_endian -assume nobscc -assume noold_ldout_format -warn usage
 
 # Lines from here on down should not need to be changed.  They are the
 # actual rules which make uses to build a.out.
