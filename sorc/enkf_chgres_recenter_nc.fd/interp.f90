@@ -1,7 +1,5 @@
  module interp
 
- use nemsio_module
-
  implicit none
 
  private
@@ -38,8 +36,6 @@
  use setup
 
  implicit none
-
- integer               :: k
 
  real, allocatable     :: pres_b4_adj_output(:,:)
  real, allocatable     :: pres_output(:,:)
@@ -103,13 +99,11 @@
  q_b4_adj_output(:,:,1) = spfh_b4_adj_output(:,:)
  q_b4_adj_output(:,:,2) = o3mr_b4_adj_output(:,:)
  q_b4_adj_output(:,:,3) = clwmr_b4_adj_output(:,:)
- if (gfdl_mp) then
-   q_b4_adj_output(:,:,4) = rwmr_b4_adj_output(:,:)
-   q_b4_adj_output(:,:,5) = icmr_b4_adj_output(:,:)
-   q_b4_adj_output(:,:,6) = snmr_b4_adj_output(:,:)
-   q_b4_adj_output(:,:,7) = grle_b4_adj_output(:,:)
-   if (icldamt == 1) q_b4_adj_output(:,:,8) = cldamt_b4_adj_output(:,:)
- endif
+ q_b4_adj_output(:,:,4) = rwmr_b4_adj_output(:,:)
+ q_b4_adj_output(:,:,5) = icmr_b4_adj_output(:,:)
+ q_b4_adj_output(:,:,6) = snmr_b4_adj_output(:,:)
+ q_b4_adj_output(:,:,7) = grle_b4_adj_output(:,:)
+ q_b4_adj_output(:,:,8) = cldamt_b4_adj_output(:,:)
 
  allocate(q_output(ij_output,lev,ntrac))
  q_output = 0.0
@@ -141,20 +135,16 @@
  o3mr_output = q_output(:,:,2)
  allocate(clwmr_output(ij_output,lev))
  clwmr_output = q_output(:,:,3)
- if (gfdl_mp) then
-   allocate(rwmr_output(ij_output,lev))
-   rwmr_output = q_output(:,:,4)
-   allocate(icmr_output(ij_output,lev))
-   icmr_output = q_output(:,:,5)
-   allocate(snmr_output(ij_output,lev))
-   snmr_output = q_output(:,:,6)
-   allocate(grle_output(ij_output,lev))
-   grle_output = q_output(:,:,7)
-   if (icldamt == 1) then
-      allocate(cldamt_output(ij_output,lev))
-      cldamt_output = q_output(:,:,8)
-   endif
- endif
+ allocate(rwmr_output(ij_output,lev))
+ rwmr_output = q_output(:,:,4)
+ allocate(icmr_output(ij_output,lev))
+ icmr_output = q_output(:,:,5)
+ allocate(snmr_output(ij_output,lev))
+ snmr_output = q_output(:,:,6)
+ allocate(grle_output(ij_output,lev))
+ grle_output = q_output(:,:,7)
+ allocate(cldamt_output(ij_output,lev))
+ cldamt_output = q_output(:,:,8)
 
  deallocate(q_output)
 
@@ -194,7 +184,6 @@
 
  deallocate(clwmr_b4_adj_output)
 
- if (gfdl_mp) then
 
 !  do k = 1, lev
 !  print*,'after vintg rw ',rwmr_b4_adj_output(ij_output/2,k),rwmr_output(ij_output/2,k)
@@ -220,22 +209,16 @@
 
    deallocate(grle_b4_adj_output)
 
-   if (icldamt == 1) then
-!     do k = 1, lev
-!     print*,'after vintg cld_amt ',cldamt_b4_adj_output(ij_output/2,k),cldamt_output(ij_output/2,k)
-!     enddo
+   deallocate(cldamt_b4_adj_output)
 
-      deallocate(cldamt_b4_adj_output)
-   endif
    
 
- endif
 
  allocate(delz_output(ij_output, lev))
  delz_output = 0.0
 
  call compute_delz(ij_output, lev, vcoord(:,1), vcoord(:,2), sfcp_output, hgt_output, &
-                   tmp_output, spfh_output, delz_output, flipdelz)
+                   tmp_output, spfh_output, delz_output)
 
  deallocate(hgt_output)
 
@@ -430,7 +413,6 @@
 ! Interpolate additional 3-d scalars for GFDL microphysics.
 !----------------------------------------------------------------------------------
 
- if (gfdl_mp) then
 
 !-------------
 !  Rain water
@@ -496,26 +478,24 @@
 
    deallocate(grle_input)
 
+
 !---------------------------
-!  Cloud amount (if present)
+!  Cloud amount
 !---------------------------
 
-   if (icldamt == 1) then
-      allocate(cldamt_b4_adj_output(ij_output,num_fields))
-      cldamt_b4_adj_output = 0
+   allocate(cldamt_b4_adj_output(ij_output,num_fields))
+   cldamt_b4_adj_output = 0
 
-      print*,'INTERPOLATE CLD_AMT'
-      call ipolates(ip, ipopt, kgds_input, kgds_output, ij_input, ij_output,&
-           num_fields, ibi, bitmap_input, cldamt_input,  &
-           numpts, rlat_output, rlon_output, ibo, bitmap_output, &
-           cldamt_b4_adj_output, iret)
-      if (iret /= 0) goto 89
-      
-      deallocate(cldamt_input)
-   endif
-   
+   print*,'INTERPOLATE CLD_AMT'
+   call ipolates(ip, ipopt, kgds_input, kgds_output, ij_input, ij_output,&
+        num_fields, ibi, bitmap_input, cldamt_input,  &
+        numpts, rlat_output, rlon_output, ibo, bitmap_output, &
+        cldamt_b4_adj_output, iret)
+   if (iret /= 0) goto 89
 
- endif
+   deallocate(cldamt_input)
+
+
 
 !----------------------------------------------------------------------------------
 ! 3d u/v winds
