@@ -1,7 +1,5 @@
  module setup
 
- use nemsio_module
-
  implicit none
 
  private
@@ -9,12 +7,12 @@
  character(len=300), public       :: input_file
  character(len=300), public       :: output_file
  character(len=300), public       :: terrain_file
- character(len=300), public       :: vcoord_file
+ character(len=300), public       :: ref_file
 
- integer(nemsio_intkind), public  :: i_output
- integer(nemsio_intkind), public  :: j_output
+ integer, public  :: i_output
+ integer, public  :: j_output
  integer                , public  :: ij_output
- logical, public :: flipdelz
+ logical, public :: cld_amt
 
  public                           :: program_setup
 
@@ -25,23 +23,27 @@
  implicit none
 
  integer                           :: istat
+ character(len=500)                :: filenamelist
 
- namelist /nam_setup/ i_output, j_output, input_file, output_file, &
-                      terrain_file, vcoord_file
+ namelist /chgres_setup/ i_output, j_output, input_file, output_file, &
+                      terrain_file, cld_amt, ref_file
+
+ cld_amt = .false. ! default option
 
  print*
- print*,"OPEN SETUP NAMELIST."
- open(43, file="./fort.43", iostat=istat)
+ call getarg(1,filenamelist)
+ print*,"OPEN SETUP NAMELIST ",trim(filenamelist)
+ open(43, file=filenamelist, iostat=istat)
  if (istat /= 0) then
    print*,"FATAL ERROR OPENING NAMELIST FILE. ISTAT IS: ",istat
-   call errexit(30)
+   stop 
  endif
 
  print*,"READ SETUP NAMELIST."
- read(43, nml=nam_setup, iostat=istat)
+ read(43, nml=chgres_setup, iostat=istat)
  if (istat /= 0) then
    print*,"FATAL ERROR READING NAMELIST FILE. ISTAT IS: ",istat
-   call errexit(31)
+   stop
  endif
 
  ij_output = i_output * j_output
