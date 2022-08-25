@@ -29,6 +29,7 @@ load(pathJoin("ncio", "1.0.0"))
 load(pathJoin("landsfcutil", "2.4.1"))
 load(pathJoin("sigio", "2.3.2"))
 load(pathJoin("bufr", "11.4.0"))
+load(pathJoin("gempak", "7.4.2"))
 
 load(pathJoin("wgrib2", "2.0.8"))
 setenv("WGRIB2","wgrib2")
