@@ -131,6 +131,18 @@ elif [[ -d /lfs3 ]] ; then
     export WRFPATH=$NCEPLIBS/wrf.shared.new/v1.1.1/src
     export myFC=mpiifort
 
+##---------------------------------------------------------------------------
+elif [[ -d /data/prod ]] ; then
+    # We are on SSEC S4
+    if ( ! eval module help > /dev/null 2>&1 ) ; then
+	     echo load the module command 1>&2
+        source /usr/share/lmod/lmod/init/$__ms_shell
+    fi
+    target=s4
+    module purge
+    export myFC=mpiifort
+    export FCOMP=mpiifort
+
 else
     echo WARNING: UNKNOWN PLATFORM 1>&2
 fi
