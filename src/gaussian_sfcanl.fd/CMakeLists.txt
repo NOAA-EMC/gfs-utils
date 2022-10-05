@@ -1,5 +1,3 @@
-add_subdirectory(weight_gen)
-
 list(APPEND fortran_src
   gaussian_sfcanl.f90
 )
