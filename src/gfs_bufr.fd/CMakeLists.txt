@@ -46,7 +46,7 @@ target_link_libraries(
   sp::sp_4
   w3emc::w3emc_4
   w3nco::w3nco_4
-  bufr::bufr_4_DA
+  bufr::bufr_4
   NetCDF::NetCDF_Fortran)
 if(OpenMP_Fortran_FOUND)
   target_link_libraries(${exe_name} OpenMP::OpenMP_Fortran)

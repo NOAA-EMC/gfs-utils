@@ -17,6 +17,6 @@ target_link_libraries(
   sp::sp_4
   w3emc::w3emc_4
   w3nco::w3nco_4
-  bufr::bufr_4_DA)
+  bufr::bufr_4)
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

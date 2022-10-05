@@ -64,7 +64,7 @@ elseif(CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU)$")
 endif()
 
 # Build and install code.
-add_subdirectory(sorc)
+add_subdirectory(src)
 
 # Install utility scripts.
 add_subdirectory(ush)
