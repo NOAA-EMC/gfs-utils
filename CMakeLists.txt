@@ -46,7 +46,7 @@ find_package(g2 REQUIRED)
 find_package(bufr REQUIRED)
 find_package(landsfcutil REQUIRED)
 find_package(wgrib2 REQUIRED)
-find_package(gempak REQUIRED)
+#find_package(gempak REQUIRED)
 # find_package(gfortran REQUIRED)
 
 # See https://github.com/NOAA-EMC/NCEPLIBS-nemsio/pull/22
