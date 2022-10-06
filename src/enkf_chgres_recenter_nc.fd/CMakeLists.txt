@@ -18,7 +18,7 @@ target_link_libraries(
   bacio::bacio_4
   ip::ip_4
   sp::sp_4
-  w3nco::w3nco_4
+  w3emc::w3emc_4
   ncio::ncio
   NetCDF::NetCDF_Fortran)
 if(OpenMP_Fortran_FOUND)

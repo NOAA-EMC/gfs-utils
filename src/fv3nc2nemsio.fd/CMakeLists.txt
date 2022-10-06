@@ -11,7 +11,7 @@ target_link_libraries(
   ${exe_name}
   nemsio::nemsio
   bacio::bacio_4
-  w3nco::w3nco_d
+  w3emc::w3emc_d
   NetCDF::NetCDF_Fortran)
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

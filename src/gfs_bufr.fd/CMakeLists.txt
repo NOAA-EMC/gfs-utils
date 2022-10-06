@@ -45,7 +45,6 @@ target_link_libraries(
   sigio::sigio
   sp::sp_4
   w3emc::w3emc_4
-  w3nco::w3nco_4
   bufr::bufr_4
   NetCDF::NetCDF_Fortran)
 if(OpenMP_Fortran_FOUND)

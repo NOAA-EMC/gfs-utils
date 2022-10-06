@@ -17,8 +17,7 @@ target_link_libraries(
   bacio::bacio_4
   ip::ip_d
   sp::sp_d
-  w3nco::w3nco_4
-  w3nco::w3nco_d)
+  w3emc::w3emc_d)
 if(OpenMP_Fortran_FOUND)
   target_link_libraries(${exe_name} OpenMP::OpenMP_Fortran)
 endif()

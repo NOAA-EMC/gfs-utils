@@ -17,7 +17,7 @@ target_link_libraries(
   ip::ip_d
   sp::sp_d
   bacio::bacio_4
-  w3nco::w3nco_4
+  w3emc::w3emc_4
   wgrib2::wgrib2
   NetCDF::NetCDF_Fortran)
 

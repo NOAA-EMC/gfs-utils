@@ -15,7 +15,6 @@ target_link_libraries(
   bacio::bacio_8
   ip::ip_8
   sp::sp_8
-  w3emc::w3emc_8
-  w3nco::w3nco_8)
+  w3emc::w3emc_8)
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

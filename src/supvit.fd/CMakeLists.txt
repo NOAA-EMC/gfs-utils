@@ -13,7 +13,6 @@ set(exe_name supvit.x)
 add_executable(${exe_name} ${fortran_src})
 target_link_libraries(
   ${exe_name}
-  w3emc::w3emc_d
-  w3nco::w3nco_d)
+  w3emc::w3emc_d)
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

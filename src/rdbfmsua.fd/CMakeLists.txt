@@ -17,6 +17,6 @@ target_link_libraries(
   bufr::bufr_4
   gempak::gempak
   gfortran::gfortran
-  w3nco::w3nco_4)
+  w3emc::w3emc_4)
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
