@@ -38,17 +38,16 @@ endif()
 
 set(exe_name gfs_bufr.x)
 add_executable(${exe_name} ${fortran_src} ${fortran_src_free})
-target_link_libraries(
-  ${exe_name}
-  nemsio::nemsio
-  bacio::bacio_4
-  sigio::sigio
-  sp::sp_4
-  w3emc::w3emc_4
-  bufr::bufr_4
-  NetCDF::NetCDF_Fortran)
+target_link_libraries(${exe_name} PRIVATE NetCDF::NetCDF_Fortran
+                                          bacio::bacio_4
+                                          sigio::sigio
+                                          sp::sp_4
+                                          w3emc::w3emc_4
+                                          nemsio::nemsio
+                                          bufr::bufr_4)
+
 if(OpenMP_Fortran_FOUND)
-  target_link_libraries(${exe_name} OpenMP::OpenMP_Fortran)
+  target_link_libraries(${exe_name} PRIVATE OpenMP::OpenMP_Fortran)
 endif()
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

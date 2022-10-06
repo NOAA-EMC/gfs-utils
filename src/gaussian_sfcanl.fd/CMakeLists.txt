@@ -10,12 +10,10 @@ endif()
 
 set(exe_name gaussian_sfcanl.x)
 add_executable(${exe_name} ${fortran_src})
-target_link_libraries(
-  ${exe_name}
-  nemsio::nemsio
-  bacio::bacio_4
-  sp::sp_4
-  w3emc::w3emc_d
-  NetCDF::NetCDF_Fortran)
+target_link_libraries(${exe_name} PRIVATE NetCDF::NetCDF_Fortran
+                                          bacio::bacio_4
+                                          sp::sp_4
+                                          w3emc::w3emc_d
+                                          nemsio::nemsio)
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

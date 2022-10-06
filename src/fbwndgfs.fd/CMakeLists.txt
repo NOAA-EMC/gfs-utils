@@ -10,11 +10,9 @@ endif()
 
 set(exe_name fbwndgfs.x)
 add_executable(${exe_name} ${fortran_src})
-target_link_libraries(
-  ${exe_name}
-  bacio::bacio_8
-  ip::ip_8
-  sp::sp_8
-  w3emc::w3emc_8)
+target_link_libraries(${exe_name} PRIVATE bacio::bacio_8
+                                          ip::ip_8
+                                          sp::sp_8
+                                          w3emc::w3emc_8)
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

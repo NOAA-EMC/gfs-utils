@@ -15,15 +15,13 @@ endif()
 
 set(exe_name enkf_chgres_recenter.x)
 add_executable(${exe_name} ${fortran_src})
-target_link_libraries(
-  ${exe_name}
-  nemsio::nemsio
-  bacio::bacio_4
-  ip::ip_d
-  sp::sp_d
-  w3emc::w3emc_d)
+target_link_libraries(${exe_name} PRIVATE nemsio::nemsio
+                                          bacio::bacio_4
+                                          ip::ip_d
+                                          sp::sp_d
+                                          w3emc::w3emc_d)
 if(OpenMP_Fortran_FOUND)
-  target_link_libraries(${exe_name} OpenMP::OpenMP_Fortran)
+  target_link_libraries(${exe_name} PRIVATE OpenMP::OpenMP_Fortran)
 endif()
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
