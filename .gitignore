@@ -1,0 +1,12 @@
+build/
+exec/
+install/
+log*
+
+*.mod
+*.[aox]
+
+*.sw[a-p]
+~
+.DS_Store
+
