@@ -30,7 +30,8 @@ elif [[ $MACHINE_ID = s4* ]] ; then
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         source /usr/share/lmod/lmod/init/bash
     fi
-    module purge
+    export LMOD_SYSTEM_DEFAULT_MODULES=license_intel
+    module reset
 
 elif [[ $MACHINE_ID = wcoss2 ]]; then
     # We are on WCOSS2
