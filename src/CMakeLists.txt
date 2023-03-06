@@ -1,7 +1,4 @@
-add_subdirectory(enkf_chgres_recenter.fd)
 add_subdirectory(enkf_chgres_recenter_nc.fd)
-add_subdirectory(fv3nc2nemsio.fd)
-add_subdirectory(regrid_nemsio.fd)
 add_subdirectory(gaussian_sfcanl.fd)
 add_subdirectory(gfs_bufr.fd)
 add_subdirectory(reg2grb2.fd)
