@@ -1105,7 +1105,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
        endif
        print*,'finish computing MSLP'
        print*,'finish computing zp ', (zp(11,k),k=1,levs)
-       print*,'finish computing zp2(1-2) ', zp2(1),zp2(2) 
+       print*,'finish computing zp2(1-2) ', zp2(1),zp2(2)
 !
 !  prepare buffer data
 !
