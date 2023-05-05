@@ -391,7 +391,7 @@
         do j=1,jm
           do i=1,im
             pint(i,j,k)=vcoord(k,1)
-     +           +vcoord(k,2)*pint(i,j,1) 
+     +           +vcoord(k,2)*pint(i,j,1)
           end do
         end do
        end do
@@ -753,7 +753,7 @@
         do j=1,jm
           do i=1,im
            dum2d(i,j,10)=(apcp(i,j)*fhour-cpcp(i,j)*ap)*3600.0
-     & 
+     &
           end do
         end do
 
@@ -845,7 +845,7 @@
         jdum=jjdum(np)
 
       else
-!  find nearest neighbor 
+!  find nearest neighbor
         rdum=rlon(np)
         if(rdum<0.)rdum=rdum+360.
 
@@ -863,7 +863,7 @@
             exit
               else if(landwater(np) == lwmask(i+1,j))then
                idum=i+1
-               jdum=j      ! 2 
+               jdum=j      ! 2
             exit
               else if(landwater(np) == lwmask(i-1,j))then
                idum=i-1
@@ -1002,7 +1002,7 @@ CC             print*, ' So it takes i,j '
 
         grids(np,1)=hgt(idum,jdum)
         grids(np,2)=pint(idum,jdum,1)
-     
+
         sfc(5,np)=dum2d(idum,jdum,1)
         sfc(6,np)=dum2d(idum,jdum,6)
         sfc(17,np)=dum2d(idum,jdum,8)
@@ -1019,10 +1019,10 @@ CC             print*, ' So it takes i,j '
 
 CC There may be cases where convective precip is greater than total precip
 CC due to rounding and interpolation errors, correct it here -G.P. Lou:
-        if(sfc(11,np) .gt. sfc(12,np)) sfc(11,np)=sfc(12,np) 
+        if(sfc(11,np) .gt. sfc(12,np)) sfc(11,np)=sfc(12,np)
 
         do k=1,levs
-          grids(np,k+2)=t3d(idum,jdum,k) 
+          grids(np,k+2)=t3d(idum,jdum,k)
           grids(np,k+2+levs)=q3d(idum,jdum,k)
           grids(np,k+2+2*levs)=omega3d(idum,jdum,k)
           gridu(np,k)=uh(idum,jdum,k)
@@ -1033,7 +1033,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !!          z1(np,k)=0.5*(zint(idum,jdum,k)+zint(idum,jdum,k+1))
  
         end do
-      end do 
+      end do
  
       print*,'finish finding nearest neighbor for each station'
 
@@ -1049,7 +1049,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !!      if(recn_dzdt == 0 ) then !!DZDT
           do k = 1, levs
             do np = 1, npoint
-              omega(np,k) = grids(np,2+levs*2+k) 
+              omega(np,k) = grids(np,2+levs*2+k)
             enddo
           enddo
                  if(debugprint)
@@ -1093,7 +1093,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
      &      pmsl(np),zp(np,1:levs),zp2(1:2))
         enddo
             print *, 'call gslp pmsl= ', (pmsl(np),np=1,20)
-      if(recn_delz == -9999) then 
+      if(recn_delz == -9999) then
         print*, 'using calculated height '
        else
         print*, 'using model height m'
@@ -1138,7 +1138,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !  look for the layer above 500 mb for precip type computation
 !
             if(pi3(np,k).ge.50000.) leveta = k
-            ppi = pi3(np,k) 
+            ppi = pi3(np,k)
             t = grids(np,k+2)
             q = max(1.e-8,grids(np,2+k+levs))
             u = gridu(np,k)
@@ -1152,8 +1152,8 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
            if (mod(k,2)>0) then
             data2((kk-1)*6+7) = p1(np,k)
             data2((kk-1)*6+8) = t
-            data2((kk-1)*6+9) = u 
-            data2((kk-1)*6+10) = v 
+            data2((kk-1)*6+9) = u
+            data2((kk-1)*6+10) = v
             data2((kk-1)*6+11) = q
             data2((kk-1)*6+12) = omega(np,k)*100.
            endif
@@ -1163,16 +1163,16 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !  process surface flux file fields
 !
 !!          data(8+nflx) = psfc * 100.                   ! SURFACE PRESSURE (PA)
-!!          data(7+nflx) = pmsl(np) 
+!!          data(7+nflx) = pmsl(np)
           data2(8+nflx2) = psfc * 100.                   ! SURFACE PRESSURE (PA)
-          data2(7+nflx2) = pmsl(np) 
+          data2(7+nflx2) = pmsl(np)
 !!          dtemp = .0065 * (grids(np,1) - elevstn(np))
 !!          dtemp = .0100 * (grids(np,1) - elevstn(np))
 !!          sfc(37,np) = data(6+nflx) * .01
 !!          sfc(37,np) = data(7+nflx) * .01
-!!          sfc(39,np) = zp2(2)   !500 hPa height 
+!!          sfc(39,np) = zp2(2)   !500 hPa height
           sfc(37,np) = data2(7+nflx2) * .01
-          sfc(39,np) = zp2(2)   !500 hPa height 
+          sfc(39,np) = zp2(2)   !500 hPa height
 !
 !  do height correction if there is no snow or if the temp is less than 0
 ! G.P.LOU:
@@ -1194,10 +1194,10 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !
 !G.P. Lou 20200501:
 !convert instantaneous surface latent heat net flux to surface
-!evapolation  1 W m-2 = 0.0864 MJ m-2 day-1 
+!evapolation  1 W m-2 = 0.0864 MJ m-2 day-1
 !         and 1 mm day-1 = 2.45 MJ m-2 day-1
 !         equivament to 0.0864/2.54 = 0.035265
-!         equivament to 2.54/0.0864 = 28.3565 
+!         equivament to 2.54/0.0864 = 28.3565
         if(debugprint)
      +   print*,'evaporation (stn 000692)= ',sfc(17,np)
 !!          data(9+nflx) = sfc(5,np)                       ! tsfc (K)
@@ -1250,8 +1250,8 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 
           if(sfc(12,np).gt.0.) then !check for precip then calc precip type
           do k = 1, leveta+1
-            pp = p1(np,k) 
-            ppi = pi3(np,k) 
+            pp = p1(np,k)
+            ppi = pi3(np,k)
             t = grids(np,k+2)
             q = max(0.,grids(np,2+k+levs))
             u = gridu(np,k)
@@ -1269,7 +1269,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
             gq0(1,k) = q
             prsl(1,k) = pp
             prsi(1,k)=ppi
-            phii(1,k)=zp(np,k)     !height in meters 
+            phii(1,k)=zp(np,k)     !height in meters
           enddo
 !       Use GFS routine calpreciptype.f to calculate precip type
             xlat=rlat(np)
