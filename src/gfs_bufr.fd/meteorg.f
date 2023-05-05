@@ -1031,10 +1031,10 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
           z1(np,k)=zint(idum,jdum,k+1)
 !!          p1(np,k)=0.5*(pint(idum,jdum,k)+pint(idum,jdum,k+1))
 !!          z1(np,k)=0.5*(zint(idum,jdum,k)+zint(idum,jdum,k+1))
- 
+
         end do
       end do
- 
+
       print*,'finish finding nearest neighbor for each station'
 
         do np = 1, npoint
