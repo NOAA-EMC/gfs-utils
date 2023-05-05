@@ -6,13 +6,13 @@
 
 !$$$  SUBPROGRAM DOCUMENTATION BLOCK
 !                .      .    .                                       .
-! SUBPROGRAM:    meteorg                           
+! SUBPROGRAM:    meteorg
 !   PRGMMR: HUALU PAN        ORG: W/NMC23    DATE: 1999-07-21
 !
 ! ABSTRACT: Creates BUFR meteogram files for the AVN and MRF.
 !
 ! PROGRAM HISTORY LOG:
-!   1999-07-21  HUALU PAN                            
+!   1999-07-21  HUALU PAN 
 !   2007-02-02  FANGLIN YANG  EXPAND FOR HYBRID COORDINATES USING SIGIO 
 !   2009-07-24  FANGLIN YANG  CHANGE OUTPUT PRESSURE TO INTEGER-LAYER 
 !                             PRESSURE (line 290)
@@ -44,15 +44,15 @@
 !     rlon(npoint)      - longtitude
 !     istat(npoint)    - station id
 !     elevstn(npoint)  - station elevation (m)
-!     nf               - forecast cycle         
-!     fnsig            - sigma file name        
-!     idate(4)         - date                   
+!     nf               - forecast cycle 
+!     fnsig            - sigma file name 
+!     idate(4)         - date 
 !     levs             - input vertical layers
-!     kdim             - sfc file dimension         
+!     kdim             - sfc file dimension 
 !
-!   OUTPUT:    
+!   OUTPUT: 
 !     nfile            - output data file channel       
-!     jdate            - date YYYYMMDDHH       
+!     jdate            - date YYYYMMDDHH 
 !
 ! ATTRIBUTES:
 !   LANGUAGE: 
@@ -221,10 +221,10 @@
         end do
       end do
    
-      endif !end read in nemsio hearder 
+      endif !end read in nemsio hearder
 
       if(debugprint) then
-      do k=1,levs+1 
+      do k=1,levs+1
       print*,'vcoord(k,1)= ', k, vcoord(k,1)
       end do
       do k=1,levs+1 
@@ -754,7 +754,7 @@
         do j=1,jm
           do i=1,im
            dum2d(i,j,10)=(apcp(i,j)*fhour-cpcp(i,j)*ap)*3600.0
-     &                       
+     & 
           end do
         end do
 
@@ -1003,7 +1003,7 @@ CC             print*, ' So it takes i,j '
 
         grids(np,1)=hgt(idum,jdum)
         grids(np,2)=pint(idum,jdum,1)
-        
+     
         sfc(5,np)=dum2d(idum,jdum,1)
         sfc(6,np)=dum2d(idum,jdum,6)
         sfc(17,np)=dum2d(idum,jdum,8)
@@ -1035,7 +1035,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
  
         end do
       end do 
-      
+ 
       print*,'finish finding nearest neighbor for each station'
 
         do np = 1, npoint
@@ -1106,7 +1106,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
        endif
        print*,'finish computing MSLP'
        print*,'finish computing zp ', (zp(11,k),k=1,levs)
-       print*,'finish computing zp2(1-2) ', zp2(1),zp2(2)         
+       print*,'finish computing zp2(1-2) ', zp2(1),zp2(2) 
 !
 !  prepare buffer data
 !
@@ -1139,7 +1139,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !  look for the layer above 500 mb for precip type computation
 !
             if(pi3(np,k).ge.50000.) leveta = k
-            ppi = pi3(np,k)                 
+            ppi = pi3(np,k) 
             t = grids(np,k+2)
             q = max(1.e-8,grids(np,2+k+levs))
             u = gridu(np,k)
@@ -1153,7 +1153,7 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
            if (mod(k,2)>0) then
             data2((kk-1)*6+7) = p1(np,k)
             data2((kk-1)*6+8) = t
-            data2((kk-1)*6+9) = u   
+            data2((kk-1)*6+9) = u 
             data2((kk-1)*6+10) = v 
             data2((kk-1)*6+11) = q
             data2((kk-1)*6+12) = omega(np,k)*100.
@@ -1164,16 +1164,16 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !  process surface flux file fields
 !
 !!          data(8+nflx) = psfc * 100.                   ! SURFACE PRESSURE (PA)
-!!          data(7+nflx) = pmsl(np)                           
+!!          data(7+nflx) = pmsl(np) 
           data2(8+nflx2) = psfc * 100.                   ! SURFACE PRESSURE (PA)
-          data2(7+nflx2) = pmsl(np)                           
+          data2(7+nflx2) = pmsl(np) 
 !!          dtemp = .0065 * (grids(np,1) - elevstn(np))
 !!          dtemp = .0100 * (grids(np,1) - elevstn(np))
 !!          sfc(37,np) = data(6+nflx) * .01
 !!          sfc(37,np) = data(7+nflx) * .01
-!!          sfc(39,np) = zp2(2)   !500 hPa height       
+!!          sfc(39,np) = zp2(2)   !500 hPa height 
           sfc(37,np) = data2(7+nflx2) * .01
-          sfc(39,np) = zp2(2)   !500 hPa height       
+          sfc(39,np) = zp2(2)   !500 hPa height 
 !
 !  do height correction if there is no snow or if the temp is less than 0
 ! G.P.LOU:
@@ -1251,8 +1251,8 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 
           if(sfc(12,np).gt.0.) then !check for precip then calc precip type
           do k = 1, leveta+1
-            pp = p1(np,k)              
-            ppi = pi3(np,k)               
+            pp = p1(np,k) 
+            ppi = pi3(np,k) 
             t = grids(np,k+2)
             q = max(0.,grids(np,2+k+levs))
             u = gridu(np,k)
