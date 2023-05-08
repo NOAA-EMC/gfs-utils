@@ -35,6 +35,7 @@
 !                              RELATED CALLS AND CLEAN UP THE CODE.
 !   2020-04-24  GUANG PING LOU Clean up code and remove station height
 !                              adjustment
+!   2023-03-28  Bo Cui  Fix compilation error with "-check all" for gfs_bufrsnd
 !
 ! USAGE:    CALL PROGRAM meteorg
 !   INPUT:
@@ -63,6 +64,7 @@
       use sigio_module
       use physcons
       use mersenne_twister
+!      use funcphys, only : gfuncphys
       use funcphys
       implicit none
       include 'mpif.h'
@@ -93,7 +95,6 @@
       real,dimension(im,jm)::  apcp, cpcp
       real,dimension(npoint,2+levs*3):: grids
       real,dimension(npoint) :: rlat,rlon,pmsl,ps,psn,elevstn
-      real,dimension(1) :: psone
       real,dimension(im*jm) :: dum1d,dum1d2
       real,dimension(im,jm) :: gdlat, hgt, gdlon
       real,dimension(im,jm,15) :: dum2d
@@ -219,7 +220,6 @@
           gdlon(i,j)=dum1d2((j-1)*im+i)
         end do
       end do
-
       endif !end read in nemsio hearder
 
       if(debugprint) then
@@ -1065,10 +1065,9 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !          print *, "elevstn = ", elevstn(np)
           if(elevstn(np)==-999.) elevstn(np) = grids(np,1)
           psn(np) = ps(np)
-          psone = ps(np)
           call sigio_modpr(1,1,levs,nvcoord,idvc,
      &         idsl,vcoord,iret,
-     &         ps=psone*1000,pd=pd3(np,1:levs))
+     &         ps=psn(np)*1000,pd=pd3(np,1:levs))
           grids(np,2) = log(psn(np))
           if(np==11)print*,'station H,grud H,psn,ps,new pm',
      &     elevstn(np),grids(np,1),psn(np),ps(np)
@@ -1106,11 +1105,12 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
        endif
        print*,'finish computing MSLP'
        print*,'finish computing zp ', (zp(11,k),k=1,levs)
-       print*,'finish computing zp2(11-12) ', zp2(11),zp2(12)
+       print*,'finish computing zp2(1-2) ', zp2(1),zp2(2)
 !
 !  prepare buffer data
 !
         if(iope == 0) then
+        call gfuncphys
         do np = 1, npoint
           pi3(np,1)=psn(np)*1000
           do k=1,levs
