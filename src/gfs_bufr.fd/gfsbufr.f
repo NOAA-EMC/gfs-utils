@@ -68,9 +68,8 @@ C$$$
       character*4 t3
       character*4 cstat(nsta)
       character*32 desc
-      character*150 dird, fnsig
+      character*512 dird, fnsig
       logical f00, makebufr
-      CHARACTER*150  FILESEQ
       CHARACTER*8      SBSET
       LOGICAL         SEQFLG(4)
       CHARACTER*80     CLIST(4)

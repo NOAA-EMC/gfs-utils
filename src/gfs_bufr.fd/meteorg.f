@@ -82,7 +82,7 @@
       integer :: idate(4),nij,nflx2,np,k,l,nf,nfhour,np1
       integer :: idate_nems(7)
       integer :: iret,jdate,leveta,lm,lp1
-      character*150 :: fnsig,fngrib
+      character*512 :: fnsig,fngrib
 !!      real*8 :: data(6*levs+25)
       real*8 :: data2(6*levso+25)
       real*8 :: rstat1
