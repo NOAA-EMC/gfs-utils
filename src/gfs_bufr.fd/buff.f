@@ -1,13 +1,12 @@
       subroutine buff(nint1,nend1,nint3,nend3,npoint,idate,jdate,levs,
      &           dird,lss,istat,sbset,seqflg,clist,npp,wrkd)
-      character*150 dird, fnbufr, fmto
+      character*512 dird, fnbufr, fmto
 !!      integer nint, nend, npoint, idate(4), levs, jdate
       integer nint1, nend1, nint3, nend3
       integer npoint, idate(4), levs, jdate
       real*8 data(6*levs+25), wrkd(1)
       integer idtln, nf, nfile, np
       integer lss, istat(npoint), ios
-      CHARACTER*150  FILESEQ
       CHARACTER*8      SBSET
       LOGICAL         SEQFLG(4)
       CHARACTER*80     CLIST(4)
