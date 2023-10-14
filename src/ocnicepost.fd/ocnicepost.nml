@@ -1,0 +1,5 @@
+& ocnicepost_nml
+ftype='ocean'
+wgtsdir='/scratch1/NCEPDEV/stmp4/Denise.Worthen/CPLD_GRIDGEN/'
+debug=.false.
+/
