@@ -1,9 +1,9 @@
 list(APPEND fortran_src
-arrays_mod.F90
-init_mod.F90
-masking_mod.F90
-ocnicepost.F90
-utils_mod.F90
+  arrays_mod.F90
+  init_mod.F90
+  masking_mod.F90
+  ocnicepost.F90
+  utils_mod.F90
 )
 
 set(exe_name ocnicepost.x)
