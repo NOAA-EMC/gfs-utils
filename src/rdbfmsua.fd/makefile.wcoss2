@@ -38,14 +38,14 @@ OBJS=	rdbfmsua.o
 # LIBS		List of libraries
 # CMD		Name of the executable
 #
-FC =		ifort
+FC =		ftn
 FFLAGS =	-g -traceback -I${GEMINC} -I${OS_INC}
 
-BRIDGE=${GEMOLB}/bridge.a
-GFORTRAN=/apps/gcc/6.2.0/lib64
+BRIDGE=${GEMOLB}/libbridge.a
+GFORTRAN=/opt/cray/pe/gcc/10.3.0/snos/lib64/libgfortran.a
 
 LIBS =    ${DECOD_UT_LIB} ${BUFR_LIB4} \
-	${GEMLIB}/gemlib.a  ${GEMLIB}/appl.a ${GEMLIB}/syslib.a ${GEMLIB}/cgemlib.a -L${GFORTRAN} -lgfortran ${BRIDGE}
+        -L${GEMOLB} -lgemlib -lappl -lsyslib -lcgemlib ${GFORTRAN} ${BRIDGE}
 
 CMD =           rdbfmsua
 
