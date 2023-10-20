@@ -1,0 +1,11 @@
+& ocnicepost_nml
+ftype='ice'
+wgtsdir='/scratch1/NCEPDEV/stmp4/Denise.Worthen/CPLD_GRIDGEN/'
+srcdims=1440,1080
+dstdims=1440,721
+maskvar='tmask'
+sinvar=''
+cosvar=''
+angvar='ANGLET'
+debug=.false.
+/
