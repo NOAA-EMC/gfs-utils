@@ -30,7 +30,7 @@ program ocnicepost
   character(len= 20) :: vname, vunit
   character(len=120) :: vlong
 
-    real    :: vfill
+  real    :: vfill
   integer :: nvalid
   integer :: n,rc,ncid,varid
   integer :: idimid,jdimid,kdimid,edimid,timid
@@ -126,7 +126,7 @@ program ocnicepost
         write(logunit,'(a)')'remap 2D fields bilinear with '//trim(wgtsfile)
         write(logunit,'(a)')'packed min/max values, mapped min/max values'
         do n = 1,nbilin2d
-           write(logunit,'(i4,a10,3(a2,a6),4g14.4)')n,trim(b2d(n)%var_name),'  ',                  &
+           write(logunit,'(i4,a10,3(a2,a6),4g14.4)')n,trim(b2d(n)%var_name),'  ',                       &
                 trim(b2d(n)%var_grid),'  ',trim(b2d(n)%var_pair),'  ', trim(b2d(n)%var_pair_grid),      &
                 minval(bilin2d(:,n)), maxval(bilin2d(:,n)),minval(rgb2d(:,n)), maxval(rgb2d(:,n))
         end do
@@ -150,7 +150,7 @@ program ocnicepost
         write(logunit,'(a)')'remap 2D fields conserv with '//trim(wgtsfile)
         write(logunit,'(a)')'packed min/max values, mapped min/max values'
         do n = 1,nconsd2d
-           write(logunit,'(i4,a10,3(a2,a6),4g14.4)')n,trim(c2d(n)%var_name),'  ',                  &
+           write(logunit,'(i4,a10,3(a2,a6),4g14.4)')n,trim(c2d(n)%var_name),'  ',                       &
                 trim(c2d(n)%var_grid),'  ',trim(c2d(n)%var_pair),'  ', trim(c2d(n)%var_pair_grid),      &
                 minval(consd2d(:,n)), maxval(consd2d(:,n)), minval(rgc2d(:,n)), maxval(rgc2d(:,n))
         end do
@@ -173,7 +173,7 @@ program ocnicepost
         write(logunit,'(a)')'remap 3D fields bilinear with '//trim(wgtsfile)
         write(logunit,'(a)')'packed min/max values,mapped min/max values'
         do n = 1,nbilin3d
-           write(logunit,'(i4,a10,3(a2,a6),4g14.4)')n,trim(b3d(n)%var_name),'  ',                  &
+           write(logunit,'(i4,a10,3(a2,a6),4g14.4)')n,trim(b3d(n)%var_name),'  ',                       &
                 trim(b3d(n)%var_grid),'  ',trim(b3d(n)%var_pair),'  ', trim(b3d(n)%var_pair_grid),      &
                 minval(bilin3d(:,:,n)), maxval(bilin3d(:,:,n)),minval(rgb3d(:,:,n)), maxval(rgb3d(:,:,n))
         end do
@@ -184,164 +184,164 @@ program ocnicepost
      end if
   end if
 
-     ! --------------------------------------------------------
-     ! mask the mapped fields
-     ! --------------------------------------------------------
+  ! --------------------------------------------------------
+  ! mask the mapped fields
+  ! --------------------------------------------------------
 
+  do n = 1,nbilin2d
+     if (allocated(rgmask3d)) then
+        where(rgmask3d(:,1) .eq. vfill)rgb2d(:,n) = vfill
+     end if
+     if (allocated(rgmask2d))then
+        where(rgmask2d(:) .eq. vfill)rgb2d(:,n) = vfill
+     end if
+  end do
+  do n = 1,nconsd2d
+     if (allocated(rgmask3d)) then
+        where(rgmask3d(:,1) .eq. vfill)rgc2d(:,n) = vfill
+     end if
+     if (allocated(rgmask2d))then
+        where(rgmask2d(:) .eq. vfill)rgc2d(:,n) = vfill
+     end if
+  end do
+  do n = 1,nbilin3d
+     if (allocated(rgmask3d)) then
+        where(rgmask3d(:,:) .eq. vfill)rgb3d(:,:,n) = vfill
+     end if
+  end do
+
+  ! --------------------------------------------------------
+  ! replace model native speed field with a value calculated
+  ! from remapped ssu,ssv
+  ! --------------------------------------------------------
+
+  if (do_ocnpost) then
      do n = 1,nbilin2d
-        if (allocated(rgmask3d)) then
-           where(rgmask3d(:,1) .eq. vfill)rgb2d(:,n) = vfill
-        end if
-        if (allocated(rgmask2d))then
-           where(rgmask2d(:) .eq. vfill)rgb2d(:,n) = vfill
-        end if
-     end do
+        if (trim(b2d(n)%var_name) == 'speed')idx1 = n
+        if (trim(b2d(n)%var_name) ==   'SSU')idx2 = n
+        if (trim(b2d(n)%var_name) ==   'SSV')idx3 = n
+     enddo
+     where(rgb2d(:,idx1) .ne. vfill)rgb2d(:,idx1) = &
+          sqrt(rgb2d(:,idx2)**2 + rgb2d(:,idx3)**2)
+  end if
+
+  ! --------------------------------------------------------
+  ! write the mapped fields
+  ! --------------------------------------------------------
+
+  allocate(out2d(nxr,nyr)); out2d = 0.0
+  allocate(out3d(nxr,nyr,nlevs)); out3d = 0.0
+
+  fout = trim(ftype)//'.'//trim(fdst)//'.nc'
+  if (debug) write(logunit, '(a)')'output file: '//trim(fout)
+
+  rc = nf90_create(trim(fout), nf90_clobber, ncid)
+  rc = nf90_def_dim(ncid, 'longitude', nxr, idimid)
+  rc = nf90_def_dim(ncid,  'latitude', nyr, jdimid)
+  rc = nf90_def_dim(ncid, 'time', nf90_unlimited, timid)
+
+  ! define the time variable
+  rc = nf90_def_var(ncid, 'time', nf90_double, (/timid/), varid)
+  rc = nf90_put_att(ncid, varid,    'units', trim(timeunit))
+  rc= nf90_put_att(ncid,  varid, 'calendar', trim(timecal))
+  ! spatial grid
+  rc = nf90_def_var(ncid, 'longitude', nf90_float,  (/idimid/), varid)
+  rc = nf90_put_att(ncid, varid, 'units', 'degrees_east')
+  rc = nf90_def_var(ncid, 'latitude', nf90_float,  (/jdimid/), varid)
+  rc = nf90_put_att(ncid, varid, 'units', 'degrees_north')
+  ! vertical grid
+  if (do_ocnpost) then
+     rc = nf90_def_dim(ncid,  'z_l',  nlevs  , kdimid)
+     rc = nf90_def_dim(ncid,  'z_i',  nlevs+1, edimid)
+     rc = nf90_def_var(ncid, 'z_l', nf90_float,  (/kdimid/), varid)
+     rc = nf90_put_att(ncid, varid,    'units', 'm')
+     rc = nf90_put_att(ncid, varid, 'positive', 'down')
+     rc = nf90_def_var(ncid, 'z_i', nf90_float,  (/edimid/), varid)
+     rc = nf90_put_att(ncid, varid,    'units', 'm')
+     rc = nf90_put_att(ncid, varid, 'positive', 'down')
+  end if
+
+  if (allocated(b2d)) then
+     do n = 1,nbilin2d
+        vname = trim(b2d(n)%var_name)
+        vunit = trim(b2d(n)%units)
+        vlong = trim(b2d(n)%long_name)
+        vfill = b2d(n)%var_fillvalue
+        rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,timid/), varid)
+        rc = nf90_put_att(ncid, varid,      'units', vunit)
+        rc = nf90_put_att(ncid, varid,  'long_name', vlong)
+        rc = nf90_put_att(ncid, varid, '_FillValue', vfill)
+     enddo
+  end if
+  if (allocated(c2d)) then
      do n = 1,nconsd2d
-        if (allocated(rgmask3d)) then
-           where(rgmask3d(:,1) .eq. vfill)rgc2d(:,n) = vfill
-        end if
-        if (allocated(rgmask2d))then
-           where(rgmask2d(:) .eq. vfill)rgc2d(:,n) = vfill
-        end if
-     end do
+        vname = trim(c2d(n)%var_name)
+        vunit = trim(c2d(n)%units)
+        vlong = trim(c2d(n)%long_name)
+        vfill = c2d(n)%var_fillvalue
+        rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,timid/), varid)
+        rc = nf90_put_att(ncid, varid,      'units', vunit)
+        rc = nf90_put_att(ncid, varid,  'long_name', vlong)
+        rc = nf90_put_att(ncid, varid, '_FillValue', vfill)
+     enddo
+  end if
+  if (allocated(b3d)) then
      do n = 1,nbilin3d
-        if (allocated(rgmask3d)) then
-           where(rgmask3d(:,:) .eq. vfill)rgb3d(:,:,n) = vfill
-        end if
+        vname = trim(b3d(n)%var_name)
+        vunit = trim(b3d(n)%units)
+        vlong = trim(b3d(n)%long_name)
+        vfill = b3d(n)%var_fillvalue
+        rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,kdimid,timid/), varid)
+        rc = nf90_put_att(ncid, varid,      'units', vunit)
+        rc = nf90_put_att(ncid, varid,  'long_name', vlong)
+        rc = nf90_put_att(ncid, varid, '_FillValue', vfill)
+     enddo
+  end if
+  rc = nf90_enddef(ncid)
+
+  ! dimensions
+  rc = nf90_inq_varid(ncid, 'longitude', varid)
+  rc = nf90_put_var(ncid,   varid, dstlon(:,1))
+  rc = nf90_inq_varid(ncid,  'latitude', varid)
+  rc = nf90_put_var(ncid,   varid, dstlat(1,:))
+  ! time
+  rc = nf90_inq_varid(ncid, 'time', varid)
+  rc = nf90_put_var(ncid, varid, timestamp)
+  ! vertical
+  if (do_ocnpost) then
+     rc = nf90_inq_varid(ncid, 'z_l', varid)
+     rc = nf90_put_var(ncid, varid, z_l)
+     rc = nf90_inq_varid(ncid, 'z_i', varid)
+     rc = nf90_put_var(ncid, varid, z_i)
+  end if
+  if (allocated(rgb2d)) then
+     do n = 1,nbilin2d
+        out2d(:,:) = reshape(rgb2d(:,n), (/nxr,nyr/))
+        out2d(:,nyr) = vfill
+        vname = trim(b2d(n)%var_name)
+        rc = nf90_inq_varid(ncid, vname, varid)
+        rc = nf90_put_var(ncid,   varid, out2d)
      end do
-
-     ! --------------------------------------------------------
-     ! replace model native speed field with a value calculated
-     ! from remapped ssu,ssv
-     ! --------------------------------------------------------
-
-     if (do_ocnpost) then
-        do n = 1,nbilin2d
-           if (trim(b2d(n)%var_name) == 'speed')idx1 = n
-           if (trim(b2d(n)%var_name) ==   'SSU')idx2 = n
-           if (trim(b2d(n)%var_name) ==   'SSV')idx3 = n
-        enddo
-        where(rgb2d(:,idx1) .ne. vfill)rgb2d(:,idx1) = &
-             sqrt(rgb2d(:,idx2)**2 + rgb2d(:,idx3)**2)
-     end if
-
-     ! --------------------------------------------------------
-     ! write the mapped fields
-     ! --------------------------------------------------------
-
-     allocate(out2d(nxr,nyr)); out2d = 0.0
-     allocate(out3d(nxr,nyr,nlevs)); out3d = 0.0
-
-     fout = trim(ftype)//'.'//trim(fdst)//'.nc'
-     if (debug) write(logunit, '(a)')'output file: '//trim(fout)
-
-     rc = nf90_create(trim(fout), nf90_clobber, ncid)
-     rc = nf90_def_dim(ncid, 'longitude', nxr, idimid)
-     rc = nf90_def_dim(ncid,  'latitude', nyr, jdimid)
-     rc = nf90_def_dim(ncid, 'time', nf90_unlimited, timid)
-
-     ! define the time variable
-     rc = nf90_def_var(ncid, 'time', nf90_double, (/timid/), varid)
-     rc = nf90_put_att(ncid, varid,    'units', trim(timeunit))
-     rc= nf90_put_att(ncid,  varid, 'calendar', trim(timecal))
-     ! spatial grid
-     rc = nf90_def_var(ncid, 'longitude', nf90_float,  (/idimid/), varid)
-     rc = nf90_put_att(ncid, varid, 'units', 'degrees_east')
-     rc = nf90_def_var(ncid, 'latitude', nf90_float,  (/jdimid/), varid)
-     rc = nf90_put_att(ncid, varid, 'units', 'degrees_north')
-     ! vertical grid
-     if (do_ocnpost) then
-        rc = nf90_def_dim(ncid,  'z_l',  nlevs  , kdimid)
-        rc = nf90_def_dim(ncid,  'z_i',  nlevs+1, edimid)
-        rc = nf90_def_var(ncid, 'z_l', nf90_float,  (/kdimid/), varid)
-        rc = nf90_put_att(ncid, varid,    'units', 'm')
-        rc = nf90_put_att(ncid, varid, 'positive', 'down')
-        rc = nf90_def_var(ncid, 'z_i', nf90_float,  (/edimid/), varid)
-        rc = nf90_put_att(ncid, varid,    'units', 'm')
-        rc = nf90_put_att(ncid, varid, 'positive', 'down')
-     end if
-
-     if (allocated(b2d)) then
-        do n = 1,nbilin2d
-           vname = trim(b2d(n)%var_name)
-           vunit = trim(b2d(n)%units)
-           vlong = trim(b2d(n)%long_name)
-           vfill = b2d(n)%var_fillvalue
-           rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,timid/), varid)
-           rc = nf90_put_att(ncid, varid,      'units', vunit)
-           rc = nf90_put_att(ncid, varid,  'long_name', vlong)
-           rc = nf90_put_att(ncid, varid, '_FillValue', vfill)
-        enddo
-     end if
-     if (allocated(c2d)) then
-        do n = 1,nconsd2d
-           vname = trim(c2d(n)%var_name)
-           vunit = trim(c2d(n)%units)
-           vlong = trim(c2d(n)%long_name)
-           vfill = c2d(n)%var_fillvalue
-           rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,timid/), varid)
-           rc = nf90_put_att(ncid, varid,      'units', vunit)
-           rc = nf90_put_att(ncid, varid,  'long_name', vlong)
-           rc = nf90_put_att(ncid, varid, '_FillValue', vfill)
-        enddo
-     end if
-     if (allocated(b3d)) then
-        do n = 1,nbilin3d
-           vname = trim(b3d(n)%var_name)
-           vunit = trim(b3d(n)%units)
-           vlong = trim(b3d(n)%long_name)
-           vfill = b3d(n)%var_fillvalue
-           rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,kdimid,timid/), varid)
-           rc = nf90_put_att(ncid, varid,      'units', vunit)
-           rc = nf90_put_att(ncid, varid,  'long_name', vlong)
-           rc = nf90_put_att(ncid, varid, '_FillValue', vfill)
-        enddo
-     end if
-     rc = nf90_enddef(ncid)
-
-     ! dimensions
-     rc = nf90_inq_varid(ncid, 'longitude', varid)
-     rc = nf90_put_var(ncid,   varid, dstlon(:,1))
-     rc = nf90_inq_varid(ncid,  'latitude', varid)
-     rc = nf90_put_var(ncid,   varid, dstlat(1,:))
-     ! time
-     rc = nf90_inq_varid(ncid, 'time', varid)
-     rc = nf90_put_var(ncid, varid, timestamp)
-     ! vertical
-     if (do_ocnpost) then
-        rc = nf90_inq_varid(ncid, 'z_l', varid)
-        rc = nf90_put_var(ncid, varid, z_l)
-        rc = nf90_inq_varid(ncid, 'z_i', varid)
-        rc = nf90_put_var(ncid, varid, z_i)
-     end if
-     if (allocated(rgb2d)) then
-        do n = 1,nbilin2d
-           out2d(:,:) = reshape(rgb2d(:,n), (/nxr,nyr/))
-           out2d(:,nyr) = vfill
-           vname = trim(b2d(n)%var_name)
-           rc = nf90_inq_varid(ncid, vname, varid)
-           rc = nf90_put_var(ncid,   varid, out2d)
-        end do
-     end if
-     if (allocated(rgc2d)) then
-        do n = 1,nconsd2d
-           out2d(:,:) = reshape(rgc2d(:,n), (/nxr,nyr/))
-           out2d(:,nyr) = vfill
-           vname = trim(c2d(n)%var_name)
-           rc = nf90_inq_varid(ncid, vname, varid)
-           rc = nf90_put_var(ncid,   varid, out2d)
-        end do
-     end if
-     if (allocated(rgb3d)) then
-        do n = 1,nbilin3d
-           out3d(:,:,:) = reshape(rgb3d(:,:,n), (/nxr,nyr,nlevs/))
-           out3d(:,nyr,:) = vfill
-           vname = trim(b3d(n)%var_name)
-           rc = nf90_inq_varid(ncid, vname, varid)
-           rc = nf90_put_var(ncid,   varid, out3d)
-        end do
-     end if
-     rc = nf90_close(ncid)
-     write(logunit,'(a)')trim(fout)//' done'
+  end if
+  if (allocated(rgc2d)) then
+     do n = 1,nconsd2d
+        out2d(:,:) = reshape(rgc2d(:,n), (/nxr,nyr/))
+        out2d(:,nyr) = vfill
+        vname = trim(c2d(n)%var_name)
+        rc = nf90_inq_varid(ncid, vname, varid)
+        rc = nf90_put_var(ncid,   varid, out2d)
+     end do
+  end if
+  if (allocated(rgb3d)) then
+     do n = 1,nbilin3d
+        out3d(:,:,:) = reshape(rgb3d(:,:,n), (/nxr,nyr,nlevs/))
+        out3d(:,nyr,:) = vfill
+        vname = trim(b3d(n)%var_name)
+        rc = nf90_inq_varid(ncid, vname, varid)
+        rc = nf90_put_var(ncid,   varid, out3d)
+     end do
+  end if
+  rc = nf90_close(ncid)
+  write(logunit,'(a)')trim(fout)//' done'
 
 end program ocnicepost

@@ -111,8 +111,7 @@ contains
     allocate(tmp3d(nxt,nyt,nlevs)); tmp3d = 0.0
 
     rc = nf90_open(trim(input_file), nf90_nowrite, ncid)
-    ! use 3D source variable to use as mask. Obtain directly from
-    ! file to obtain fill value
+    ! Obtain maskvar directly from file to set fill value
     rc = nf90_inq_varid(ncid, trim(maskvar), varid)
     rc = nf90_get_att(ncid, varid, '_FillValue', vfill)
     rc = nf90_get_var(ncid, varid, tmp3d)
@@ -141,8 +140,7 @@ contains
     allocate(tmp2d(nxt,nyt)); tmp2d = 0.0
 
     rc = nf90_open(trim(input_file), nf90_nowrite, ncid)
-    ! use 2D source variable to use as mask. Obtain directly from
-    ! file to obtain fill value
+    ! Obtain maskvar directly from file to set fill value
     rc = nf90_inq_varid(ncid, trim(maskvar), varid)
     rc = nf90_get_att(ncid, varid, '_FillValue', vfill)
     rc = nf90_get_var(ncid, varid, tmp2d)

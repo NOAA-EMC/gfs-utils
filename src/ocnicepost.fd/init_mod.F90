@@ -43,7 +43,6 @@ module init_mod
   logical :: debug      !< If true, print debug messages and intermediate files
   logical :: do_ocnpost !< If true, the source file is ocean, otherwise ice
 
-
 contains
 
   subroutine readnml
