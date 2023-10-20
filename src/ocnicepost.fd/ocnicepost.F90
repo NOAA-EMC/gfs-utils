@@ -1,5 +1,29 @@
 program ocnicepost
 
+  ! This program will remap MOM6 ocean or CICE6 ice output on the tripole grid to a
+  ! rectilinear grid using pre-computed ESMF weights to remap the chosen fields to the
+  ! destination grid and write the results to a new netCDF file. The ESMF weights needed
+  ! are pre-generated using the UFS-UTILS cpld_gridgen utility described at
+  ! https://ufs-community.github.io/UFS_UTILS/cpld_gridgen/index.html. Weights are currently
+  ! generated only for mapping a source grid to a similar or lower resolution rectilinear grid.
+  !
+  ! Two control files determine the code behaviour. A name list file ocnicepost.nml is used
+  ! to set the input file type (ice or ocean), the location of the ESMF weights, the dimensions
+  ! of the source and destination grids, the source variable to used to create an interpolation
+  ! mask, the required rotation variables and a flag to produce debugging output.
+  !
+  ! The list of variables to be remapped is expected in either ocean.csv or ice.csv. Each
+  ! variable is specified by name, dimensionality, and the required mapping method. For vectors,
+  ! the paired vector and it's grid is also listed.
+  !
+  ! Either a 2D (ice) or 3D (ocean) interpolation mask is used to mask remapped fields so that
+  ! only valid ocean grid points on the source grid appear in the remapped fields.
+  !
+  ! Source fields are packed by mapping method and the remapped. Vector fields are first remapped
+  ! to the center (Ct) grid points and rotated from the I-J orientation to E-W before remapping.
+  ! The interpolation mask is used to masks out land contaminated points prior to writing the
+  ! output netCDF file.
+
   use netcdf
   use init_mod   , only : nxt, nyt, nlevs, nxr, nyr, outvars, readnml, readcsv
   use init_mod   , only : wgtsdir, ftype, fsrc, fdst, input_file, cosvar, sinvar, angvar
