@@ -16,3 +16,4 @@ add_subdirectory(overgridid.fd)
 # add_subdirectory(rdbfmsua.fd)
 add_subdirectory(webtitle.fd)
 
+add_subdirectory(ocnicepost.fd)

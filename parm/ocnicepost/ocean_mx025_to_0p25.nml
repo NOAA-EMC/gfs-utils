@@ -1,0 +1,11 @@
+& ocnicepost_nml
+ftype='ocean'
+wgtsdir='/scratch1/NCEPDEV/stmp4/Denise.Worthen/CPLD_GRIDGEN/'
+srcdims=1440,1080,40
+dstdims=1440,721
+maskvar='temp'
+sinvar='sin_rot'
+cosvar='cos_rot'
+angvar=''
+debug=.false.
+/

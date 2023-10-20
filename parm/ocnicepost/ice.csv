@@ -1,0 +1,8 @@
+! variable name, dimension, grid location, remapping method, vector pair, grid location of vector pair
+  'hi_h', 2 , 'Ct', 'bilinear', '', ''
+  'hs_h', 2 , 'Ct', 'bilinear', '', ''
+'aice_h', 2 , 'Ct', 'bilinear', '', ''
+ 'sst_h', 2 , 'Ct', 'bilinear', '', ''
+'Tsfc_h', 2 , 'Ct', 'bilinear', '', ''
+'uvel_h', 2 , 'Bu_x', 'bilinear', 'vvel_h', 'Bu_y'
+'vvel_h', 2 , 'Bu_y', 'bilinear', 'uvel_h', 'Bu_x'
