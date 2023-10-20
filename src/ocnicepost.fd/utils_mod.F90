@@ -1,14 +1,11 @@
 module utils_mod
 
   use netcdf
-  use outputvars, only : vardefs
+  use init_mod, only : debug, logunit, vardefs
 
   implicit none
 
   private
-
-  logical, public :: debug
-  integer, public :: logunit
 
   interface getfield
      module procedure getfield2d
@@ -70,7 +67,7 @@ contains
        if (trim(vars(n)%var_grid) == 'Cu' .or. trim(vars(n)%var_grid) == 'Bu_x') then
           allocate(vecpair(dims(1)*dims(2),2)); vecpair = 0.0
           call getvecpair(trim(filesrc), trim(wgtsdir), cosrot, sinrot,   &
-               trim(vars(n)%input_var_name), trim(vars(n)%var_grid(1:2)), &
+               trim(vars(n)%var_name), trim(vars(n)%var_grid(1:2)), &
                trim(vars(n)%var_pair), trim(vars(n)%var_pair_grid(1:2)),  &
                dims=(/dims(1),dims(2)/), vecpair=vecpair)
        end if
@@ -81,7 +78,7 @@ contains
     do n = 1,nflds
        if (len_trim(vars(n)%var_pair) == 0) then
           nn = nn + 1
-          call getfield(trim(filesrc), trim(vars(n)%input_var_name), dims=(/dims(1),dims(2)/), &
+          call getfield(trim(filesrc), trim(vars(n)%var_name), dims=(/dims(1),dims(2)/), &
                field=fields(:,nn))
        else ! fill with vector pairs
           nn = nn+1
@@ -122,7 +119,7 @@ contains
        if (trim(vars(n)%var_grid) == 'Cu') then
           allocate(vecpair(dims(1)*dims(2),dims(3),2)); vecpair = 0.0
           call getvecpair(trim(filesrc), trim(wgtsdir), cosrot, sinrot, &
-               trim(vars(n)%input_var_name), trim(vars(n)%var_grid),    &
+               trim(vars(n)%var_name), trim(vars(n)%var_grid),    &
                trim(vars(n)%var_pair), trim(vars(n)%var_pair_grid),     &
                dims=(/dims(1),dims(2),dims(3)/), vecpair=vecpair)
        end if
@@ -133,7 +130,7 @@ contains
     do n = 1,nflds
        if (len_trim(vars(n)%var_pair) == 0) then
           nn = nn + 1
-          call getfield(trim(filesrc), trim(vars(n)%input_var_name), dims=(/dims(1),dims(2),dims(3)/), &
+          call getfield(trim(filesrc), trim(vars(n)%var_name), dims=(/dims(1),dims(2),dims(3)/), &
                field=fields(:,:,nn))
        else ! fill with vector pairs
           nn = nn+1
@@ -201,7 +198,7 @@ contains
     integer :: ii,k
     real, dimension(dims(1)*dims(2)) :: urot, vrot
     character(len=240) :: wgtsfile
-    character(len=20) :: subname = 'getfield3d'
+    character(len=20) :: subname = 'getvecpair3d'
 
     if (debug)write(logunit,'(a)')'enter '//trim(subname)
 
@@ -536,7 +533,7 @@ contains
     real,             intent(in) :: field(:,:)
 
     ! local variable
-    integer :: n, ncid, varid, rc, idimid, jdimid, kdimid
+    integer :: ncid, varid, rc, idimid, jdimid, kdimid
     real, allocatable :: a3d(:,:,:)
     character(len=20) :: subname = 'dumpnc3dk'
 
@@ -568,7 +565,7 @@ contains
     real,             intent(in) :: field(:)
 
     ! local variable
-    integer           :: n, ncid, varid, rc, idimid, jdimid
+    integer           :: ncid, varid, rc, idimid, jdimid
     real, allocatable :: a2d(:,:)
     character(len=20) :: subname = 'dumpnc1d'
 
