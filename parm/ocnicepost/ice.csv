@@ -9,3 +9,4 @@
    'albsni_h', 2 , 'Ct', 'bilinear', '', ''
 'mlt_onset_h', 2 , 'Ct', 'bilinear', '', ''
 'frz_onset_h', 2 , 'Ct', 'bilinear', '', ''
+      'sst_h', 2 , 'Ct', 'bilinear', '', ''
