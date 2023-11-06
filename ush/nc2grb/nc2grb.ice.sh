@@ -4,9 +4,10 @@ set -x
 # This is an example script to convert a sample 0.25 degree latlon
 # grid netCDF file outputted from ocnicepost to a GRIB2 file in the
 # same grid. In addition to an input file, this script requires a
-# template.global.0p25.gb2 file, located under fix/nc2grb, to run.
-# If the input netCDF file has a different resolution, use wgrib2 to
-# regrid the template file. 
+# template.global.0p25.gb2 file to run. The template file is located
+# in the fix directory of the global-workflow repository. If the
+# input netCDF file has a different resolution, use wgrib2 to regrid
+# the template file.
 # Author: L. Gwen Chen (lichuan.chen@noaa.gov), 11/02/2023
 
 module load intel/19.1.3.304
