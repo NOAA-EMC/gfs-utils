@@ -207,6 +207,7 @@
  use output_data
  use input_data
  use setup
+ use ip_mod, only: ipolates, ipolatev
 
  implicit none
 

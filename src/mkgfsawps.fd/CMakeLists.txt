@@ -13,7 +13,7 @@ endif()
 set(exe_name mkgfsawps.x)
 add_executable(${exe_name} ${fortran_src})
 target_link_libraries(${exe_name} PRIVATE bacio::bacio_4
-                                          ip::ip_d
+                                          ip::ip_4
                                           sp::sp_d
                                           w3emc::w3emc_d)
 if(OpenMP_Fortran_FOUND)
