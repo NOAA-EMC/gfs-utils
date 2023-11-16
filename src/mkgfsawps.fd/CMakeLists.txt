@@ -15,7 +15,7 @@ add_executable(${exe_name} ${fortran_src})
 target_link_libraries(${exe_name} PRIVATE bacio::bacio_4
                                           ip::ip_4
                                           sp::sp_d
-                                          w3emc::w3emc_d)
+                                          w3emc::w3emc_4)
 if(OpenMP_Fortran_FOUND)
   target_link_libraries(${exe_name} PRIVATE OpenMP::OpenMP_Fortran)
 endif()
