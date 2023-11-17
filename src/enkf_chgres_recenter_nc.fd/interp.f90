@@ -207,7 +207,9 @@
  use output_data
  use input_data
  use setup
+#ifdef IP_V4
  use ip_mod, only: ipolates, ipolatev
+#endif
 
  implicit none
 

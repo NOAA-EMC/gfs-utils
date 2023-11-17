@@ -8,7 +8,10 @@ utils.f90
 )
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fp-model precise")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fp-model precise -fpp")
+endif()
+if(ip_VERSION GREATER_EQUAL 4.0.0)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DIP_V4")
 endif()
 
 set(exe_name enkf_chgres_recenter_nc.x)
