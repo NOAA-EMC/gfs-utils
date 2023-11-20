@@ -1,7 +1,7 @@
 list(APPEND fortran_src
 driver.f90
 input_data.f90
-interp.f90
+interp.F90
 output_data.f90
 setup.f90
 utils.f90
@@ -21,6 +21,10 @@ target_link_libraries(${exe_name} PRIVATE NetCDF::NetCDF_Fortran
                                           ncio::ncio)
 if(OpenMP_Fortran_FOUND)
   target_link_libraries(${exe_name} PRIVATE OpenMP::OpenMP_Fortran)
+endif()
+
+if(ip_VERSION VERSION_GREATER_EQUAL 4.0.0)
+   target_compile_definitions(${exe_name} PRIVATE "IP_V4")
 endif()
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
