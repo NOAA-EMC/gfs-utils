@@ -399,7 +399,7 @@ C   CONVERT EARTH COORDINATES OF STATION TO GRID COORDINATES
                   DO 110 J = 1,NRSTNS
 C                     CALL GDSWIZ(KGDS,-1,1,FILL,XPTS(J),YPTS(J),
 C     &                    ALON(J),ALAT(J),IRET,0,DUM,DUM)
-#ifdef W3EMC_210
+#ifdef W3EMC_V2_10
                      CALL GDSWZD_GRIB1(KGDS,-1,1,FILL,XPTS(J),YPTS(J),
      &                    ALON(J),ALAT(J),IRET)
 #else

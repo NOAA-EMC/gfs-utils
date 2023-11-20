@@ -10,9 +10,6 @@ utils.f90
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fp-model precise")
 endif()
-if(ip_VERSION VERSION_GREATER_EQUAL 4.0.0)
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DIP_V4")
-endif()
 
 set(exe_name enkf_chgres_recenter_nc.x)
 add_executable(${exe_name} ${fortran_src})
@@ -24,6 +21,10 @@ target_link_libraries(${exe_name} PRIVATE NetCDF::NetCDF_Fortran
                                           ncio::ncio)
 if(OpenMP_Fortran_FOUND)
   target_link_libraries(${exe_name} PRIVATE OpenMP::OpenMP_Fortran)
+endif()
+
+if(ip_VERSION VERSION_GREATER_EQUAL 4.0.0)
+   target_compile_definitions(${exe_name} PRIVATE "IP_V4")
 endif()
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
