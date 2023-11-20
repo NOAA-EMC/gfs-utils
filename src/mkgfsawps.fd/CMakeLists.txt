@@ -1,15 +1,16 @@
 list(APPEND fortran_src
-  mkgfsawps.f
+  mkgfsawps.F
 )
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -convert big_endian -fp-model source -fpp")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -convert big_endian -fp-model source")
   set_source_files_properties(${fortran_src_free} PROPERTIES COMPILE_FLAGS "-free")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU)$")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fconvert=big-endian")
   set_source_files_properties(${fortran_src_free} PROPERTIES COMPILE_FLAGS "-ffree-form")
 endif()
-if(ip_VERSION GREATER_EQUAL 4.0.0)
+
+if(ip_VERSION VERSION_GREATER_EQUAL 4.0.0)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DIP_V4")
 endif()
 

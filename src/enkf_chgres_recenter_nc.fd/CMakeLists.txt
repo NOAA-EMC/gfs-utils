@@ -1,16 +1,16 @@
 list(APPEND fortran_src
 driver.f90
 input_data.f90
-interp.f90
+interp.F90
 output_data.f90
 setup.f90
 utils.f90
 )
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fp-model precise -fpp")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fp-model precise")
 endif()
-if(ip_VERSION GREATER_EQUAL 4.0.0)
+if(ip_VERSION VERSION_GREATER_EQUAL 4.0.0)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DIP_V4")
 endif()
 
