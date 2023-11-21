@@ -141,9 +141,9 @@ contains
 
     call nf90_err(nf90_open(trim(input_file), nf90_nowrite, ncid), 'open: '//trim(input_file))
     ! Obtain maskvar directly from file to set fill value
-    call nf90_err(nf90_inq_varid(ncid, trim(maskvar), varid)    'get variable Id: '// trim(maskvar))
-    call nf90_err(nf90_get_att(ncid, varid, '_FillValue', vfill)'get variable attribute: FillValue '// trim(maskvar))
-    call nf90_err(nf90_get_var(ncid, varid, tmp2d)              'get variable: '//trim(maskvar))
+    call nf90_err(nf90_inq_varid(ncid, trim(maskvar), varid), 'get variable Id: '// trim(maskvar))
+    call nf90_err(nf90_get_att(ncid, varid, '_FillValue', vfill), 'get variable attribute: FillValue '// trim(maskvar))
+    call nf90_err(nf90_get_var(ncid, varid, tmp2d), 'get variable: '//trim(maskvar))
     call nf90_err(nf90_close(ncid), 'close: '//trim(input_file))
 
     mask2d = reshape(tmp2d, (/nxt*nyt/))

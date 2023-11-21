@@ -371,7 +371,7 @@ contains
     ! retrieve the weights
     call nf90_err(nf90_open(trim(fname), nf90_nowrite, ncid), 'open: '//fname)
     call nf90_err(nf90_inq_dimid(ncid, 'n_s', id), 'get dimension Id: n_s')
-    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_s)
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_s), 'get dimension: n_s')
     call nf90_err(nf90_inq_dimid(ncid, 'n_a', id), 'get dimension Id: n_a')
     call nf90_err(nf90_inquire_dimension(ncid, id, len=n_a), 'get dimension: n_a')
     call nf90_err(nf90_inq_dimid(ncid, 'n_b', id), 'get dimension Id: n_b')
@@ -421,7 +421,7 @@ contains
     ! retrieve the weights
     call nf90_err(nf90_open(trim(fname), nf90_nowrite, ncid), 'open: '//fname)
     call nf90_err(nf90_inq_dimid(ncid, 'n_s', id), 'get dimension Id: n_s')
-    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_s)
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_s), 'get dimension: n_s')
     call nf90_err(nf90_inq_dimid(ncid, 'n_a', id), 'get dimension Id: n_a')
     call nf90_err(nf90_inquire_dimension(ncid, id, len=n_a), 'get dimension: n_a')
     call nf90_err(nf90_inq_dimid(ncid, 'n_b', id), 'get dimension Id: n_b')

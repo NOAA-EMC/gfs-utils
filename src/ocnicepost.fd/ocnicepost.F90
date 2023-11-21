@@ -83,7 +83,7 @@ program ocnicepost
 
   ! timestamp
   call nf90_err(nf90_inq_varid(ncid, 'time', varid), 'get variable Id: time'//trim(input_file))
-  call nf90_err(nf90_get_var(ncid, varid, timestamp, 'get variable: time'//trim(input_file))           )
+  call nf90_err(nf90_get_var(ncid, varid, timestamp), 'get variable: time'//trim(input_file))
   call nf90_err(nf90_get_att(ncid, varid,    'units', timeunit), 'get variable attribute : units '//trim(input_file))
   call nf90_err(nf90_get_att(ncid, varid, 'calendar', timecal), 'get variable attribute : calendar '//trim(input_file))
   if (do_ocnpost) then
@@ -315,7 +315,7 @@ program ocnicepost
         vunit = trim(b3d(n)%units)
         vlong = trim(b3d(n)%long_name)
         vfill = b3d(n)%var_fillvalue
-        call nf90_err(nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,kimid,timid/), varid), 'define variable: '// vname)
+        call nf90_err(nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,kdimid,timid/), varid), 'define variable: '// vname)
         call nf90_err(nf90_put_att(ncid, varid,      'units', vunit), 'put variable attribute: units' )
         call nf90_err(nf90_put_att(ncid, varid,  'long_name', vlong), 'put variable attribute: long_name' )
         call nf90_err(nf90_put_att(ncid, varid, '_FillValue', vfill), 'put variable attribute: FillValue' )
