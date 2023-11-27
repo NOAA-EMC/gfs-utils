@@ -6,7 +6,7 @@ module masking_mod
   use init_mod   , only : wgtsdir, ftype, fsrc, fdst, input_file
   use init_mod   , only : do_ocnpost, debug, logunit, maskvar
   use arrays_mod , only : dstlat, dstlon
-  use utils_mod  , only : getfield, dumpnc, remap
+  use utils_mod  , only : getfield, dumpnc, remap, nf90_err
 
   implicit none
 
@@ -41,14 +41,14 @@ contains
     allocate(dstlat(nxr,nyr)); dstlat = 0.0
     allocate(out1d(nxr*nyr)); out1d = 0.0
 
-    rc = nf90_open(trim(wgtsfile), nf90_nowrite, ncid)
-    rc = nf90_inq_varid(ncid, 'xc_b', varid)
-    rc = nf90_get_var(ncid,    varid, out1d)
+    call nf90_err(nf90_open(trim(wgtsfile), nf90_nowrite, ncid), 'open: '//wgtsfile)
+    call nf90_err(nf90_inq_varid(ncid, 'xc_b', varid), 'get variable Id: xc_b')
+    call nf90_err(nf90_get_var(ncid,    varid, out1d), 'get variable: xc_b')
     dstlon = reshape(out1d,(/nxr,nyr/))
-    rc = nf90_inq_varid(ncid, 'yc_b', varid)
-    rc = nf90_get_var(ncid,    varid, out1d)
+    call nf90_err(nf90_inq_varid(ncid, 'yc_b', varid), 'get variable Id: yc_b')
+    call nf90_err(nf90_get_var(ncid,    varid, out1d), 'get variable: yc_b')
     dstlat = reshape(out1d,(/nxr,nyr/))
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_close(ncid), 'close: '//wgtsfile)
 
     ! --------------------------------------------------------
     ! mask is a 2d (ice) or 3d (ocn) array which contains 1's
@@ -110,12 +110,12 @@ contains
 
     allocate(tmp3d(nxt,nyt,nlevs)); tmp3d = 0.0
 
-    rc = nf90_open(trim(input_file), nf90_nowrite, ncid)
+    call nf90_err(nf90_open(trim(input_file), nf90_nowrite, ncid), 'open: '//trim(input_file))
     ! Obtain maskvar directly from file to set fill value
-    rc = nf90_inq_varid(ncid, trim(maskvar), varid)
-    rc = nf90_get_att(ncid, varid, '_FillValue', vfill)
-    rc = nf90_get_var(ncid, varid, tmp3d)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_inq_varid(ncid, trim(maskvar), varid)    , 'get variable Id: '// trim(maskvar))
+    call nf90_err(nf90_get_att(ncid, varid, '_FillValue', vfill), 'get variable attribute: FillValue '// trim(maskvar))
+    call nf90_err(nf90_get_var(ncid, varid, tmp3d)              , 'get variable: '//trim(maskvar))
+    call nf90_err(nf90_close(ncid), 'close: '//trim(input_file))
 
     mask3d = reshape(tmp3d, (/nxt*nyt,nlevs/))
     ! set mask3d to 0 on ocean, 1 on land on source grid
@@ -139,12 +139,12 @@ contains
 
     allocate(tmp2d(nxt,nyt)); tmp2d = 0.0
 
-    rc = nf90_open(trim(input_file), nf90_nowrite, ncid)
+    call nf90_err(nf90_open(trim(input_file), nf90_nowrite, ncid), 'open: '//trim(input_file))
     ! Obtain maskvar directly from file to set fill value
-    rc = nf90_inq_varid(ncid, trim(maskvar), varid)
-    rc = nf90_get_att(ncid, varid, '_FillValue', vfill)
-    rc = nf90_get_var(ncid, varid, tmp2d)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_inq_varid(ncid, trim(maskvar), varid), 'get variable Id: '// trim(maskvar))
+    call nf90_err(nf90_get_att(ncid, varid, '_FillValue', vfill), 'get variable attribute: FillValue '// trim(maskvar))
+    call nf90_err(nf90_get_var(ncid, varid, tmp2d), 'get variable: '//trim(maskvar))
+    call nf90_err(nf90_close(ncid), 'close: '//trim(input_file))
 
     mask2d = reshape(tmp2d, (/nxt*nyt/))
     ! set mask2d to 0 on ocean, 1 on land on source grid

@@ -39,6 +39,7 @@ module utils_mod
   public packarrays
   public remap
   public dumpnc
+  public nf90_err
 
 contains
 
@@ -242,14 +243,11 @@ contains
     allocate(a2d(dims(1),dims(2))); a2d = 0.0
     allocate(atmp(dims(1)*dims(2))); atmp = 0.0
 
-    rc = nf90_open(fname, nf90_nowrite, ncid)
-    call handle_err(rc,' nf90_open '//fname)
-    rc = nf90_inq_varid(ncid, vname, varid)
-    call handle_err(rc,' get variable ID '// vname)
-    rc = nf90_get_var(ncid, varid, a2d)
-    call handle_err(rc,' get variable'// vname)
-    rc = nf90_get_att(ncid, varid, '_FillValue', fval)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_open(fname, nf90_nowrite, ncid), 'nf90_open: '//fname)
+    call nf90_err(nf90_inq_varid(ncid, vname, varid), 'get variable ID: '//vname)
+    call nf90_err(nf90_get_var(ncid, varid, a2d), 'get variable: '//vname)
+    call nf90_err(nf90_get_att(ncid, varid, '_FillValue', fval), 'get attribute FillValue: '//vname)
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     atmp(:) = reshape(a2d, (/dims(1)*dims(2)/))
     where(atmp .eq. fval)atmp = 0.0
@@ -284,14 +282,11 @@ contains
     allocate(a3d(dims(1),dims(2),dims(3))); a3d = 0.0
     allocate(atmp(dims(1)*dims(2),dims(3))); atmp = 0.0
 
-    rc = nf90_open(fname, nf90_nowrite, ncid)
-    call handle_err(rc,' nf90_open '//fname)
-    rc = nf90_inq_varid(ncid, vname, varid)
-    call handle_err(rc,' get variable ID '// vname)
-    rc = nf90_get_var(ncid, varid, a3d)
-    call handle_err(rc,' get variable'// vname)
-    rc = nf90_get_att(ncid, varid, '_FillValue', fval)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_open(fname, nf90_nowrite, ncid), 'nf90_open: '//fname)
+    call nf90_err(nf90_inq_varid(ncid, vname, varid), 'get variable ID: '//vname)
+    call nf90_err(nf90_get_var(ncid, varid, a3d), 'get variable: '//vname)
+    call nf90_err(nf90_get_att(ncid, varid, '_FillValue', fval), 'get attribute FillValue: '//vname)
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     atmp(:,:) = reshape(a3d, (/dims(1)*dims(2),dims(3)/))
     where(atmp .eq. fval)atmp = 0.0
@@ -324,26 +319,25 @@ contains
     if (debug)write(logunit,'(a)')'enter '//trim(subname)
 
     ! retrieve the weights
-    rc = nf90_open(trim(fname), nf90_nowrite, ncid)
-    call handle_err(rc,' nf90_open '//fname)
-    rc = nf90_inq_dimid(ncid, 'n_s', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_s)
-    rc = nf90_inq_dimid(ncid, 'n_a', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_a)
-    rc = nf90_inq_dimid(ncid, 'n_b', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_b)
+    call nf90_err(nf90_open(trim(fname), nf90_nowrite, ncid), 'open: '//fname)
+    call nf90_err(nf90_inq_dimid(ncid, 'n_s', id), 'get dimension Id: n_s')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_s), 'get dimension: n_s' )
+    call nf90_err(nf90_inq_dimid(ncid, 'n_a', id), 'get dimension Id: n_a')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_a), 'get dimension: n_a' )
+    call nf90_err(nf90_inq_dimid(ncid, 'n_b', id), 'get dimension Id: n_b')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_b), 'get dimension: n_b' )
 
     allocate(col(1:n_s)); col = 0
     allocate(row(1:n_s)); row = 0
     allocate(  S(1:n_s)); S = 0.0
 
-    rc = nf90_inq_varid(ncid, 'col', id)
-    rc = nf90_get_var(ncid,     id, col)
-    rc = nf90_inq_varid(ncid, 'row', id)
-    rc = nf90_get_var(ncid,     id, row)
-    rc = nf90_inq_varid(ncid,   'S', id)
-    rc = nf90_get_var(ncid,      id,  S)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_inq_varid(ncid, 'col', id),'get variable Id: col')
+    call nf90_err(nf90_get_var(ncid,     id, col),'get variable: col')
+    call nf90_err(nf90_inq_varid(ncid, 'row', id),'get variable Id: row')
+    call nf90_err(nf90_get_var(ncid,     id, row),'get variable: row')
+    call nf90_err(nf90_inq_varid(ncid,   'S', id),'get variable Id: S')
+    call nf90_err(nf90_get_var(ncid,      id,  S),'get variable: S')
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     dst_field = 0.0
     do i = 1,n_s
@@ -375,26 +369,25 @@ contains
     if (debug)write(logunit,'(a)')'enter '//trim(subname)//' weights = '//trim(fname)
 
     ! retrieve the weights
-    rc = nf90_open(trim(fname), nf90_nowrite, ncid)
-    call handle_err(rc,' nf90_open '//fname)
-    rc = nf90_inq_dimid(ncid, 'n_s', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_s)
-    rc = nf90_inq_dimid(ncid, 'n_a', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_a)
-    rc = nf90_inq_dimid(ncid, 'n_b', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_b)
+    call nf90_err(nf90_open(trim(fname), nf90_nowrite, ncid), 'open: '//fname)
+    call nf90_err(nf90_inq_dimid(ncid, 'n_s', id), 'get dimension Id: n_s')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_s), 'get dimension: n_s')
+    call nf90_err(nf90_inq_dimid(ncid, 'n_a', id), 'get dimension Id: n_a')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_a), 'get dimension: n_a')
+    call nf90_err(nf90_inq_dimid(ncid, 'n_b', id), 'get dimension Id: n_b')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_b), 'get dimension: n_b')
 
     allocate(col(1:n_s)); col = 0
     allocate(row(1:n_s)); row = 0
     allocate(  S(1:n_s)); S = 0.0
 
-    rc = nf90_inq_varid(ncid, 'col', id)
-    rc = nf90_get_var(ncid,     id, col)
-    rc = nf90_inq_varid(ncid, 'row', id)
-    rc = nf90_get_var(ncid,     id, row)
-    rc = nf90_inq_varid(ncid,   'S', id)
-    rc = nf90_get_var(ncid,      id,  S)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_inq_varid(ncid, 'col', id),'get variable Id: col')
+    call nf90_err(nf90_get_var(ncid,     id, col),'get variable: col')
+    call nf90_err(nf90_inq_varid(ncid, 'row', id),'get variable Id: row')
+    call nf90_err(nf90_get_var(ncid,     id, row),'get variable: row')
+    call nf90_err(nf90_inq_varid(ncid,   'S', id),'get variable Id: S')
+    call nf90_err(nf90_get_var(ncid,      id,  S),'get variable: S')
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     dst_field = 0.0
     do i = 1,n_s
@@ -426,26 +419,25 @@ contains
     if (debug)write(logunit,'(a)')'enter '//trim(subname)//' weights = '//trim(fname)
 
     ! retrieve the weights
-    rc = nf90_open(trim(fname), nf90_nowrite, ncid)
-    call handle_err(rc,' nf90_open '//fname)
-    rc = nf90_inq_dimid(ncid, 'n_s', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_s)
-    rc = nf90_inq_dimid(ncid, 'n_a', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_a)
-    rc = nf90_inq_dimid(ncid, 'n_b', id)
-    rc = nf90_inquire_dimension(ncid, id, len=n_b)
+    call nf90_err(nf90_open(trim(fname), nf90_nowrite, ncid), 'open: '//fname)
+    call nf90_err(nf90_inq_dimid(ncid, 'n_s', id), 'get dimension Id: n_s')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_s), 'get dimension: n_s')
+    call nf90_err(nf90_inq_dimid(ncid, 'n_a', id), 'get dimension Id: n_a')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_a), 'get dimension: n_a')
+    call nf90_err(nf90_inq_dimid(ncid, 'n_b', id), 'get dimension Id: n_b')
+    call nf90_err(nf90_inquire_dimension(ncid, id, len=n_b), 'get dimension: n_b')
 
     allocate(col(1:n_s)); col = 0
     allocate(row(1:n_s)); row = 0
     allocate(  S(1:n_s)); S = 0.0
 
-    rc = nf90_inq_varid(ncid, 'col', id)
-    rc = nf90_get_var(ncid,     id, col)
-    rc = nf90_inq_varid(ncid, 'row', id)
-    rc = nf90_get_var(ncid,     id, row)
-    rc = nf90_inq_varid(ncid,   'S', id)
-    rc = nf90_get_var(ncid,      id,  S)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_inq_varid(ncid, 'col', id),'get variable Id: col')
+    call nf90_err(nf90_get_var(ncid,     id, col),'get variable: col')
+    call nf90_err(nf90_inq_varid(ncid, 'row', id),'get variable Id: row')
+    call nf90_err(nf90_get_var(ncid,     id, row),'get variable: row')
+    call nf90_err(nf90_inq_varid(ncid,   'S', id),'get variable Id: S')
+    call nf90_err(nf90_get_var(ncid,      id,  S),'get variable: S')
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     dst_field = 0.0
     do i = 1,n_s
@@ -474,16 +466,16 @@ contains
     if (debug)write(logunit,'(a)')'enter '//trim(subname)//' variable '//vname
     allocate(a3d(dims(1),dims(2),nflds)); a3d = 0.0
 
-    rc = nf90_create(trim(fname), nf90_clobber, ncid)
-    rc = nf90_def_dim(ncid, 'nx', dims(1), idimid)
-    rc = nf90_def_dim(ncid, 'ny', dims(2), jdimid)
-    rc = nf90_def_dim(ncid, 'nf', nflds,   fdimid)
-    rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,fdimid/), varid)
-    rc = nf90_enddef(ncid)
+    call nf90_err(nf90_create(trim(fname), nf90_clobber, ncid), 'create: '//fname)
+    call nf90_err(nf90_def_dim(ncid, 'nx', dims(1), idimid), 'define dimension: nx')
+    call nf90_err(nf90_def_dim(ncid, 'ny', dims(2), jdimid), 'define dimension: ny')
+    call nf90_err(nf90_def_dim(ncid, 'nf', nflds,   fdimid), 'define dimension: nf')
+    call nf90_err(nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,fdimid/), varid), 'define variable: '//vname)
+    call nf90_err(nf90_enddef(ncid), 'nf90_enddef: '//fname)
 
     a3d(:,:,:) =  reshape(field(1:dims(1)*dims(2),1:nflds), (/dims(1),dims(2),nflds/))
-    rc = nf90_put_var(ncid, varid, a3d)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_put_var(ncid, varid, a3d), 'put variable: '//vname)
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     if (debug)write(logunit,'(a)')'exit '//trim(subname)//' variable '//vname
   end subroutine dumpnc2d
@@ -506,19 +498,19 @@ contains
     if (debug)write(logunit,'(a)')'enter '//trim(subname)//' variable '//vname
     allocate(a4d(dims(1),dims(2),dims(3),nflds)); a4d = 0.0
 
-    rc = nf90_create(trim(fname), nf90_clobber, ncid)
-    rc = nf90_def_dim(ncid, 'nx', dims(1), idimid)
-    rc = nf90_def_dim(ncid, 'ny', dims(2), jdimid)
-    rc = nf90_def_dim(ncid, 'nk', dims(3), kdimid)
-    rc = nf90_def_dim(ncid, 'nf', nflds,   fdimid)
-    rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,kdimid,fdimid/), varid)
-    rc = nf90_enddef(ncid)
+    call nf90_err(nf90_create(trim(fname), nf90_clobber, ncid), 'create: '//fname)
+    call nf90_err(nf90_def_dim(ncid, 'nx', dims(1), idimid), 'define dimension: nx')
+    call nf90_err(nf90_def_dim(ncid, 'ny', dims(2), jdimid), 'define dimension: ny')
+    call nf90_err(nf90_def_dim(ncid, 'nk', dims(3), kdimid), 'define dimension: nk')
+    call nf90_err(nf90_def_dim(ncid, 'nf', nflds,   fdimid), 'define dimension: nf')
+    call nf90_err(nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,kdimid,fdimid/), varid), 'define variable: '//vname)
+    call nf90_err(nf90_enddef(ncid), 'nf90_enddef: '//fname)
 
     do n = 1,nflds
        a4d(:,:,:,n) = reshape(field(1:dims(1)*dims(2),1:dims(3),n), (/dims(1),dims(2),dims(3)/))
     end do
-    rc = nf90_put_var(ncid, varid, a4d)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_put_var(ncid, varid, a4d), 'put variable: '//vname)
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     if (debug)write(logunit,'(a)')'exit '//trim(subname)//' variable '//vname
   end subroutine dumpnc3d
@@ -540,16 +532,16 @@ contains
     if (debug)write(logunit,'(a)')'enter '//trim(subname)//' variable '//vname
     allocate(a3d(dims(1),dims(2),dims(3))); a3d = 0.0
 
-    rc = nf90_create(trim(fname), nf90_clobber, ncid)
-    rc = nf90_def_dim(ncid, 'nx', dims(1), idimid)
-    rc = nf90_def_dim(ncid, 'ny', dims(2), jdimid)
-    rc = nf90_def_dim(ncid, 'nk', dims(3), kdimid)
-    rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,kdimid/), varid)
-    rc = nf90_enddef(ncid)
+    call nf90_err(nf90_create(trim(fname), nf90_clobber, ncid), 'nf90_create: '//fname)
+    call nf90_err(nf90_def_dim(ncid, 'nx', dims(1), idimid), 'define dimension: nx')
+    call nf90_err(nf90_def_dim(ncid, 'ny', dims(2), jdimid), 'define dimension: ny')
+    call nf90_err(nf90_def_dim(ncid, 'nk', dims(3), kdimid), 'define dimension: nk')
+    call nf90_err(nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid,kdimid/), varid), 'define variable: '//vname)
+    call nf90_err(nf90_enddef(ncid), 'nf90_enddef: '//fname)
 
     a3d(:,:,:) =  reshape(field(1:dims(1)*dims(2),1:dims(3)), (/dims(1),dims(2),dims(3)/))
-    rc = nf90_put_var(ncid, varid, a3d)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_put_var(ncid, varid, a3d), 'put variable: '//vname)
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     if (debug)write(logunit,'(a)')'exit '//trim(subname)//' variable '//vname
 
@@ -572,15 +564,15 @@ contains
     if (debug)write(logunit,'(a)')'enter '//trim(subname)//' variable '//vname
     allocate(a2d(dims(1),dims(2))); a2d = 0.0
 
-    rc = nf90_create(trim(fname), nf90_clobber, ncid)
-    rc = nf90_def_dim(ncid, 'nx', dims(1), idimid)
-    rc = nf90_def_dim(ncid, 'ny', dims(2), jdimid)
-    rc = nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid/), varid)
-    rc = nf90_enddef(ncid)
+    call nf90_err(nf90_create(trim(fname), nf90_clobber, ncid), 'nf90_create: '//fname)
+    call nf90_err(nf90_def_dim(ncid, 'nx', dims(1), idimid), 'define dimension: nx')
+    call nf90_err(nf90_def_dim(ncid, 'ny', dims(2), jdimid), 'define dimension: ny')
+    call nf90_err(nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid/), varid), 'define variable: '//vname)
+    call nf90_err(nf90_enddef(ncid), 'nf90_enddef:'//fname)
 
     a2d(:,:) =  reshape(field(1:dims(1)*dims(2)), (/dims(1),dims(2)/))
-    rc = nf90_put_var(ncid, varid, a2d)
-    rc = nf90_close(ncid)
+    call nf90_err(nf90_put_var(ncid, varid, a2d), 'put variable: '//vname)
+    call nf90_err(nf90_close(ncid), 'close: '//fname)
 
     if (debug)write(logunit,'(a)')'exit '//trim(subname)//' variable '//vname
 
@@ -589,13 +581,13 @@ contains
   !----------------------------------------------------------
   ! handle netcdf errors
   !----------------------------------------------------------
-  subroutine handle_err(ierr,string)
+  subroutine nf90_err(ierr, string)
 
     integer ,         intent(in) :: ierr
     character(len=*), intent(in) :: string
     if (ierr /= nf90_noerr) then
-      write(logunit,'(a)') '*** ERROR ***: '//trim(string)//':'//trim(nf90_strerror(ierr))
+      write(logunit,'(a)') '*** FATAL ERROR ***: '//trim(string)//':'//trim(nf90_strerror(ierr))
       stop
     end if
-  end subroutine handle_err
+  end subroutine nf90_err
 end module utils_mod
