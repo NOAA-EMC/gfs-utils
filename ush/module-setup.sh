@@ -20,7 +20,15 @@ elif [[ $MACHINE_ID = hera* ]] ; then
 elif [[ $MACHINE_ID = orion* ]] ; then
     # We are on Orion
     if ( ! eval module help > /dev/null 2>&1 ) ; then
-        source /apps/lmod/init/bash
+        source /apps/lmod/lmod/init/bash
+    fi
+    export LMOD_SYSTEM_DEFAULT_MODULES=contrib
+    module reset
+
+elif [[ $MACHINE_ID = hercules* ]] ; then
+    # We are on Hercules
+    if ( ! eval module help > /dev/null 2>&1 ) ; then
+        source /apps/other/lmod/lmod/init/bash
     fi
     export LMOD_SYSTEM_DEFAULT_MODULES=contrib
     module reset
