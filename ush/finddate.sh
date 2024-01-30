@@ -1,5 +1,7 @@
+#!/bin/bash
 # finddate.sh
 # author:  Luke Lin    phone:  457-5047           24 June 1998
+# author:  Daniel Wesloh                          30 January 2024
 # abstract:  This script looks in ether forward or backward in time to
 # generate  either a variable containing sequential date/time stamps
 # for a period up to a month or just the date/time stamp occurring
@@ -20,144 +22,136 @@
 #     list=`sh /nwprod/util/scripts/finddate.sh 19990929 d-10`
 # list will contain 10 time stamps starting with 19990929.  Time stamps
 # are separated by blanks.
-#
-# This script will work for periods up to a month.  The number indicating
-# the period in question should be two digits.  For single digits 1-9
-# use 01, 02, 03, etc.
 set +x
-unset pdstr
-today=$1
-var=$2
-yy=`echo $today | cut -c1-4 `
-mm=`echo $today | cut -c5-6 `
-dd=`echo $today | cut -c7-8 `
-nxtyy=$yy
-pyy=$yy
-what=`echo $var | cut -c1-1`
-up=`echo $var | cut -c2-2`
-num=`echo $var | cut -c3-4`
-mod=`expr \( $yy / 4 \) \* 4 - $yy `
-leap=0
-if test "$mod" -eq 0
-then
-leap=1
-fi
-case $mm in
-01)  mday=31
-     pday=31
-     pmon=12
-     pyy=`expr $yy - 1`
-     if test $pyy -lt '0'
-     then
-       pyy='1999'
-     fi
-     nxtmon=02;;
-02)  mday=`expr "$leap" + 28 `
-     pday=31
-     pmon=01
-     nxtmon=03;;
-03)  mday=31
-     pday=`expr "$leap" + 28 `
-     pmon=02
-     nxtmon=04;;
-04)  mday=30
-     pday=31
-     pmon=03
-     nxtmon=05;;
-05)  mday=31
-     pday=30
-     pmon=04
-     nxtmon=06;;
-06)  mday=30
-     pday=31
-     pmon=05
-     nxtmon=07;;
-07)  mday=31
-     pday=30
-     pmon=06
-     nxtmon=08;;
-08)  mday=31
-     pday=31
-     pmon=07
-     nxtmon=09;;
-09)  mday=30
-     pday=31
-     pmon=08
-     nxtmon=10;;
-10)  mday=31
-     pday=30
-     pmon=09
-     nxtmon=11;;
-11)  mday=30
-     pday=31
-     pmon=10
-     nxtmon=12;;
-12)  mday=31
-     pday=30
-     pmon=11
-     nxtmon=01
-     nxtyy=`expr $yy + 1 `
-     if test $yy -eq 1999
-     then
-       nxtyy=2000
-     fi ;;
-*)   echo mon=$mon is illegal
-     exit 99 ;;
-esac
- 
-if test $dd -gt $mday
-then
-  echo "day=$dd is illegal.  In month=$mon there are only $mday days."
-  exit 16
-fi
- 
-i=1
-n=0
-while test $i -le $num
-do
-  if test "$up" = '+'
-  then
-    ddn=`expr $dd + $i`
-    mmn=$mm
-    yyn=$yy
-    if test $ddn -gt $mday
+
+# Takes four-digit year as argument
+# Returns 0/true if argument is leap year
+# Returns 1/false if argument is not leap year
+function isleap() {
+    local -i year="$1"
+    local -i isleap=$((${year} % 4 == 0))
+    if [ $((${year} % 100)) -eq 0 ];
     then
-      n=`expr $n + 1`
-      ddn=$n
-      mmn=$nxtmon
-      yyn=$nxtyy
+        isleap=$((${year} % 400 == 0))
     fi
-    if test $ddn -lt 10
+    test "${isleap}" -eq 1
+}
+
+# Takes four-digit year and two-digit month as argument
+# Prints days in month to stdout
+function days_per_month() {
+    local -i year="$1"
+    local -i month="10#$2"
+    case "${month}" in
+      1|3|5|7|8|10|12)
+          echo 31
+          ;;
+      4|6|9|11)
+          echo 30
+          ;;
+      2)
+          if isleap "${year}"
+          then
+              echo 29
+          else
+              echo 28
+          fi
+          ;;
+      *)
+          exit 1
+    esac
+}
+
+# Takes four-digit year, two-digit month and day and days ahead as arguments
+# Prints date the given number of days after the given date in YYYYMMDD format to stdout
+function n_days_ahead() {
+    local -i year="$1"
+    local -i month="10#$2"
+    local -i day=$((10#$3 + 10#$4))
+
+    local -i month_days="$(days_per_month "${year}" "${month}")"
+    while [ "${day}" -gt "${month_days}" ];
+    do
+        month=$((${month} + 1))
+        day=$((${day} - ${month_days}))
+
+        if [ "${month}" -gt 12 ];
+        then
+          year=$((${year} + 1))
+          month=$((${month} - 12))
+        fi
+
+        month_days="$(days_per_month "${year}" "${month}")"
+    done
+
+    while [ "${day}" -lt "1" ];
+    do
+      month=$((${month} - 1))
+
+      if [ "${month}" -lt "1" ];
+      then
+          year=$((${year} - 1))
+          month=$((${month} + 12))
+      fi
+
+      day=$((${day} + $(days_per_month "${year}" "${month}")))
+    done
+    printf '%03d%02d%02d' "${year}" "${month}" "${day}"
+}
+
+function sequence_n_days_ahead() {
+    local -i year="10#$1"
+    local -i month="10#$2"
+    local -i day="10#$3"
+    local -i ndays="10#$4"
+
+    if [ "${ndays}" -ge 0 ];
     then
-      ddn="0$ddn"
+        local -i month_days="$(days_per_month "${year}" "${month}")"
+        for (( days_so_far=0; ${days_so_far} < ${ndays} ; days_so_far=${days_so_far}+1 ));
+        do
+            local -i date_so_far="$(n_days_ahead "${year}" "${month}" "${day}" "1")"
+            printf '%08d ' "${date_so_far}"
+
+            year="${date_so_far:0:4}"
+            month="${date_so_far:4:2}"
+            day="${date_so_far:6:2}"
+        done
+    else
+        for (( days_so_far=0 ; ${days_so_far} > ${ndays} ; days_so_far=${days_so_far} - 1));
+        do
+            local -i date_so_far="$(n_days_ahead "${year}" "${month}" "${day}" "-1")"
+            printf '%08d ' "${date_so_far}"
+
+            year="${date_so_far:0:4}"
+            month="${date_so_far:4:2}"
+            day="${date_so_far:6:2}"
+        done
     fi
-  elif test "$up" = '-'
-  then
-    ddn=`expr $dd - $i`
-    mmn=$mm
-    yyn=$yy
-    if test $ddn -le '0'
+}
+
+# The core functionality of the script, from the original finddate.sh
+# Prints date or date sequence a given number of days from given date.
+# Does not include given date in sequence.
+# Given date is YYYYMMDD format
+function finddate() {
+    local -i year_month_day="10#${1}"
+    local -i year="10#${year_month_day:0:4}"
+    local -i month="10#${year_month_day:4:2}"
+    local -i day="10#${year_month_day:6:2}"
+
+    local second_arg="${2}"
+    local day_or_sequence="${second_arg:0:1}"
+    local -i ndays="10#${second_arg:1}"
+
+    if [ "${day_or_sequence}" = "d" ];
     then
-      n=`expr $pday + $ddn`
-      ddn=$n
-      mmn=$pmon
-      yyn=$pyy
+        n_days_ahead "${year}" "${month}" "${day}" "${ndays}"
+    else
+        sequence_n_days_ahead "${year}" "${month}" "${day}" "${ndays}"
     fi
-    if test $ddn -lt 10
-    then
-      ddn="0$ddn"
-    fi
-  else
-    echo '+ or - are allowed for 2nd variable in argument.'
-    echo "You tried $up, this is illegal."
-    exit 16
-  fi
-  i=`expr $i + 1 `
-  if test "$what" = 's'
-  then
-  pdstr=$pdstr"$yyn$mmn$ddn "
-  else
-  pdstr=$yyn$mmn$ddn
-  fi
-done
-echo $pdstr
+    echo
+}
+
+# Actually call the function, the way the old finddate.sh expects to be used
+finddate "$1" "$2"
