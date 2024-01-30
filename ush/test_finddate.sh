@@ -3,6 +3,18 @@
 echo TAP version 14
 
 declare -i test_num=1
+declare -i suite_status=0
+function tap_start() {
+    declare -i num_tests="$1"
+    echo "1..${num_tests}"
+    test_num=1
+    suite_status=0
+}
+function tap_end() {
+    echo "Result: ${suite_status} failures"
+    exit ${suite_status}
+}
+
 function tap_log_test() {
     local -i status="$1"
     local message="$2"
@@ -14,6 +26,7 @@ function tap_log_test() {
 
     echo "ok ${test_num} - ${message}"
     test_num=$((${test_num} + 1))
+    suite_status=$((${suite_status} + ${status}))
 }
 
 declare -i subtest_num=1
@@ -53,11 +66,12 @@ function tap_end_subtest() {
 
     echo "ok ${test_num} - ${name}"
     test_num=$((${test_num} + 1))
+    suite_status=$((${suite_status} + ${status}))
 }
 
 ############################################################
 
-echo 1..5
+echo 1..6
 
 # Comment out the output from loading the test functions
 echo -n '# '
@@ -163,3 +177,81 @@ do
     done
 done
 tap_end_subtest sequence_n_days_ahead
+
+tap_start_subtest "finddate matches old output" 4
+start_date=19990929
+
+declare +i actual="$(finddate "${start_date}" s+10)"
+declare +i expected="19990930 19991001 19991002 19991003 19991004 19991005 19991006 19991007 19991008 19991009 "
+if [ "${actual}" = "${expected}" ];
+then
+    result=0
+else
+    result=1
+fi
+tap_log_subtest "${result}" "s+10 matches old output"
+
+actual="$(finddate "${start_date}" d+10)"
+expected="19991009"
+if [ "${actual}" = "${expected}" ];
+then
+    result=0
+else
+    result=1
+fi
+tap_log_subtest "${result}" "d+10 matches old output"
+
+actual="$(finddate "${start_date}" s-10)"
+expected="19990928 19990927 19990926 19990925 19990924 19990923 19990922 19990921 19990920 19990919 "
+if [ "${actual}" = "${expected}" ];
+then
+    result=0
+else
+    result=1
+fi
+tap_log_subtest "${result}" "s-10 matches old output"
+
+actual="$(finddate "${start_date}" d-10)"
+expected="19990919"
+if [ "${actual}" = "${expected}" ];
+then
+    result=0
+else
+    result=1
+fi
+tap_log_subtest "${result}" "d-10 matches old output"
+tap_end_subtest "finddate matches old output"
+
+tap_start_subtest "finddate extreme examples" 3
+declare -i actual="10#$(finddate "${start_date}" d+366)"
+declare -i expected="20000929"
+if [ "${actual}" -eq "${expected}" ];
+then
+    result=0
+else
+    result=1
+fi
+tap_log_subtest "${result}" "One-year ahead match: expected ${expected} got ${actual}"
+
+actual="10#$(finddate "${start_date}" d+3653)"
+expected="20090929"
+if [ "${actual}" -eq "${expected}" ];
+then
+    result=0
+else
+    result=1
+fi
+tap_log_subtest "${result}" "Ten-year ahead match: expected ${expected} got ${actual}"
+
+actual="10#$(finddate "${start_date}" d+7305)"
+expected="20190929"
+if [ "${actual}" -eq "${expected}" ];
+then
+    result=0
+else
+    result=1
+fi
+tap_log_subtest "${result}" "Twenty-year ahead match: expected ${expected} got ${actual}"
+tap_end_subtest "finddate extreme examples"
+
+tap_end
