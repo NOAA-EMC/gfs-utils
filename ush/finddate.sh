@@ -37,17 +37,6 @@ function isleap() {
     test "${isleap}" -eq 1
 }
 
-# for year in $(seq 1995 2005) $(seq 2095 2105);
-# do
-#     if isleap "${year}";
-#     then
-# 	echo "${year} is a leap year"
-#     else
-# 	echo "${year} is not a leap year"
-#     fi
-# done
-
-
 # Takes four-digit year and two-digit month as argument
 # Prints days in that month to stdout
 function days_per_month() {
@@ -72,12 +61,6 @@ function days_per_month() {
 	    exit 1
     esac
 }
-
-# for year_month in $(seq 202101 202112) $(seq 199502 100 200502) 210002;
-# do
-#     echo -n "Days in ${year_month}: "
-#     days_per_month $(($year_month / 100)) $(($year_month % 100))
-# done
 
 # Takes four-digit year, month, day and days ahead as arguments
 # Prints date the given number of days after the given date in YYYYMMDD format to stdout
@@ -118,25 +101,6 @@ function n_days_ahead() {
     printf '%04d%02d%02d' "${year}" "${month}" "${day}"
 }
 
-# for startday in 20210501 20191201;
-# do
-#     for ndays in $(seq 55 65) $(seq 85 95) 365 730;
-#     do
-# 	echo -n "${ndays} days after ${startday} is "
-# 	n_days_ahead "${startday:0:4}" "${startday:4:2}" "${startday:6:2}" "${ndays}"
-# 	echo
-#     done
-#     echo
-#
-#     for ndays in $(seq 55 65) $(seq 85 95) 365 730;
-#     do
-# 	echo -n "${ndays} days before ${startday} is "
-# 	n_days_ahead "${startday:0:4}" "${startday:4:2}" "${startday:6:2}" "-${ndays}"
-# 	echo
-#     done
-#     echo
-# done
-
 function sequence_n_days_ahead() {
     local -i year="10#${1}"
     local -i month="10#${2}"
@@ -148,23 +112,6 @@ function sequence_n_days_ahead() {
 	local -i month_days="$(days_per_month "${year}" "${month}")"
 	for (( days_so_far=0 ; ${days_so_far} < ${ndays} ; days_so_far=${days_so_far} + 1 ));
 	do
-	    # day=$((${day} + 1))
-
-	    # if [ "${day}" -gt "${month_days}" ];
-	    # then
-	    # 	day=$((${day} - ${month_days}))
-	    # 	month=$((${month} + 1))
-
-	    # 	if [ "${month}" -gt 12 ];
-	    # 	then
-	    # 	    month=$((${month} - 12))
-	    # 	    year=$((${year} + 1))
-	    # 	fi
-
-	    # 	month_days="$(days_per_month "${year}" "${month}")"
-	    # fi
-	    # printf -v date_so_far '%04d%02d%02d ' "${year}" "${month}" "${day}"
-
 	    local -i date_so_far="$(n_days_ahead "${year}" "${month}" "${day}" 1)"
 	    printf '%08d ' "${date_so_far}"
 
@@ -175,21 +122,6 @@ function sequence_n_days_ahead() {
     else
 	for (( days_so_far=0 ; ${days_so_far} > ${ndays} ; days_so_far=${days_so_far} - 1));
 	do
-	    # day=$((${day} - 1))
-
-	    # if [ "${day}" -lt 1 ];
-	    # then
-	    # 	month=$((${month} - 1))
-
-	    # 	if [ "${month}" -lt 1 ];
-	    # 	then
-	    # 	    year=$((${year} - 1))
-	    # 	    month=$((${month} + 12))
-	    # 	fi
-	    # 	day=$((${day} + $(days_per_month "${year}" "${month}")))
-	    # fi
-	    # printf '%04d%02d%02d ' "${year}" "${month}" "${day}"
-
 	    local -i date_so_far="$(n_days_ahead "${year}" "${month}" "${day}" -1)"
 	    printf '%08d ' "${date_so_far}"
 
@@ -199,18 +131,6 @@ function sequence_n_days_ahead() {
 	done
     fi
 }
-
-# for start_date in 20210531;
-# do
-#     echo "The 32 dates starting with ${start_date}"
-#     sequence="$(sequence_n_days_ahead "${start_date:0:4}" "${start_date:4:2}" "${start_date:6:2}"  32)"
-#     echo "${sequence}: $(echo "${sequence}" | wc -w) dates"
-
-#     echo "The 32 dates before ${start_date}"
-#     sequence="$(sequence_n_days_ahead "${start_date:0:4}" "${start_date:4:2}" "${start_date:6:2}" -32)"
-#     echo "${sequence}: $(echo "${sequence}" | wc -w) dates"
-#     echo
-# done
 
 # Copy of finddate.sh
 # Prints date or date sequence a given number of days from given date
@@ -234,20 +154,5 @@ function finddate() {
     echo
 }
 
-# finddate 19990929 s+10
-# echo
-# finddate 19990929 d+10
-# echo
-# finddate 19990929 s-10
-# echo
-# finddate 19990929 d-10
-# echo
-
-# finddate 19990929 d+366
-# echo
-# finddate 19990929 d+3653
-# echo
-# finddate 19990929 d+7305
-# echo
-
+# The old finddate.sh didn't provide functions, so call the main function here
 finddate "$1" "$2"
