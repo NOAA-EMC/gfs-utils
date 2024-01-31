@@ -104,9 +104,9 @@ contains
 
     fdst = ''
     if (nxr == 1440 .and. nyr == 721) fdst = '0p25'      ! 1/4deg rectilinear
-    if (nxr == 720  .and. nyr == 361) fdst = '0p5'       ! 1/2 deg rectilinear
-    if (nxr == 360  .and. nyr == 181) fdst = '1p0'       ! 1 deg rectilinear
-    if (nxr == 72   .and. nyr == 36) fdst = '5p0'        ! 5 deg rectilinear
+    if (nxr == 720  .and. nyr == 361) fdst = '0p50'      ! 1/2 deg rectilinear
+    if (nxr == 360  .and. nyr == 181) fdst = '1p00'      ! 1 deg rectilinear
+    if (nxr == 72   .and. nyr == 36) fdst = '5p00'       ! 5 deg rectilinear
     if (len_trim(fdst) == 0) then
        write(logunit,'(a)')'destination grid dimensions unknown'
        stop
