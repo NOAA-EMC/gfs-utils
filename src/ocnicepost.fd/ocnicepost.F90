@@ -74,6 +74,10 @@ program ocnicepost
   ! --------------------------------------------------------
 
   call nf90_err(nf90_open(trim(input_file), nf90_nowrite, ncid), 'open: '//trim(input_file))
+  if (do_ocnpost) then
+    call nf90_err(nf90_inq_dimid(ncid, 'z_l', varid), 'get dimension Id: z_l'//trim(input_file))
+    call nf90_err(nf90_inquire_dimension(ncid, varid, len=nlevs), 'get dimension Id: z_l'//trim(input_file))
+  endif
   do n = 1,nvalid
      call nf90_err(nf90_inq_varid(ncid, trim(outvars(n)%var_name), varid), 'get variable Id: '//trim(outvars(n)%var_name))
      call nf90_err(nf90_get_att(ncid, varid,  'long_name', outvars(n)%long_name), 'get variable attribute: long_name '//trim(outvars(n)%var_name))

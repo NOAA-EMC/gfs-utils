@@ -50,7 +50,7 @@ contains
     ! local variable
     character(len=40) :: fname
     integer :: ierr, iounit
-    integer :: srcdims(3), dstdims(2)
+    integer :: srcdims(2), dstdims(2)
 
     namelist /ocnicepost_nml/ ftype, srcdims, wgtsdir, dstdims, maskvar, sinvar, cosvar, &
          angvar, debug
@@ -78,12 +78,11 @@ contains
     close (iounit)
     nxt = srcdims(1); nyt = srcdims(2)
     nxr = dstdims(1); nyr = dstdims(2)
-    If (srcdims(3) > 0) nlevs = srcdims(3)
 
     ! initialize the source file type and variables
     if (trim(ftype) == 'ocean') then
        do_ocnpost = .true.
-       else
+    else
        do_ocnpost = .false.
     end if
     input_file = trim(ftype)//'.nc'
