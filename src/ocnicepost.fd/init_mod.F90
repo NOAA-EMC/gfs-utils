@@ -7,13 +7,13 @@ module init_mod
   real, parameter :: maxvars = 50              !< The maximum number of fields expected in a source file
 
   type :: vardefs
-     character(len= 10)   :: var_name          !< A variable's variable name
+     character(len= 20)   :: var_name          !< A variable's variable name
      character(len=120)   :: long_name         !< A variable's long name
      character(len= 20)   :: units             !< A variable's unit
-     character(len= 10)   :: var_remapmethod   !< A variable's mapping method
+     character(len= 20)   :: var_remapmethod   !< A variable's mapping method
      integer              :: var_dimen         !< A variable's dimensionality
      character(len=  4)   :: var_grid          !< A variable's input grid location; all output locations are on cell centers
-     character(len= 10)   :: var_pair          !< A variable's pair
+     character(len= 20)   :: var_pair          !< A variable's pair
      character(len=  4)   :: var_pair_grid     !< A pair variable grid
      real                 :: var_fillvalue     !< A variable's fillvalue
   end type vardefs
@@ -120,7 +120,7 @@ contains
 
     character(len= 40) :: fname
     character(len=100) :: chead
-    character(len= 10) :: c1,c3,c4,c5,c6
+    character(len= 20) :: c1,c3,c4,c5,c6
     integer :: i2
     integer :: nn,n,ierr,iounit
 
