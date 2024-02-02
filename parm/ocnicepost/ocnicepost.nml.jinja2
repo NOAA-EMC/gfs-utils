@@ -1,11 +1,11 @@
 & ocnicepost_nml
-  ftype = {{ component }},
-  wgtsdir = {{ interpolation_weights_dir }},
+  ftype = "{{ component }}",
+  wgtsdir = "./",
   srcdims = {{ source_tripole_dims }},
   dstdims = {{ target_latlon_dims }},
-  maskvar = {{ maskvar }},
-  sinvar = {{ sinvar }},
-  cosvar = {{ cosvar }},
-  angvar = {{ angvar }},
+  maskvar = "{{ maskvar }}",
+  sinvar = "{{ sinvar }}",
+  cosvar = "{{ cosvar }}",
+  angvar = "{{ angvar }}",
   debug = {{ debug | default('.false.') }}
 /
