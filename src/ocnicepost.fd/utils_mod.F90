@@ -1,7 +1,7 @@
 module utils_mod
 
   use netcdf
-  use init_mod, only : debug, logunit, vardefs
+  use init_mod, only : debug, logunit, vardefs, fsrc
 
   implicit none
 
@@ -164,10 +164,10 @@ contains
 
     if (debug)write(logunit,'(a)')'enter '//trim(subname)
 
-    wgtsfile = trim(wdir)//'tripole.mx025.'//vgrid1//'.to.Ct.bilinear.nc'
+    wgtsfile = trim(wdir)//'tripole.'//trim(fsrc)//'.'//vgrid1//'.to.Ct.bilinear.nc'
     call getfield(fname, vname1, dims=dims, field=vecpair(:,1), wgts=trim(wgtsfile))
     if (debug)write(logunit,'(a)')'wgtsfile for 2d vector '//trim(vname1)//'   '//trim(wgtsfile)
-    wgtsfile = trim(wdir)//'tripole.mx025.'//vgrid2//'.to.Ct.bilinear.nc'
+    wgtsfile = trim(wdir)//'tripole.'//trim(fsrc)//'.'//vgrid2//'.to.Ct.bilinear.nc'
     call getfield(fname, vname2, dims=dims, field=vecpair(:,2), wgts=trim(wgtsfile))
     if (debug)write(logunit,'(a)')'wgtsfile for 2d vector '//trim(vname2)//'   '//trim(wgtsfile)
 
@@ -203,9 +203,9 @@ contains
 
     if (debug)write(logunit,'(a)')'enter '//trim(subname)
 
-    wgtsfile = trim(wdir)//'tripole.mx025.'//vgrid1//'.to.Ct.bilinear.nc'
+    wgtsfile = trim(wdir)//'tripole.'//trim(fsrc)//'.'//vgrid1//'.to.Ct.bilinear.nc'
     call getfield(fname, vname1, dims=dims, field=vecpair(:,:,1), wgts=trim(wgtsfile))
-    wgtsfile = trim(wdir)//'tripole.mx025.'//vgrid2//'.to.Ct.bilinear.nc'
+    wgtsfile = trim(wdir)//'tripole.'//trim(fsrc)//'.'//vgrid2//'.to.Ct.bilinear.nc'
     call getfield(fname, vname2, dims=dims, field=vecpair(:,:,2), wgts=trim(wgtsfile))
 
     do k = 1,dims(3)
