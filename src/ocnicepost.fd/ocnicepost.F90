@@ -369,4 +369,6 @@ program ocnicepost
   call nf90_err(nf90_close(ncid), 'close: '// trim(fout))
   write(logunit,'(a)')trim(fout)//' done'
 
+  stop
+
 end program ocnicepost
