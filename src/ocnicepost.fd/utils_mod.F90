@@ -568,7 +568,7 @@ contains
     call nf90_err(nf90_def_dim(ncid, 'nx', dims(1), idimid), 'define dimension: nx')
     call nf90_err(nf90_def_dim(ncid, 'ny', dims(2), jdimid), 'define dimension: ny')
     call nf90_err(nf90_def_var(ncid, vname, nf90_float, (/idimid,jdimid/), varid), 'define variable: '//vname)
-    call nf90_err(nf90_enddef(ncid), 'nf90_enddef:'//fname)
+    call nf90_err(nf90_enddef(ncid), 'nf90_enddef: '//fname)
 
     a2d(:,:) =  reshape(field(1:dims(1)*dims(2)), (/dims(1),dims(2)/))
     call nf90_err(nf90_put_var(ncid, varid, a2d), 'put variable: '//vname)
@@ -586,8 +586,8 @@ contains
     integer ,         intent(in) :: ierr
     character(len=*), intent(in) :: string
     if (ierr /= nf90_noerr) then
-      write(logunit,'(a)') '*** FATAL ERROR ***: '//trim(string)//':'//trim(nf90_strerror(ierr))
-      stop
+      write(0, '(a)') 'FATAL ERROR: ' // trim(string)// ' : ' // trim(nf90_strerror(ierr))
+      stop ierr
     end if
   end subroutine nf90_err
 end module utils_mod
