@@ -2,7 +2,7 @@ help([[
 Build environment for GFS utilities on S4
 ]])
 
-prepend_path("MODULEPATH", "/data/prod/jedi/spack-stack/spack-stack-1.5.1/envs/gsi-addon/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/data/prod/jedi/spack-stack/spack-stack-1.6.0/envs/gsi-addon-env/install/modulefiles/Core")
 
 load("license_intel")
 
