@@ -65,8 +65,8 @@ contains
     fname = 'ocnicepost.nml'
     inquire (file=trim(fname), iostat=ierr)
     if (ierr /= 0) then
-       write (6, '(3a)') 'Error: input file "', trim(fname), '" does not exist.'
-       stop
+       write (0, '(3a)') 'FATAL ERROR: input file "', trim(fname), '" does not exist.'
+       stop 1
     end if
 
     ! Open and read namelist file.
@@ -97,8 +97,8 @@ contains
     if (nxt == 360  .and. nyt == 320) fsrc = 'mx100'     ! 1deg tripole
     if (nxt == 72   .and. nyt == 35) fsrc = 'mx500'      ! 5deg tripole
     if (len_trim(fsrc) == 0) then
-       write(logunit,'(a)')'source grid dimensions unknown'
-       stop
+       write(0,'(a)')'FATAL ERROR: source grid dimensions unknown'
+       stop 2
     end if
 
     fdst = ''
@@ -107,8 +107,8 @@ contains
     if (nxr == 360  .and. nyr == 181) fdst = '1p00'      ! 1 deg rectilinear
     if (nxr == 72   .and. nyr == 36) fdst = '5p00'       ! 5 deg rectilinear
     if (len_trim(fdst) == 0) then
-       write(logunit,'(a)')'destination grid dimensions unknown'
-       stop
+       write(0,'(a)')'FATAL ERROR: destination grid dimensions unknown'
+       stop 3
     end if
 
     !TODO: test for consistency of source/destination resolution
@@ -131,8 +131,8 @@ contains
     fname=trim(ftype)//'.csv'
     open(newunit=iounit, file=trim(fname), status='old', iostat=ierr)
     if (ierr /= 0) then
-       write (6, '(3a)') 'Error: input file "', trim(fname), '" does not exist.'
-       stop
+       write (0, '(3a)') 'FATAL ERROR: input file "', trim(fname), '" does not exist.'
+       stop 4
     end if
 
     read(iounit,*)chead

@@ -91,8 +91,8 @@ program ocnicepost
   end do
 
   ! timestamp
-  call nf90_err(nf90_inq_varid(ncid, 'time', varid), 'get variable Id: time'//trim(input_file))
-  call nf90_err(nf90_get_var(ncid, varid, timestamp), 'get variable: time'//trim(input_file))
+  call nf90_err(nf90_inq_varid(ncid, 'time', varid), 'get variable Id: time '//trim(input_file))
+  call nf90_err(nf90_get_var(ncid, varid, timestamp), 'get variable: time '//trim(input_file))
   call nf90_err(nf90_get_att(ncid, varid,    'units', timeunit), 'get variable attribute : units '//trim(input_file))
   call nf90_err(nf90_get_att(ncid, varid, 'calendar', timecal), 'get variable attribute : calendar '//trim(input_file))
   if (do_ocnpost) then
