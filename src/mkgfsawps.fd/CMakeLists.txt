@@ -1,5 +1,5 @@
 list(APPEND fortran_src
-  mkgfsawps.f
+  mkgfsawps.F
 )
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
@@ -13,11 +13,15 @@ endif()
 set(exe_name mkgfsawps.x)
 add_executable(${exe_name} ${fortran_src})
 target_link_libraries(${exe_name} PRIVATE bacio::bacio_4
-                                          ip::ip_d
+                                          ip::ip_4
                                           sp::sp_d
-                                          w3emc::w3emc_d)
+                                          w3emc::w3emc_4)
 if(OpenMP_Fortran_FOUND)
   target_link_libraries(${exe_name} PRIVATE OpenMP::OpenMP_Fortran)
+endif()
+
+if(ip_VERSION VERSION_GREATER_EQUAL 4.0.0)
+   target_compile_definitions(${exe_name} PRIVATE "IP_V4")
 endif()
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
