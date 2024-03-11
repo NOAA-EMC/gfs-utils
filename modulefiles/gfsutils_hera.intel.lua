@@ -14,4 +14,7 @@ load(pathJoin("cmake", cmake_ver))
 
 load("gfsutils_common")
 
+local gempak_ver=os.getenv("gempak_ver") or "7.4.2"
+load(pathJoin("gempak", gempak_ver))
+
 whatis("Description: GFS utilities environment on Hera with Intel Compilers")

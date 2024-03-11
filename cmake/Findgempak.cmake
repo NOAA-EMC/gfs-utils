@@ -62,17 +62,16 @@ endforeach()
 mark_as_advanced(GEMPAK_INCLUDE_DIR OS_GEMPAK_INCLUDE_DIR GEMPAK_gemlib_LIBRARY GEMPAK_appl_LIBRARY GEMPAK_syslib_LIBRARY GEMPAK_cgemlib_LIBRARY GEMPAK_bridge_LIBRARY)
 
 message(DEBUG "[Findgempak.cmake]: creating target gempak::gempak")
-add_library(gempak::gempak UNKNOWN IMPORTED)
-set_target_properties(gempak::gempak PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${GEMPAK_INCLUDE_DIR};${OS_GEMPAK_INCLUDE_DIR}")
-set_target_properties(gempak::gempak PROPERTIES IMPORTED_LOCATION ${GEMPAK_gemlib_LIBRARY})
-set_target_properties(gempak::gempak PROPERTIES INTERFACE_LINK_LIBRARIES ${GEMPAK_appl_LIBRARY})
-set_target_properties(gempak::gempak PROPERTIES INTERFACE_LINK_LIBRARIES ${GEMPAK_syslib_LIBRARY})
-set_target_properties(gempak::gempak PROPERTIES INTERFACE_LINK_LIBRARIES ${GEMPAK_cgemlib_LIBRARY})
-set_target_properties(gempak::gempak PROPERTIES INTERFACE_LINK_LIBRARIES ${GEMPAK_bridge_LIBRARY})
 
 foreach( _lib IN LISTS _libraries )
   list( APPEND GEMPAK_LIBRARIES "${GEMPAK_${_lib}_LIBRARY}" )
+	add_library(gempak::${_lib} UNKNOWN IMPORTED)
+	set_target_properties(gempak::${_lib} PROPERTIES IMPORTED_LOCATION "${GEMPAK_${_lib}_LIBRARY}"
+                                                 	 INTERFACE_INCLUDE_DIRECTORIES "${GEMPAK_INCLUDE_DIR};${OS_GEMPAK_INCLUDE_DIR}")
 endforeach()
+
+add_library(gempak::gempak INTERFACE IMPORTED)
+target_link_libraries(gempak::gempak INTERFACE gempak::gemlib gempak::appl gempak::syslib gempak::cgemlib gempak::bridge)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(gempak
