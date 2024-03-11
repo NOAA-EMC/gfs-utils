@@ -3,6 +3,7 @@ find_library(
   NAMES libgfortran.so
   HINTS ${GFORTRAN_LIBRARY_DIRS}
         /apps/gnu/gcc-9.2.0
+        /apps/gcc-8/gcc-8.3.0
         /opt/cray/pe/gcc/10.3.0/snos
   PATH_SUFFIXES lib lib64
   DOC "Path to GFORTRAN_LIBRARY"
