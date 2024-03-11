@@ -14,4 +14,7 @@ load(pathJoin("cmake", cmake_ver))
 
 load("gfsutils_common")
 
+local gempak_ver=os.getenv("gempak_ver") or "7.5.1"
+load(pathJoin("gempak", gempak_ver))
+
 whatis("Description: GFS utilities environment on Orion with Intel Compilers")
