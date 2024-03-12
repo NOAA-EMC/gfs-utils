@@ -46,8 +46,7 @@ find_package(bufr REQUIRED)
 find_package(landsfcutil REQUIRED)
 find_package(wgrib2 REQUIRED)
 # rdbfmsua.fd needs gempak and gfortran, but
-# gempak is not built with spack-stack and so cannot be found.
-# do not make gempak required for now until it is available via spack-stack
+# make them optional and skip rdbfmsua building if they are not found.
 find_package(gempak)
 find_package(gfortran)
 
