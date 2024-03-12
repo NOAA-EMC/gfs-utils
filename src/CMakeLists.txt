@@ -26,3 +26,8 @@ endif()
 add_subdirectory(webtitle.fd)
 
 add_subdirectory(ocnicepost.fd)
+
+add_subdirectory(ensadd.fd)
+add_subdirectory(ensppf.fd)
+add_subdirectory(ensstat.fd)
+add_subdirectory(wave_stat.fd)
