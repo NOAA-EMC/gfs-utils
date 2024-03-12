@@ -50,7 +50,7 @@ load(pathJoin("nemsio", nemsio_ver))
 load(pathJoin("wrf_io", wrf_io_ver))
 load(pathJoin("g2", g2_ver))
 load(pathJoin("landsfcutil", landsfcutil_ver))
---load(pathJoin("gempak", gempak_ver))
+load(pathJoin("gempak", gempak_ver))
 load(pathJoin("wgrib2", wgrib2_ver))
 
 pushenv("HPC_OPT", "/apps/ops/para/libs")

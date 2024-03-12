@@ -50,10 +50,11 @@ list( APPEND _libraries gemlib appl syslib cgemlib bridge )
 foreach( _lib IN LISTS _libraries )
   find_library(
     GEMPAK_${_lib}_LIBRARY
-    NAMES ${_lib}.a
+    NAMES ${_lib}.a lib${_lib}.a
     HINTS ${GEMPAK_LIBRARY_DIRS}
           ${GEMPAK} $ENV{GEMPAK}
           ${GEMLIB} $ENV{GEMLIB}
+          ${GEMOLB} $ENV{GEMOLB}
     PATH_SUFFIXES lib lib64
     DOC "Path to GEMPAK_${_lib}_LIBRARY"
   )
@@ -65,9 +66,9 @@ message(DEBUG "[Findgempak.cmake]: creating target gempak::gempak")
 
 foreach( _lib IN LISTS _libraries )
   list( APPEND GEMPAK_LIBRARIES "${GEMPAK_${_lib}_LIBRARY}" )
-	add_library(gempak::${_lib} UNKNOWN IMPORTED)
-	set_target_properties(gempak::${_lib} PROPERTIES IMPORTED_LOCATION "${GEMPAK_${_lib}_LIBRARY}"
-                                                 	 INTERFACE_INCLUDE_DIRECTORIES "${GEMPAK_INCLUDE_DIR};${OS_GEMPAK_INCLUDE_DIR}")
+  add_library(gempak::${_lib} UNKNOWN IMPORTED)
+  set_target_properties(gempak::${_lib} PROPERTIES IMPORTED_LOCATION "${GEMPAK_${_lib}_LIBRARY}"
+                                                   INTERFACE_INCLUDE_DIRECTORIES "${GEMPAK_INCLUDE_DIR};${OS_GEMPAK_INCLUDE_DIR}")
 endforeach()
 
 add_library(gempak::gempak INTERFACE IMPORTED)
