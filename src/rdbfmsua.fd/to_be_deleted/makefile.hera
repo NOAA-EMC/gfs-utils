@@ -29,7 +29,7 @@ SHELL=/bin/sh
 # LEX, or CAL.  An explicit rule will need to be added for PASCAL modules.
 #
 OBJS=	rdbfmsua.o
- 
+
 
 # Tunable parameters
 #
@@ -38,33 +38,21 @@ OBJS=	rdbfmsua.o
 # LIBS		List of libraries
 # CMD		Name of the executable
 #
-FC =		ifort	
-# FFLAGS =	-O3 -q32 -I${GEMINC} -I${NAWIPS}/os/${NA_OS}/include
-# FFLAGS =	-I${GEMINC} -I${NAWIPS}/os/${NA_OS}/include
-FFLAGS =	-I${GEMINC} -I${OS_INC}
-# LDFLAGS =       -O3 -q32 -s
-# LDFLAGS =       -Wl,-Map,MAPFILE
+FC =		ifort
+FFLAGS =	-g -traceback -I${GEMINC} -I${OS_INC}
 
-# BRIDGE=/gpfs/dell1/nco/ops/nwpara/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/lib/libbridge.a
 BRIDGE=${GEMOLB}/bridge.a
 GFORTRAN=/apps/gcc/6.2.0/lib64
 
 LIBS =    ${DECOD_UT_LIB} ${BUFR_LIB4} \
 	${GEMLIB}/gemlib.a  ${GEMLIB}/appl.a ${GEMLIB}/syslib.a ${GEMLIB}/cgemlib.a -L${GFORTRAN} -lgfortran ${BRIDGE}
 
-# LIBS =    ${DECOD_UT_LIB} ${BUFR_LIB4} \
-#	-L${GEMOLB} -lgemlib -lappl -lsyslib -lcgemlib -lgfortran ${BRIDGE}
-
-#	-L${GEMOLB} -lgemlib -lappl -lsyslib -lcgemlib -lgfortran ${BRIDGE}
-#          -L/nwprod/gempak/nawips1/os/linux2.6.32_x86_64/lib -lgemlib -lappl -lsyslib -lcgemlib -lbridge -lncepBUFR \
-#           -lgfortran
-
 CMD =           rdbfmsua
 
 # To perform the default compilation, use the first line
 # To compile with flowtracing turned on, use the second line
 # To compile giving profile additonal information, use the third line
-# CFLAGS=		-O3 -q32 
+# CFLAGS=		-O3 -q32
 
 # Lines from here on down should not need to be changed.  They are the
 # actual rules which make uses to build a.out.
@@ -77,7 +65,7 @@ $(CMD):         $(OBJS)
 # The following rule reads the required NAWIPS definitions and then recursively
 # runs this same makefile with a new target in the spawned shell.
 #
-	
+
 clean:
 	-rm -f ${OBJS}
 

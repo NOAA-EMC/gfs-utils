@@ -15,8 +15,7 @@
 #   - OS_ROOT             - root of gempak os installation
 #
 
-list( APPEND _libraries appl bridge cgemlib gemlib syslib )
-
+# First find the INCLUDE_DIRS
 find_path(
   GEMPAK_INCLUDE_DIR
   NAMES GEMPRM.PRM BRIDGE.PRM
@@ -27,6 +26,7 @@ find_path(
   DOC "Path to GEMPRM.PRM, BRIDGE.PRM"
   )
 
+# FIXME: On Hera, MCHPRM.PRM is linked to GEMINC directory so may cause issues
 find_path(
   OS_GEMPAK_INCLUDE_DIR
   NAMES MCHPRM.PRM
@@ -38,70 +38,50 @@ find_path(
   DOC "Path to MCHPRM.PRM"
 )
 
-mark_as_advanced(GEMPAK_INCLUDE_DIR OS_GEMPAK_INCLUDE_DIR)
-
 # if(NOT TARGET gempak::gempak)
   # message(DEBUG "[FindGempak.cmake]: creating target gempak::gempak")
   # add_library(gempak::gempak UNKNOWN IMPORTED)
 #   set_target_properties(gempak::gempak PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${GEMPAK_INCLUDE_DIR};${OS_GEMPAK_INCLUDE_DIR}")
 # endif()
 
+# Next find the LIBRARY_DIRS and LIBRARIES
+list( APPEND _libraries gemlib appl syslib cgemlib bridge )
+
 foreach( _lib IN LISTS _libraries )
   find_library(
     GEMPAK_${_lib}_LIBRARY
-    NAMES ${_lib}.a
+    NAMES ${_lib}.a lib${_lib}.a
     HINTS ${GEMPAK_LIBRARY_DIRS}
           ${GEMPAK} $ENV{GEMPAK}
-          ${OS_ROOT} $ENV{OS_ROOT}
+          ${GEMLIB} $ENV{GEMLIB}
+          ${GEMOLB} $ENV{GEMOLB}
     PATH_SUFFIXES lib lib64
     DOC "Path to GEMPAK_${_lib}_LIBRARY"
   )
-
-#  target_link_libraries(gempak::gempak INTERFACE ${GEMPAK_${_lib}_LIBRARY})
-
-  if(NOT TARGET gempak::gempak_${_lib})
-    add_library(gempak::gempak_${_lib} UNKNOWN IMPORTED)
-    set_target_properties(gempak::gempak_${_lib} PROPERTIES
-      IMPORTED_LOCATION "${GEMPAK_${_lib}_LIBRARY}"
-      )
-    if(EXISTS "${GEMPAK_${_lib}_LIBRARY}")
-      set_target_properties(gempak::gempak_${_lib} PROPERTIES
-        IMPORTED_LOCATION "${GEMPAK_${_lib}_LIBRARY}")
-    endif()
-  endif()
-
-  if(NOT TARGET gempak::gempak)
-    add_library(gempak::gempak UNKNOWN IMPORTED)
-    set_target_properties(gempak::gempak PROPERTIES
-      IMPORTED_LOCATION "${GEMPAK_${_lib}_LIBRARY}"
-      INTERFACE_INCLUDE_DIRECTORIES "${GEMPAK_INCLUDE_DIR};${OS_GEMPAK_INCLUDE_DIR}"
-      )
-    if(EXISTS "${GEMPAK_${_lib}_LIBRARY}")
-      set_target_properties(gempak::gempak PROPERTIES
-        IMPORTED_LOCATION "${GEMPAK_${_lib}_LIBRARY}")
-    endif()
-  endif()
-  list(APPEND GEMPAK_LIBRARIES "${GEMPAK_${_lib}_LIBRARY}")
-
 endforeach()
 
-message(STATUS "GEMPAK_LIBRARIES = ${GEMPAK_LIBRARIES}")
-set(GEMPAK_LIBRARIES "${GEMPAK_LIBRARIES}" CACHE STRING "gempak library targets" FORCE)
-mark_as_advanced(GEMPAK_LIBRARIES)
+mark_as_advanced(GEMPAK_INCLUDE_DIR OS_GEMPAK_INCLUDE_DIR GEMPAK_gemlib_LIBRARY GEMPAK_appl_LIBRARY GEMPAK_syslib_LIBRARY GEMPAK_cgemlib_LIBRARY GEMPAK_bridge_LIBRARY)
 
-message(DEBUG "[FindGempak.cmake]: linking with appl.a bridge.a cgemlib.a gemlib.a syslib.a")
-set_target_properties(gempak::gempak PROPERTIES
-  INTERFACE_LINK_LIBRARIES "${GEMPAK_LIBRARIES}")
+message(DEBUG "[Findgempak.cmake]: creating target gempak::gempak")
+
+foreach( _lib IN LISTS _libraries )
+  list( APPEND GEMPAK_LIBRARIES "${GEMPAK_${_lib}_LIBRARY}" )
+  add_library(gempak::${_lib} UNKNOWN IMPORTED)
+  set_target_properties(gempak::${_lib} PROPERTIES IMPORTED_LOCATION "${GEMPAK_${_lib}_LIBRARY}"
+                                                   INTERFACE_INCLUDE_DIRECTORIES "${GEMPAK_INCLUDE_DIR};${OS_GEMPAK_INCLUDE_DIR}")
+endforeach()
+
+add_library(gempak::gempak INTERFACE IMPORTED)
+target_link_libraries(gempak::gempak INTERFACE gempak::gemlib gempak::appl gempak::syslib gempak::cgemlib gempak::bridge)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(gempak
-  REQUIRED_VARS GEMPAK_INCLUDE_DIR OS_GEMPAK_INCLUDE_DIR
+  REQUIRED_VARS GEMPAK_LIBRARIES GEMPAK_INCLUDE_DIR OS_GEMPAK_INCLUDE_DIR
   )
 
 if(gempak_FOUND AND NOT gempak_FIND_QUIETLY)
-  message(STATUS "FindGempak:")
+  message(STATUS "Findgempak:")
   message(STATUS "  - GEMPAK_INCLUDE_DIR: ${GEMPAK_INCLUDE_DIR}")
   message(STATUS "  - OS_GEMPAK_INCLUDE_DIR: ${OS_GEMPAK_INCLUDE_DIR}")
-#  message(STATUS "  - GEMPAK_LIBRARIES: ${GEMPAK_LIBRARIES}")
+  message(STATUS "  - GEMPAK_LIBRARIES: ${GEMPAK_LIBRARIES}")
 endif()
-

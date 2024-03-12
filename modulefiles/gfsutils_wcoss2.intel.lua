@@ -50,8 +50,11 @@ load(pathJoin("nemsio", nemsio_ver))
 load(pathJoin("wrf_io", wrf_io_ver))
 load(pathJoin("g2", g2_ver))
 load(pathJoin("landsfcutil", landsfcutil_ver))
---load(pathJoin("gempak", gempak_ver))
+load(pathJoin("gempak", gempak_ver))
 load(pathJoin("wgrib2", wgrib2_ver))
+
+-- Used in rdbfmsua.f
+setenv("gfortran_ROOT", "//opt/cray/pe/gcc/10.3.0/snos")
 
 pushenv("HPC_OPT", "/apps/ops/para/libs")
 prepend_path("MODULEPATH", "/apps/ops/para/libs/modulefiles/compiler/intel/19.1.3.304")
