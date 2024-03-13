@@ -17,7 +17,6 @@ local wrf_io_ver=os.getenv("wrf_io_ver") or "1.2.0"
 local ncio_ver=os.getenv("ncio_ver") or "1.1.2"
 local g2_ver=os.getenv("g2_ver") or "3.4.5"
 local landsfcutil_ver=os.getenv("landsfcutil_ver") or "2.4.1"
-local gempak_ver=os.getenv("gempak_ver") or "7.14.1"
 local wgrib2_ver=os.getenv("wgrib2_ver") or "2.0.8"
 local libpng_ver=os.getenv("libpng_ver") or "1.6.37"
 
@@ -38,5 +37,4 @@ load(pathJoin("wrf-io", wrf_io_ver))
 load(pathJoin("ncio", ncio_ver))
 load(pathJoin("g2", g2_ver))
 load(pathJoin("landsfcutil", landsfcutil_ver))
---load(pathJoin("gempak", gempak_ver))
 load(pathJoin("wgrib2", wgrib2_ver))

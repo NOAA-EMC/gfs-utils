@@ -587,7 +587,11 @@ contains
     character(len=*), intent(in) :: string
     if (ierr /= nf90_noerr) then
       write(0, '(a)') 'FATAL ERROR: ' // trim(string)// ' : ' // trim(nf90_strerror(ierr))
-      stop ierr
+      ! This fails on WCOSS2 with Intel 19 compiler. See
+      ! https://community.intel.com/t5/Intel-Fortran-Compiler/STOP-and-ERROR-STOP-with-variable-stop-codes/m-p/1182521#M149254
+      ! When WCOSS2 moves to Intel 2020+, uncomment the next line and remove stop 99
+      !stop ierr
+      stop 99
     end if
   end subroutine nf90_err
 end module utils_mod
