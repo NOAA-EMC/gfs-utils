@@ -40,4 +40,20 @@ make -j ${BUILD_JOBS:-8} VERBOSE=${BUILD_VERBOSE:-}
 make install
 set +x
 
+# Build rdbfmsua.x separately due to GEMPAK issues
+# Load modules
+source $DIR_ROOT/ush/module-setup.sh
+module use $DIR_ROOT/modulefiles
+module load rdbfmsua_$MACHINE_ID.$COMPILER
+module show gempak
+module list
+
+cd $DIR_ROOT/src/rdbfmsua.fd
+export MACHINE_ID
+export COMPILER
+export PREFIX=${INSTALL_PREFIX}/bin
+make clean
+make VERBOSE=${BUILD_VERBOSE:-}
+make install VERBOSE=${BUILD_VERBOSE:-}
+
 exit

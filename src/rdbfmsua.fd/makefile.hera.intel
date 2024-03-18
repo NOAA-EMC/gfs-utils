@@ -1,0 +1,12 @@
+FC = ifort
+
+GFORTRAN=/apps/gcc/6.2.0/lib64
+
+FFLAGS = -g -traceback -I${GEMPAK}/include -I${OS_INC}
+LIBS = ${BUFR_LIB4} \
+       ${GEMLIB}/gemlib.a \
+       ${GEMLIB}/appl.a \
+       ${GEMLIB}/syslib.a \
+       ${GEMLIB}/cgemlib.a \
+       ${GEMLIB}/bridge.a \
+       -L${GFORTRAN} -lgfortran
