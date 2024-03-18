@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -eu
-
 # Get the root of the cloned GFS-utils directory
 #shellcheck disable=SC2155
 readonly DIR_ROOT=$(cd "$(dirname "$(readlink -f -n "${BASH_SOURCE[0]}" )" )/.." && pwd -P)
@@ -36,7 +35,7 @@ mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}"
 
 # Configure, build, install
 set -x
-cmake "${CMAKE_OPTS}" "${DIR_ROOT}"
+cmake ${CMAKE_OPTS} "${DIR_ROOT}"
 make -j "${BUILD_JOBS:-8}" VERBOSE="${BUILD_VERBOSE:-}"
 make install
 set +x
