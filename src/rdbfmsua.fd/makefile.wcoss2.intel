@@ -1,9 +1,7 @@
 FC = ftn
 
-GFORTRAN=/opt/cray/pe/gcc/10.3.0/snos/lib64/libgfortran.a
-
 FFLAGS = -g -traceback -I${GEMINC} -I${OS_INC}
 LIBS = ${BUFR_LIB4} \
        -L${GEMOLB} -lgemlib -lappl -lsyslib -lcgemlib \
        ${GEMOLB}/libbridge.a \
-       ${GFORTRAN}
+       ${gfortran_ROOT}/lib64/libgfortran.a

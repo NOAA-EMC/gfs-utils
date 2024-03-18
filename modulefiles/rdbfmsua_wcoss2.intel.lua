@@ -31,6 +31,6 @@ load(pathJoin("bacio", bacio_ver))
 load(pathJoin("w3emc", w3emc_ver))
 load(pathJoin("gempak", gempak_ver))
 
-setenv("gfortran_ROOT", "//opt/cray/pe/gcc/10.3.0/snos")
+setenv("gfortran_ROOT", "/opt/cray/pe/gcc/10.3.0/snos")
 
 whatis("Description: GFS utilities environment on WCOSS2 with Intel Compilers")
