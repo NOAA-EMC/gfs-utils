@@ -46,7 +46,6 @@ set +x
 source "${DIR_ROOT}/ush/module-setup.sh"
 module use "${DIR_ROOT}/modulefiles"
 module load "rdbfmsua_${MACHINE_ID}.${COMPILER}"
-module show gempak
 module list
 
 cd "${DIR_ROOT}/src/rdbfmsua.fd"
