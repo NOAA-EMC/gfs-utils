@@ -15,7 +15,7 @@ load(pathJoin("cmake", cmake_ver))
 load("gfsutils_common")
 
 local gempak_ver=os.getenv("gempak_ver") or "7.5.1"
-load(pathJoin("gempak", gempak_ver))
+-- load(pathJoin("gempak", gempak_ver))
 
 -- Used in rdbfmsua.f
 setenv("gfortran_ROOT", "/apps/gcc-8/gcc-8.3.0")
