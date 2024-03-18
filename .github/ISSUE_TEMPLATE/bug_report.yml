@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Your bug may already be reported!
-        Please search on the [Issue tracker](https://github.com/NOAA-EMC/global-workflow/issues) before creating one.
+        Please search on the [Issue tracker](https://github.com/NOAA-EMC/gfs-utils/issues) before creating one.
 
   - type: textarea
     id: current_behavior

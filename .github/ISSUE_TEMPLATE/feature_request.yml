@@ -13,7 +13,7 @@ body:
         - Files need to be updated or added to fix
 
 
-        Please search on the [Issue tracker](https://github.com/NOAA-EMC/global-workflow/issues) to make sure the feature has not already been requested to avoid duplicates.
+        Please search on the [Issue tracker](https://github.com/NOAA-EMC/gfs-utils/issues) to make sure the feature has not already been requested to avoid duplicates.
   
   - type: textarea
     id: description
