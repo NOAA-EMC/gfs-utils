@@ -9,11 +9,11 @@ $(CMD): $(OBJS)
 	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(LIBS)
 
 clean:
-	-rm -f ${OBJS} ${CMD}
+	-rm -f ${OBJS}
 
 clobber: clean
 	-rm -f ${CMD}
 
 install:
-	-mv ${CMD} ${PREFIX}/
+	-mv ${CMD} ${PREFIX}/bin/
 
