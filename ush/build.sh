@@ -35,6 +35,7 @@ mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}"
 
 # Configure, build, install
 set -x
+# shellcheck disable=SC2086
 cmake ${CMAKE_OPTS} "${DIR_ROOT}"
 make -j "${BUILD_JOBS:-8}" VERBOSE="${BUILD_VERBOSE:-}"
 make install
@@ -42,13 +43,13 @@ set +x
 
 # Build rdbfmsua.x with makefile separately due to GEMPAK issues in cmake
 # Load modules
-if [[ -f "${DIR_ROOT}/modulefiles/rdbfmsua_${MACHINE_ID}.${COMPILER}" ]]; then
-  source "${DIR_ROOT}/ush/module-setup.sh"
-  module use "${DIR_ROOT}/modulefiles"
-  module load "rdbfmsua_${MACHINE_ID}.${COMPILER}"
+source "${DIR_ROOT}/ush/module-setup.sh"
+module use "${DIR_ROOT}/modulefiles"
+if module load "rdbfmsua_${MACHINE_ID}.${COMPILER}" &> /dev/null; then
   module list
 else
-  echo "No modulefile for 'rdbfmsua' on '${MACHINE_ID}'. Skip building 'rdbfmsua.x'"
+  echo "WARNING: Unable to load modelfile for 'rdbfmsua' on '${MACHINE_ID}' (does it exist?)."
+  echo "  Skipping building 'rdbfmsua.x'"
   exit 0
 fi
 
