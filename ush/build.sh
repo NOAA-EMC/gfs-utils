@@ -42,10 +42,15 @@ set +x
 
 # Build rdbfmsua.x with makefile separately due to GEMPAK issues in cmake
 # Load modules
-source "${DIR_ROOT}/ush/module-setup.sh"
-module use "${DIR_ROOT}/modulefiles"
-module load "rdbfmsua_${MACHINE_ID}.${COMPILER}"
-module list
+if [[ -f "${DIR_ROOT}/modulefiles/rdbfmsua_${MACHINE_ID}.${COMPILER}" ]]; then
+  source "${DIR_ROOT}/ush/module-setup.sh"
+  module use "${DIR_ROOT}/modulefiles"
+  module load "rdbfmsua_${MACHINE_ID}.${COMPILER}"
+  module list
+else
+  echo "No modulefile for 'rdbfmsua' on '${MACHINE_ID}'. Skip building 'rdbfmsua.x'"
+  exit 0
+fi
 
 cd "${DIR_ROOT}/src/rdbfmsua.fd"
 export MACHINE_ID
