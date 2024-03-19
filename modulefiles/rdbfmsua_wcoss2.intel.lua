@@ -22,10 +22,6 @@ load(pathJoin("intel", intel_ver))
 load(pathJoin("craype", craype_ver))
 load(pathJoin("cray-mpich", cray_mpich_ver))
 
-load(pathJoin("jasper", jasper_ver))
-load(pathJoin("zlib", zlib_ver))
-load(pathJoin("libpng", libpng_ver))
-
 load(pathJoin("bufr", bufr_ver))
 load(pathJoin("bacio", bacio_ver))
 load(pathJoin("w3emc", w3emc_ver))
