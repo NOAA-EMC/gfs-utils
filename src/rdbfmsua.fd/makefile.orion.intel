@@ -1,5 +1,4 @@
 FC = ifort
-
 FFLAGS = -g -traceback -I${GEMPAK}/include -I${OS_INC}
 LIBS = ${BUFR_LIB4} \
        ${GEMLIB}/gemlib.a \

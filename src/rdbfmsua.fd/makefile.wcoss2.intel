@@ -1,5 +1,4 @@
 FC = ftn
-
 FFLAGS = -g -traceback -I${GEMINC} -I${OS_INC}
 LIBS = ${BUFR_LIB4} \
        -L${GEMOLB} -lgemlib -lappl -lsyslib -lcgemlib \
