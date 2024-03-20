@@ -24,7 +24,6 @@ local nemsiogfs_ver=os.getenv("nemsiogfs_ver") or "2.5.3"
 local wrf_io_ver=os.getenv("wrf_io_ver") or "1.2.0"
 local g2_ver=os.getenv("g2_ver") or "3.4.5"
 local landsfcutil_ver=os.getenv("landsfcutil_ver") or "2.4.1"
-local gempak_ver=os.getenv("gempak_ver") or "7.14.1"
 local wgrib2_ver=os.getenv("wgrib2_ver") or "2.0.8"
 
 load(pathJoin("PrgEnv-intel", PrgEnv_intel_ver))
@@ -50,11 +49,7 @@ load(pathJoin("nemsio", nemsio_ver))
 load(pathJoin("wrf_io", wrf_io_ver))
 load(pathJoin("g2", g2_ver))
 load(pathJoin("landsfcutil", landsfcutil_ver))
--- load(pathJoin("gempak", gempak_ver))
 load(pathJoin("wgrib2", wgrib2_ver))
-
--- Used in rdbfmsua.f
-setenv("gfortran_ROOT", "//opt/cray/pe/gcc/10.3.0/snos")
 
 pushenv("HPC_OPT", "/apps/ops/para/libs")
 prepend_path("MODULEPATH", "/apps/ops/para/libs/modulefiles/compiler/intel/19.1.3.304")
