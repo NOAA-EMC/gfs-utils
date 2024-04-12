@@ -26,7 +26,6 @@
 #------------------------------------------------------
 
 if ($ENV{job}) { $job=$ENV{job}; }
-if ($ENV{SENDCOM}) { $SENDCOM=$ENV{SENDCOM}; }
 if ($ENV{SENDDBN}) { $SENDDBN=$ENV{SENDDBN}; }
 $NArgs = @ARGV;
 
@@ -112,14 +111,12 @@ sub make_tocbull {
       $ByteCount = length($cho2);
       print " length is $ByteCount ";
       $BulletinFlagFieldSep = sprintf( "****%10.10d****", $ByteCount);
-      if ($SENDCOM eq "YES") {
-        if ($ByteCount  >  50  ) {
-          print OUTFILE "$BulletinFlagFieldSep\n";
-          print OUTFILE $cho2;
-        }
-        else {   
-          $ix = 1;
-        }
+      if ($ByteCount  >  50  ) {
+        print OUTFILE "$BulletinFlagFieldSep\n";
+        print OUTFILE $cho2;
+      }
+      else {
+        $ix = 1;
       }
    }
    close OUTFILE;
@@ -169,14 +166,12 @@ sub make_tocplot {
       $ByteCount = length($cho2);
       print " length is $ByteCount ";
       $BulletinFlagFieldSep = sprintf( "****%10.10d****", $ByteCount);
-      if ($SENDCOM eq "YES") {
-        if ($ByteCount  >  50  ) {
-          print OUTFILE "$BulletinFlagFieldSep\n";
-          print OUTFILE $cho2;
-        }
-        else {
-          $ix = 1;
-        }
+      if ($ByteCount  >  50  ) {
+        print OUTFILE "$BulletinFlagFieldSep\n";
+        print OUTFILE $cho2;
+      }
+      else {
+        $ix = 1;
       }
    }
    close OUTFILE;
@@ -221,12 +216,9 @@ sub make_tocredb {
    $ByteCount = length($cho);
    print " length is $ByteCount ";
    $BulletinFlagFieldSep = sprintf( "****%10.10d****", $ByteCount);
-   if ($SENDCOM eq "YES") {
-      if ($ByteCount  >  50  ) {
-          print OUTFILE "$BulletinFlagFieldSep\n";
-          print OUTFILE $cho;
-          
-      }
+   if ($ByteCount  >  50  ) {
+     print OUTFILE "$BulletinFlagFieldSep\n";
+     print OUTFILE $cho;
    }
    close OUTFILE;
    if ($SENDDBN eq "YES" ) {
