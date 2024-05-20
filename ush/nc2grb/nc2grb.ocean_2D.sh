@@ -9,6 +9,7 @@ set -x
 # input netCDF file has a different resolution, use wgrib2 to regrid
 # the template file.
 # Author: L. Gwen Chen (lichuan.chen@noaa.gov), 11/02/2023
+#         updated on 05/20/2024
 
 module load intel/19.1.3.304
 module load wgrib2/2.0.8
@@ -30,7 +31,7 @@ wgrib2 template.global.0p25.gb2 \
     -set_date $ddate -set_ftime "$aperiod hour ave fcst" \
     -set_scaling same same -set_grib_type c1 -grib_out $outfile \
   -import_netcdf $infile "SSS" "0:1:0:721:0:1440" \
-    -set_var SALTY -set center 7 -rpn "1000.0:/" \
+    -set_var SALIN -set center 7 \
     -set_date $ddate -set_ftime "$aperiod hour ave fcst" \
     -set_scaling same same -set_grib_type c1 -grib_out $outfile \
   -import_netcdf $infile "speed" "0:1:0:721:0:1440" \
@@ -54,11 +55,11 @@ wgrib2 template.global.0p25.gb2 \
     -set_date $ddate -set_ftime "$aperiod hour ave fcst" \
     -set_scaling same same -set_grib_type c1 -grib_out $outfile \
   -import_netcdf $infile "SW" "0:1:0:721:0:1440" \
-    -set_var DSWRF -set center 7 \
+    -set_var NSWRF -set center 7 \
     -set_date $ddate -set_ftime "$aperiod hour ave fcst" \
     -set_scaling same same -set_grib_type c1 -grib_out $outfile \
   -import_netcdf $infile "LW" "0:1:0:721:0:1440" \
-    -set_var DLWRF -set center 7 \
+    -set_var NLWRF -set center 7 \
     -set_date $ddate -set_ftime "$aperiod hour ave fcst" \
     -set_scaling same same -set_grib_type c1 -grib_out $outfile \
   -import_netcdf $infile "LwLatSens" "0:1:0:721:0:1440" \
