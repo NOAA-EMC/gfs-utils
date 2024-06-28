@@ -48,7 +48,14 @@ module use "${DIR_ROOT}/modulefiles"
 if module load "rdbfmsua_${MACHINE_ID}.${COMPILER}" &> /dev/null; then
   module list
 else
-  echo "WARNING: Unable to load modelfile for 'rdbfmsua' on '${MACHINE_ID}' (does it exist?)."
+  if [[ -f "${DIR_ROOT}/modulefiles/rdbfmsua_${MACHINE_ID}.${COMPILER}.lua" ]]; then
+    echo "WARNING: Unable to load modulefile for 'rdbfmsua' on '${MACHINE_ID}'."
+    set +e
+    module load "rdbfmsua_${MACHINE_ID}.${COMPILER}"
+    set -e
+  else
+    echo "${DIR_ROOT}/modulefiles/rdbfmsua_${MACHINE_ID}.${COMPILER}.lua does not exist!"
+  fi
   echo "  Skipping building 'rdbfmsua.x'"
   exit 0
 fi
