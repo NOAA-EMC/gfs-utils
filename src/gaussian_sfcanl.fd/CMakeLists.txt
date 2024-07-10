@@ -3,7 +3,7 @@ list(APPEND fortran_src
 )
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -r8 -i4 -fp-model precise")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O0 -r8 -i4 -g -traceback -ftrapuv")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU)$")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-real-8")
 endif()
