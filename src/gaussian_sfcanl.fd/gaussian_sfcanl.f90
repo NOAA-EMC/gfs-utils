@@ -123,6 +123,7 @@
  integer                 :: yy, mm, dd, hh
  integer, allocatable    :: col(:), row(:)
 
+ real, parameter           :: fill = 0.0
  real(kind=8), allocatable :: s(:)
 
  namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst
@@ -197,59 +198,111 @@
 !------------------------------------------------------------------------------
 
  allocate(gaussian_data%orog(igaus*jgaus))    ! sfc
+ gaussian_data%orog = fill
  allocate(gaussian_data%t2m(igaus*jgaus))
+ gaussian_data%t2m = fill
  allocate(gaussian_data%tisfc(igaus*jgaus))
+ gaussian_data%tisfc = fill
  allocate(gaussian_data%q2m(igaus*jgaus))
+ gaussian_data%q2m = fill
  allocate(gaussian_data%stype(igaus*jgaus))
+ gaussian_data%stype = fill
  allocate(gaussian_data%snwdph(igaus*jgaus))
+ gaussian_data%snwdph = fill
  allocate(gaussian_data%slope(igaus*jgaus))
+ gaussian_data%slope = fill
  allocate(gaussian_data%shdmax(igaus*jgaus))
+ gaussian_data%shdmax = fill
  allocate(gaussian_data%shdmin(igaus*jgaus))
+ gaussian_data%shdmin = fill
  allocate(gaussian_data%snoalb(igaus*jgaus))
+ gaussian_data%snoalb = fill
  allocate(gaussian_data%slmask(igaus*jgaus))
+ gaussian_data%slmask = fill
  allocate(gaussian_data%tg3(igaus*jgaus))
+ gaussian_data%tg3 = fill
  allocate(gaussian_data%alvsf(igaus*jgaus))
+ gaussian_data%alvsf = fill
  allocate(gaussian_data%alvwf(igaus*jgaus))
+ gaussian_data%alvwf = fill
  allocate(gaussian_data%alnsf(igaus*jgaus))
+ gaussian_data%alnsf = fill
  allocate(gaussian_data%alnwf(igaus*jgaus))
+ gaussian_data%alnwf = fill
  allocate(gaussian_data%facsf(igaus*jgaus))
+ gaussian_data%facsf = fill
  allocate(gaussian_data%facwf(igaus*jgaus))
+ gaussian_data%facwf = fill
  allocate(gaussian_data%ffhh(igaus*jgaus))
+ gaussian_data%ffhh = fill
  allocate(gaussian_data%ffmm(igaus*jgaus))
+ gaussian_data%ffmm = fill
  allocate(gaussian_data%sheleg(igaus*jgaus))
+ gaussian_data%sheleg = fill
  allocate(gaussian_data%canopy(igaus*jgaus))
+ gaussian_data%canopy = fill
  allocate(gaussian_data%vfrac(igaus*jgaus))
+ gaussian_data%vfrac = fill
  allocate(gaussian_data%vtype(igaus*jgaus))
+ gaussian_data%vtype = fill
  allocate(gaussian_data%zorl(igaus*jgaus))
+ gaussian_data%zorl = fill
  allocate(gaussian_data%tsea(igaus*jgaus))
+ gaussian_data%tsea = fill
  allocate(gaussian_data%f10m(igaus*jgaus))
+ gaussian_data%f10m = fill
  allocate(gaussian_data%tprcp(igaus*jgaus))
+ gaussian_data%tprcp = fill
  allocate(gaussian_data%uustar(igaus*jgaus))
+ gaussian_data%uustar = fill
  allocate(gaussian_data%fice(igaus*jgaus))
+ gaussian_data%fice = fill
  allocate(gaussian_data%hice(igaus*jgaus))
+ gaussian_data%hice = fill
  allocate(gaussian_data%srflag(igaus*jgaus))
+ gaussian_data%srflag = fill
  allocate(gaussian_data%slc(igaus*jgaus,4))
+ gaussian_data%slc = fill
  allocate(gaussian_data%smc(igaus*jgaus,4))
+ gaussian_data%smc = fill
  allocate(gaussian_data%stc(igaus*jgaus,4))
+ gaussian_data%stc = fill
 
  if (donst) then
    allocate(gaussian_data%c0(igaus*jgaus))  ! nst
+   gaussian_data%c0 = fill
    allocate(gaussian_data%cd(igaus*jgaus))  
+   gaussian_data%cd = fill
    allocate(gaussian_data%dconv(igaus*jgaus))  
+   gaussian_data%dconv = fill
    allocate(gaussian_data%dtcool(igaus*jgaus)) 
+   gaussian_data%dtcool = fill
    allocate(gaussian_data%land(igaus*jgaus)) 
+   gaussian_data%land = fill
    allocate(gaussian_data%qrain(igaus*jgaus)) 
+   gaussian_data%qrain = fill
    allocate(gaussian_data%tref(igaus*jgaus)) 
+   gaussian_data%tref = fill
    allocate(gaussian_data%w0(igaus*jgaus)) 
+   gaussian_data%w0 = fill
    allocate(gaussian_data%wd(igaus*jgaus)) 
+   gaussian_data%wd = fill
    allocate(gaussian_data%xs(igaus*jgaus)) 
+   gaussian_data%xs = fill
    allocate(gaussian_data%xt(igaus*jgaus)) 
+   gaussian_data%xt = fill
    allocate(gaussian_data%xtts(igaus*jgaus)) 
+   gaussian_data%xtts = fill
    allocate(gaussian_data%xu(igaus*jgaus)) 
+   gaussian_data%xu = fill
    allocate(gaussian_data%xv(igaus*jgaus)) 
+   gaussian_data%xv = fill
    allocate(gaussian_data%xz(igaus*jgaus)) 
+   gaussian_data%xz = fill
    allocate(gaussian_data%xzts(igaus*jgaus)) 
+   gaussian_data%xzts = fill
    allocate(gaussian_data%zc(igaus*jgaus)) 
+   gaussian_data%zc = fill
  endif
 
  do i = 1, n_s
