@@ -14,8 +14,6 @@ C             PACKAGE TOO AND THIS SPEEDS UP BFS BUFR BY 3X
 C   17-02-27  GUANG PING LOU: CHANGE MODEL OUTPUT READ-IN TO HOURLY
 C             TO 120 HOURS AND 3 HOURLY TO 180 HOURS.
 C   19-07-16  GUANG PING LOU: CHANGE FROM NEMSIO TO GRIB2.
-C   24-08-08  Bo Cui: UPDATE TO HANDLE ONE FORECAST AT A TIME
-C                     REMOVE NEMSIO INPUT FILES
 C   
 C
 C USAGE:
@@ -44,21 +42,25 @@ C   MACHINE:  IBM SP
 C
 C$$$
       use netcdf
+      use mpi
+      use nemsio_module
       use sigio_module
       implicit none
+!!      include 'mpif.h'
       integer,parameter:: nsta=3000
       integer,parameter:: ifile=11
       integer,parameter:: levso=64
       integer(sigio_intkind):: irets
+      type(nemsio_gfile) :: gfile
       integer ncfsig, nsig
-      integer istat(nsta), idate(4), jdate, nfhour
+      integer istat(nsta), idate(4), jdate
       integer :: levs,nstart,nend,nint,nsfc,levsi,im,jm
       integer :: npoint,np,ist,is,iret,lss,nss,nf,nsk,nfile
       integer :: ielev
       integer :: lsfc
       real :: alat,alon,rla,rlo
       real :: wrkd(1),dummy
-      real rlat(nsta), rlon(nsta), elevstn(nsta), fhour
+      real rlat(nsta), rlon(nsta), elevstn(nsta)
       integer iidum(nsta),jjdum(nsta)
       integer nint1, nend1, nint3, nend3, np1
       integer landwater(nsta)
@@ -66,7 +68,7 @@ C$$$
       character*4 t3
       character*4 cstat(nsta)
       character*32 desc
-      character*512 dird, fnsig,fngrib,fngrib2
+      character*512 dird, fnsig
       logical f00, makebufr
       CHARACTER*8      SBSET
       LOGICAL         SEQFLG(4)
@@ -78,7 +80,6 @@ C$$$
       integer  :: error, ncid, id_var,dimid
       character(len=10) :: dim_nam
       character(len=6) :: fformat
-      character(len=100) :: long_name
       !added from Cory
       integer :: iope, ionproc
       integer, allocatable  :: iocomms(:)
@@ -93,10 +94,14 @@ c     &                      'CLS1' ,'D10M' /
 C
       namelist /nammet/ levs, makebufr, dird,
      &                  nstart, nend, nint, nend1, nint1, 
-     &                  nint3, nsfc, f00, fformat, np1,
-     &                  fnsig,fngrib,fngrib2                          
+     &                  nint3, nsfc, f00, fformat, np1
 
-      CALL W3TAGB('METEOMRF',1999,0202,0087,'NP23')
+      call mpi_init(ierr)
+      call mpi_comm_rank(MPI_COMM_WORLD,mrank,ierr)
+      call mpi_comm_size(MPI_COMM_WORLD,msize,ierr)
+      if(mrank.eq.0) then
+        CALL W3TAGB('METEOMRF',1999,0202,0087,'NP23')
+      endif
       open(5,file='gfsparm')
       read(5,nammet)
       write(6,nammet)
@@ -145,7 +150,7 @@ CC        print*, IST,ALAT,NS,ALON,EW,T3,lsfc,DESC,IELEV
           enddo
       endif
   98     FORMAT (3I6, 2F9.2) 
-      if (makebufr) then
+      if (mrank.eq.0.and.makebufr) then
         REWIND 1
         READ (1,100) SBSET
   100   FORMAT ( ////// 2X, A8 )
@@ -166,23 +171,40 @@ C     READ PARM NAMES AND NUMBER OF PARM NAMES FROM BUFR TABLE.
         lss = lss - 1
       END DO
 C
-      else   ! else of makebufr
-
-!!   nfile - output data file channel, start from fort.21
-!!   nf  - forecast hour 
-
-        nf=nstart
+      endif
+      nsig = 11
+      nss = nstart + nint
+      if(f00) nss = nstart
+c     do nf = nss, nend, nint
+      ntot = (nend - nss) / nint + 1
+        ntask = mrank/(float(msize)/float(ntot))
+        nf = ntask * nint + nss
+        print*,'n0 ntot nint nss mrank msize'
+        print*, n0,ntot,nint,nss,mrank,msize
+        print*,'nf, ntask= ', nf, ntask
         if(nf .le. nend1) then
         nfile = 21 + (nf / nint1)
          else
         nfile = 21 + (nend1/nint1) + (nf-nend1)/nint3
         endif
         print*, 'nf,nint,nfile = ',nf,nint,nfile
-        print *, 'Opening atmos file : ',trim(fnsig)
-        print *, 'Opening surface file : ',trim(fngrib)
-        print *, 'Opening surface file 2 : ',trim(fngrib2)
+        if(nf.le.nend) then
+          if(nf.lt.10) then
+            fnsig = 'sigf0'
+            write(fnsig(6:6),'(i1)') nf
+            ncfsig = 6
+          elseif(nf.lt.100) then
+            fnsig = 'sigf'
+            write(fnsig(5:6),'(i2)') nf
+            ncfsig = 6
+          else
+            fnsig = 'sigf'
+            write(fnsig(5:7),'(i3)') nf
+            ncfsig = 7
+          endif
+           print *, 'Opening file : ',fnsig
 
-!! read in NetCDF files
+!! read in either nemsio or NetCDF files
        if (fformat == 'netcdf') then
           error=nf90_open(trim(fnsig),nf90_nowrite,ncid)
           error=nf90_inq_dimid(ncid,"grid_xt",dimid)
@@ -192,52 +214,62 @@ C
           error=nf90_inq_dimid(ncid,"pfull",dimid)
           error=nf90_inquire_dimension(ncid,dimid,dim_nam,levsi)
           error=nf90_close(ncid)
-!         print*,'NetCDF file im,jm,lm= ',im,jm,levs,levsi
+          print*,'NetCDF file im,jm,lm= ',im,jm,levs,levsi
+
+           else
+          call nemsio_init(iret=irets)
+          print *,'nemsio_init, iret=',irets
+          call nemsio_open(gfile,trim(fnsig),'read',iret=irets)
+          if ( irets /= 0 ) then
+            print*,"fail to open nems atmos file";stop
+          endif
+
+          call nemsio_getfilehead(gfile,iret=irets
+     &           ,dimx=im,dimy=jm,dimz=levsi)
+          if( irets /= 0 ) then
+           print*,'error finding model dimensions '; stop
+          endif
+          print*,'nemsio file im,jm,lm= ',im,jm,levsi
+          call nemsio_close(gfile,iret=irets)
+         endif
+         allocate (iocomms(0:ntot))
+       if (fformat == 'netcdf') then
+        print*,'iocomms= ', iocomms
+        call mpi_comm_split(MPI_COMM_WORLD,ntask,0,iocomms(ntask),ierr)
+        call mpi_comm_rank(iocomms(ntask), iope, ierr)
+        call mpi_comm_size(iocomms(ntask), ionproc, ierr)
 
           call meteorg(npoint,rlat,rlon,istat,cstat,elevstn,
-     &             nf,nfile,fnsig,fngrib,fngrib2,jdate,idate,
+     &             nf,nfile,fnsig,jdate,idate,
      &      levsi,im,jm,nsfc,
      &      landwater,nend1, nint1, nint3, iidum,jjdum,np1,
-     &      fformat)
-        endif  ! end of process
-
-      endif  ! endif of makebufr
+     &      fformat,iocomms(ntask),iope,ionproc)
+       call mpi_barrier(iocomms(ntask), ierr)
+       call mpi_comm_free(iocomms(ntask), ierr)
+       else
+!! For nemsio input
+          call meteorg(npoint,rlat,rlon,istat,cstat,elevstn,
+     &             nf,nfile,fnsig,jdate,idate,
+     &      levs,im,jm,nsfc,
+     &      landwater,nend1, nint1, nint3, iidum,jjdum,np1,
+     &      fformat,iocomms(ntask),iope,ionproc)
+        endif  
+        endif  
+      call mpi_barrier(mpi_comm_world,ierr)
+      call mpi_finalize(ierr)
+      if(mrank.eq.0) then
+      print *, ' starting to make bufr files'
+      print *, ' makebufr= ', makebufr
+      print *, 'nint1,nend1,nint3,nend= ',nint1,nend1,nint3,nend
+!!  idate =           0           7           1        2019
+!!  jdate =   2019070100
 
       if(makebufr) then
-
-!  read in NetCDF file header info
-!  sample of idate and jdate
-!  idate =  0  7  1 2019
-!  jdate = 2019070100
-
-        if (fformat == 'netcdf') then
-          error=nf90_open(trim(fnsig),nf90_nowrite,ncid)
-          error=nf90_inq_varid(ncid, "time", id_var)
-          error=nf90_get_var(ncid, id_var, nfhour)
-          error=nf90_get_att(ncid,id_var,"units",long_name)
-          error=nf90_close(ncid)
-        endif
-
-        read(long_name(13:16),"(i4)")idate(4)
-        read(long_name(18:19),"(i2)")idate(2)
-        read(long_name(21:22),"(i2)")idate(3)
-        read(long_name(24:25),"(i2)")idate(1)
-        fhour=float(nfhour)
-        jdate = idate(4)*1000000 + idate(2)*10000+
-     &        idate(3)*100 + idate(1)
-
-        print *, ' starting to make bufr files'
-        print *, ' makebufr= ', makebufr
-        print *, ' processing forecast hour ', fhour
-        print *, 'nint1,nend1,nint3,nend= ',nint1,nend1,nint3,nend
-        print *, 'idate,jdate=',idate,jdate                           
-
-        nend3 = nend
-        call buff(nint1,nend1,nint3,nend3,
+          nend3 = nend
+         call buff(nint1,nend1,nint3,nend3,
      &        npoint,idate,jdate,levso,
      &        dird,lss,istat,sbset,seqflg,clist,npp,wrkd)
-        CALL W3TAGE('METEOMRF')
-
-      endif  ! end of makebufr
-
+      CALL W3TAGE('METEOMRF')
+      endif
+      endif
       end

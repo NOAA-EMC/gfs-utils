@@ -10,7 +10,7 @@ list(APPEND fortran_src
   mstadb.f
   newsig1.f
   read_nemsio.f
-  read_netcdf.f
+  #read_netcdf.f
   read_netcdf_p.f
   rsearch.f
   svp.f
