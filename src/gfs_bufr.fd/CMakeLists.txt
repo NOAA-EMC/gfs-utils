@@ -11,7 +11,7 @@ list(APPEND fortran_src
   newsig1.f
   read_nemsio.f
   read_netcdf.f
-  read_netcdf_p.f
+  #read_netcdf_p.f
   rsearch.f
   svp.f
   tdew.f
