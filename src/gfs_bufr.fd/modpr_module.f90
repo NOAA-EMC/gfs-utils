@@ -10,7 +10,8 @@ module modpr_module
 ! - Removed all other subroutines and associated code that were present in sigio_module.f
 ! 
 ! Reason for modification:
-! - To simplify the module by including only the necessary subroutines
+! - To remove the dependency on sigio 
+! - To simplify the module by including only the necessary one        
 ! 
 !  Program History Log:
 !   2024-08-23  Bo Cui: Simplified the module by retaining only sigio_modpr subroutine
