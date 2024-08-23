@@ -71,7 +71,6 @@
 !      use funcphys, only : gfuncphys
       use funcphys
       implicit none
-      include 'mpif.h'
       integer :: nfile,npoint,levs,kdim,nsoil
       character(len=10) :: dim_nam
       integer :: nfile1
