@@ -44,12 +44,10 @@ C   MACHINE:  IBM SP
 C
 C$$$
       use netcdf
-      use sigio_module
       implicit none
       integer,parameter:: nsta=3000
       integer,parameter:: ifile=11
       integer,parameter:: levso=64
-      integer(sigio_intkind):: irets
       integer ncfsig, nsig
       integer istat(nsta), idate(4), jdate, nfhour
       integer :: levs,nstart,nend,nint,nsfc,levsi,im,jm

@@ -37,6 +37,8 @@
 !                              adjustment
 !   2023-03-28  Bo Cui  Fix compilation error with "-check all" for gfs_bufrsnd
 !   2024-08-08  Bo Cui  UPDATE TO HANDLE ONE FORECAST AT A TIME, REMOVE NEMSIO INPUT FILES
+!   2024-08-23  Bo Cui  Replace sigio_module with the simplified module modpr_module
+!                          
 !
 ! USAGE:    CALL PROGRAM meteorg
 !   INPUT:
@@ -63,7 +65,7 @@
 !
 !$$$
       use netcdf
-      use sigio_module
+      use modpr_module
       use physcons
       use mersenne_twister
 !      use funcphys, only : gfuncphys
