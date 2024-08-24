@@ -5,7 +5,6 @@
 
       use netcdf
       implicit none
-      include 'mpif.h'
       character(len=20),intent(in) :: VarName
       character(len=3),intent(in) :: Zreverse
       integer,intent(in) :: ncid,im,jm,levs
