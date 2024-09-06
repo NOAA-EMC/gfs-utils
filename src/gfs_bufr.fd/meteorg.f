@@ -1,8 +1,8 @@
       subroutine meteorg(npoint,rlat,rlon,istat,cstat,elevstn,
-     &             nf,nfile,fnsig,jdate,idate,
+     &             nf,nfile,fnsig,fngrib,fngrib2,jdate,idate,
      &       levs,im,jm,kdim,
      &       landwater,nend1,nint1,nint3,iidum,jjdum,np1,
-     &       fformat,iocomms,iope,ionproc)
+     &       fformat)
 
 !$$$  SUBPROGRAM DOCUMENTATION BLOCK
 !                .      .    .                                       .
@@ -36,6 +36,9 @@
 !   2020-04-24  GUANG PING LOU Clean up code and remove station height
 !                              adjustment
 !   2023-03-28  Bo Cui  Fix compilation error with "-check all" for gfs_bufrsnd
+!   2024-08-08  Bo Cui  UPDATE TO HANDLE ONE FORECAST AT A TIME, REMOVE NEMSIO INPUT FILES
+!   2024-08-23  Bo Cui  Replace sigio_module with the simplified module modpr_module
+!                          
 !
 ! USAGE:    CALL PROGRAM meteorg
 !   INPUT:
@@ -46,6 +49,8 @@
 !     elevstn(npoint)  - station elevation (m)
 !     nf               - forecast cycle
 !     fnsig            - sigma file name
+!     fngrib           - surface file name
+!     fngrib2          - surface file name
 !     idate(4)         - date
 !     levs             - input vertical layers
 !     kdim             - sfc file dimension
@@ -60,18 +65,14 @@
 !
 !$$$
       use netcdf
-      use nemsio_module
-      use sigio_module
+      use modpr_module
       use physcons
       use mersenne_twister
 !      use funcphys, only : gfuncphys
       use funcphys
       implicit none
-      include 'mpif.h'
-      type(nemsio_gfile) :: gfile
-      type(nemsio_gfile) :: ffile
-      type(nemsio_gfile) :: ffile2
-      integer :: nfile,npoint,levs,kdim
+      integer :: nfile,npoint,levs,kdim,nsoil
+      character(len=10) :: dim_nam
       integer :: nfile1
       integer :: i,j,im,jm,kk,idum,jdum,idvc,idsl
 !     idsl              Integer(sigio_intkind) semi-lagrangian id
@@ -82,7 +83,7 @@
       integer :: idate(4),nij,nflx2,np,k,l,nf,nfhour,np1
       integer :: idate_nems(7)
       integer :: iret,jdate,leveta,lm,lp1
-      character*512 :: fnsig,fngrib
+      character*512 :: fnsig,fngrib,fngrib2
 !!      real*8 :: data(6*levs+25)
       real*8 :: data2(6*levso+25)
       real*8 :: rstat1
@@ -100,6 +101,8 @@
       real,dimension(im,jm,15) :: dum2d
       real,dimension(im,jm,levs) :: t3d, q3d, uh, vh,omega3d
       real,dimension(im,jm,levs) :: delpz
+!     real,dimension(im,jm,4) :: soilt3d
+      real, allocatable  :: soilt3d(:,:,:)
       real,dimension(im,jm,levs+1) :: pint, zint
       real,dimension(npoint,levs) :: gridu,gridv,omega,qnew,zp
       real,dimension(npoint,levs) :: p1,pd3,ttnew
@@ -117,7 +120,7 @@
       integer :: n3dfercld,iseedl
       integer :: istat(npoint)
       logical :: trace
-!!      logical, parameter :: debugprint=.true.
+!     logical, parameter :: debugprint=.true.
       logical, parameter :: debugprint=.false.
       character             lprecip_accu*3
       real, parameter :: ERAD=6.371E6
@@ -125,7 +128,6 @@
       real :: ap
       integer :: nf1, fint
       integer :: nend1, nint1, nint3
-      character*150 :: fngrib2
       integer recn_dpres,recn_delz,recn_dzdt
       integer :: jrec
       equivalence (cstat1,rstat1)
@@ -139,7 +141,6 @@
       character(7)  :: zone
       character(3)  :: Zreverse
       character(20)  :: VarName,LayName
-      integer iocomms,iope,ionproc
 
       nij = 12
 !!      nflx = 6 * levs
@@ -160,9 +161,7 @@
 !         enddo
 
        if(fformat .eq. "netcdf") then
-         print*,'iocomms inside meteorg.f=', iocomms
-        error=nf90_open(trim(fnsig),ior(nf90_nowrite,nf90_mpiio),
-     &          ncid,comm=iocomms, info = mpi_info_null)
+          error=nf90_open(trim(fnsig),nf90_nowrite,ncid)
           error=nf90_get_att(ncid,nf90_global,"ak",vdummy)
            do k = 1, levs+1
             vcoord(k,1)=vdummy(levs-k+1)
@@ -189,38 +188,8 @@
           error=nf90_get_var(ncid, id_var, gdlon)
           error=nf90_inq_varid(ncid, "lat", id_var)
           error=nf90_get_var(ncid, id_var, gdlat)
-!!end read NetCDF hearder info, read nemsio below if necessary
-       else
-
-      call nemsio_open(gfile,trim(fnsig),'read',iret=iret)
-      call nemsio_getfilehead(gfile,iret=iret
-     +     ,idate=idate_nems(1:7),nfhour=nfhour
-     +     ,idvc=idvc,idsl=idsl,lat=dum1d,lon=dum1d2
-     +     ,vcoord=vcoordnems)
-
-      do k=1,levs+1
-        vcoord(k,1)=vcoordnems(k,1,1)
-        vcoord(k,2)=vcoordnems(k,2,1)
-      end do
-      idate(1)=idate_nems(4)
-      idate(2)=idate_nems(2)
-      idate(3)=idate_nems(3)
-      idate(4)=idate_nems(1)
-      fhour=float(nfhour)
-      print *, ' processing forecast hour ', fhour
-      print *, ' idate =', idate
-      jdate = idate(4)*1000000 + idate(2)*10000+
-     &        idate(3)*100 + idate(1)
-      print *, 'jdate = ', jdate
-      print *, 'Total number of stations = ', npoint
-      ap = 0.0
-      do j=1,jm
-        do i=1,im
-          gdlat(i,j)=dum1d((j-1)*im+i)
-          gdlon(i,j)=dum1d2((j-1)*im+i)
-        end do
-      end do
-      endif !end read in nemsio hearder
+!!end read NetCDF hearder info
+      endif !end read in netcdf             
 
       if(debugprint) then
       do k=1,levs+1
@@ -238,14 +207,8 @@
       if (fformat == 'netcdf') then
       VarName='hgtsfc'
       Zreverse='yes'
-      call read_netcdf_p(ncid,im,jm,1,VarName,hgt,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'surface hgt not found'
-       else
-      VarName='hgt'
-      LayName='sfc'
-       call  read_nemsio(gfile,im,jm,1,VarName,LayName,hgt,
-     &     iope,ionproc,iocomms,error)
+      call read_netcdf(ncid,im,jm,1,VarName,hgt,Zreverse,
+     &     error)
         if (error /= 0) print*,'surface hgt not found'
       endif
         if(debugprint)print*,'sample sfc h= ',hgt(im/5,jm/4)
@@ -255,15 +218,8 @@
        if (fformat == 'netcdf') then
       VarName='pressfc'
       Zreverse='yes'
-       call read_netcdf_p(ncid,im,jm,1,VarName,pint(:,:,1),
-     &       Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'surface pressure not found'
-       else
-      VarName='pres'
-      LayName='sfc'
-        call  read_nemsio(gfile,im,jm,1,VarName,
-     &                    LayName,pint(:,:,1),error)
+       call read_netcdf(ncid,im,jm,1,VarName,pint(:,:,1),
+     &       Zreverse,error)
         if (error /= 0) print*,'surface pressure not found'
        endif
         if(debugprint)print*,'sample sfc P= ',pint(im/2,jm/4,1),
@@ -273,13 +229,8 @@
       if (fformat == 'netcdf') then
       VarName='tmp'
       Zreverse='yes'
-       call read_netcdf_p(ncid,im,jm,levs,VarName,t3d,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'temp not found'
-       else
-      VarName='tmp'
-      LayName='mid layer'
-        call  read_nemsio(gfile,im,jm,levs,VarName,LayName,t3d,error)
+       call read_netcdf(ncid,im,jm,levs,VarName,t3d,Zreverse,
+     &     error)
         if (error /= 0) print*,'temp not found'
        endif
          if(debugprint) then
@@ -292,13 +243,8 @@
       if (fformat == 'netcdf') then
       VarName='spfh'
       Zreverse='yes'
-       call read_netcdf_p(ncid,im,jm,levs,VarName,q3d,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'spfh not found'
-       else
-      VarName='spfh'
-      LayName='mid layer'
-        call  read_nemsio(gfile,im,jm,levs,VarName,LayName,q3d,error)
+       call read_netcdf(ncid,im,jm,levs,VarName,q3d,Zreverse,
+     &     error)
         if (error /= 0) print*,'spfh not found'
        endif
         if(debugprint) then
@@ -311,13 +257,8 @@
       if (fformat == 'netcdf') then
       VarName='ugrd'
       Zreverse='yes'
-       call read_netcdf_p(ncid,im,jm,levs,VarName,uh,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'ugrd not found'
-       else
-      VarName='ugrd'
-      LayName='mid layer'
-        call  read_nemsio(gfile,im,jm,levs,VarName,LayName,uh,error)
+       call read_netcdf(ncid,im,jm,levs,VarName,uh,Zreverse,
+     &     error)
         if (error /= 0) print*,'ugrd not found'
        endif
           if(debugprint) then
@@ -330,13 +271,8 @@
       if (fformat == 'netcdf') then
       VarName='vgrd'
       Zreverse='yes'
-       call read_netcdf_p(ncid,im,jm,levs,VarName,vh,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'vgrd not found'
-       else
-      VarName='vgrd'
-      LayName='mid layer'
-        call  read_nemsio(gfile,im,jm,levs,VarName,LayName,vh,error)
+       call read_netcdf(ncid,im,jm,levs,VarName,vh,Zreverse,
+     &     error)
         if (error /= 0) print*,'vgrd not found'
        endif
           if(debugprint) then
@@ -349,14 +285,8 @@
       if (fformat == 'netcdf') then
       VarName='dzdt'
       Zreverse='yes'
-      call read_netcdf_p(ncid,im,jm,levs,VarName,omega3d,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'dzdt not found'
-       else
-      VarName='dzdt'
-      LayName='mid layer'
-        call  read_nemsio(gfile,im,jm,levs,VarName,LayName,
-     &           omega3d,error)
+      call read_netcdf(ncid,im,jm,levs,VarName,omega3d,Zreverse,
+     &     error)
         if (error /= 0) print*,'dzdt not found'
        endif
           if(debugprint) then
@@ -369,14 +299,8 @@
       if (fformat == 'netcdf') then
       VarName='dpres'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,levs,VarName,delpz,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'dpres not found'
-       else
-      VarName='dpres'
-      LayName='mid layer'
-        call  read_nemsio(gfile,im,jm,levs,VarName,LayName,
-     &               delpz,error)
+       call read_netcdf(ncid,im,jm,levs,VarName,delpz,Zreverse,
+     &     error)
         if (error /= 0) print*,'dpres not found'
        endif
           if(debugprint) then
@@ -431,13 +355,8 @@
       if (fformat == 'netcdf') then
       VarName='delz'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,levs,VarName,delpz,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'delz not found'
-       else
-      VarName='delz'
-      LayName='mid layer'
-        call read_nemsio(gfile,im,jm,levs,VarName,LayName,delpz,error)
+       call read_netcdf(ncid,im,jm,levs,VarName,delpz,Zreverse,
+     &     error)
         if (error /= 0) print*,'delz not found'
        endif
           if(debugprint) then
@@ -493,51 +412,18 @@
       nf1 = nf - nint3
        endif
        if ( nf == 0 ) nf1=0
-      if(nf==0) then
-        fngrib='flxf00'
-      elseif(nf.lt.10) then
-        fngrib='flxf0'
-        write(fngrib(6:6),'(i1)') nf
-      elseif(nf.lt.100) then
-        fngrib='flxf'
-        write(fngrib(5:6),'(i2)') nf
-      else
-        fngrib='flxf'
-        write(fngrib(5:7),'(i3)') nf
-      endif
-      if(nf1==0) then
-        fngrib2='flxf00'
-      elseif(nf1.lt.10) then
-        fngrib2='flxf0'
-        write(fngrib2(6:6),'(i1)') nf1
-      elseif(nf1.lt.100) then
-        fngrib2='flxf'
-        write(fngrib2(5:6),'(i2)') nf1
-      else
-        fngrib2='flxf'
-        write(fngrib2(5:7),'(i3)') nf1
-      endif
       if (fformat == 'netcdf') then
           error=nf90_open(trim(fngrib),nf90_nowrite,ncid)
 !open T-nint below
           error=nf90_open(trim(fngrib2),nf90_nowrite,ncid2)
-       if(error /= 0)print*,'file not open',trim(fngrib), trim(fngrib2)
-       else
-      call nemsio_open(ffile,trim(fngrib),'read',iret=error)
-      call nemsio_open(ffile2,trim(fngrib2),'read',iret=error)
        if(error /= 0)print*,'file not open',trim(fngrib), trim(fngrib2)
        endif
 ! land water mask
       if (fformat == 'netcdf') then
       VarName='land'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,lwmask,Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'lwmask not found'
-       else
-      VarName='land'
-      LayName='sfc'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,lwmask,error)
+       call read_netcdf(ncid,im,jm,1,VarName,lwmask,Zreverse,
+     &     error)
         if (error /= 0) print*,'lwmask not found'
        endif
         if(debugprint)
@@ -548,15 +434,8 @@
       if (fformat == 'netcdf') then
       VarName='tmpsfc'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,1),
-     &       Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'tmpsfc not found'
-       else
-      VarName='tmp'
-      LayName='sfc'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     &        dum2d(:,:,1),error)
+       call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,1),
+     &       Zreverse,error)
         if (error /= 0) print*,'tmpsfc not found'
        endif
         if(debugprint)
@@ -566,15 +445,8 @@
       if (fformat == 'netcdf') then
       VarName='tmp2m'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,2),
-     &              Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'tmp2m not found'
-       else
-      VarName='tmp'
-      LayName='2 m above gnd'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,2),error)
+       call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,2),
+     &              Zreverse,error)
         if (error /= 0) print*,'tmp2m not found'
        endif
         if(debugprint)
@@ -585,15 +457,8 @@
       if (fformat == 'netcdf') then
       VarName='spfh2m'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,3),
-     &           Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'spfh2m not found'
-       else
-      VarName='spfh'
-      LayName='2 m above gnd'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,3),error)
+       call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,3),
+     &           Zreverse,error)
         if (error /= 0) print*,'spfh2m not found'
        endif
         if(debugprint)
@@ -604,15 +469,8 @@
       if (fformat == 'netcdf') then
       VarName='ugrd10m'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,4),
-     &              Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'ugrd10m not found'
-       else
-      VarName='ugrd'
-      LayName='10 m above gnd'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,4),error)
+       call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,4),
+     &              Zreverse,error)
         if (error /= 0) print*,'ugrd10m not found'
        endif
 
@@ -620,33 +478,45 @@
       if (fformat == 'netcdf') then
       VarName='vgrd10m'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,5),
-     &             Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'vgrd10m not found'
-       else
-      VarName='vgrd'
-      LayName='10 m above gnd'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,5),error)
+       call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,5),
+     &             Zreverse,error)
         if (error /= 0) print*,'vgrd10m not found'
        endif
 
 ! soil T
       if (fformat == 'netcdf') then
-      VarName='soilt1'
-      Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,6),
-     &              Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'soilt1 not found'
-       else
-      VarName='tmp'
-      LayName='0-10 cm down'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,6),error)
-        if (error /= 0) print*,'soil T not found'
-       endif
+
+        error=nf90_inq_varid(ncid,'zsoil',dimid)
+
+        if(error/=0)then !read soil avriables in 2D
+
+          VarName='soilt1'
+          Zreverse='no'
+          call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,6),
+     &              Zreverse,error)
+          if (error /= 0) print*,'soilt1 not found'
+
+        else !read soil variables in 3D
+
+          error=nf90_inq_dimid(ncid,"zsoil",dimid)
+          error=nf90_inquire_dimension(ncid,dimid,dim_nam,nsoil)
+      
+          print*,'NetCDF file 3D soil = ',error, nsoil
+          allocate(soilt3d(im,jm,nsoil))
+
+          VarName='soilt'
+          Zreverse='no'
+          call read_netcdf(ncid,im,jm,nsoil,VarName,soilt3d,
+     &     Zreverse,error)
+          if (error /= 0) print*,'3D soil temp not found'
+          dum2d(1:im,1:jm,6)=soilt3d(1:im,1:jm,1)
+!         print*,'soilt3d(im/2,jm/2,:)= ', soilt3d(im/2,jm/2,:)
+!         print*,'dum2d(im/2,jm/2,6)= ', dum2d(im/2,jm/2,6)
+          deallocate(soilt3d)
+        endif
+
+      endif
+
         if(debugprint)
      +   print*,'sample soil T= ',dum2d(im/2,jm/4,6),dum2d(im/2,jm/3,6),
      +          dum2d(im/2,jm/2,6)
@@ -655,15 +525,8 @@
       if (fformat == 'netcdf') then
       VarName='snod'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,7),
-     &          Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'snod not found'
-       else
-      VarName='snod'
-      LayName='sfc'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,7),error)
+       call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,7),
+     &          Zreverse,error)
         if (error /= 0) print*,'snod not found'
        endif
 
@@ -672,15 +535,8 @@
       if (fformat == 'netcdf') then
       VarName='lhtfl'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,8),
-     &            Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'lhtfl not found'
-       else
-      VarName='lhtfl'
-      LayName='sfc'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,8),error)
+       call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,8),
+     &            Zreverse,error)
         if (error /= 0) print*,'lhtfl not found'
        endif
         if(debugprint)
@@ -700,21 +556,12 @@
       if (fformat == 'netcdf') then
       VarName='prate_ave'
       Zreverse='no'
-!!       call read_netcdf_p(ncid,im,jm,1,VarName,apcp,Zreverse,error) !current hour
-       call read_netcdf_p(ncid,im,jm,1,VarName,apcp,Zreverse,
-     &     iope,ionproc,iocomms,error)
-!!       call read_netcdf_p(ncid2,im,jm,1,VarName,cpcp,Zreverse,error) !earlier hour
-       call read_netcdf_p(ncid2,im,jm,1,VarName,cpcp,Zreverse,
-     &     iope,ionproc,iocomms,error)
+!!       call read_netcdf(ncid,im,jm,1,VarName,apcp,Zreverse,error) !current hour
+       call read_netcdf(ncid,im,jm,1,VarName,apcp,Zreverse,
+     &     error)
+!!       call read_netcdf(ncid2,im,jm,1,VarName,cpcp,Zreverse,error) !earlier hour
+       call read_netcdf(ncid2,im,jm,1,VarName,cpcp,Zreverse,error)
         if (error /= 0) print*,'prate_ave not found'
-       else
-      VarName='prate_ave'
-      LayName='sfc'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             apcp,error)
-        call  read_nemsio(ffile2,im,jm,1,VarName,LayName,
-     +             cpcp,error)
-        if (error /= 0) print*,'prate_ave2 not found'
        endif
         if(debugprint)
      & print*,'sample fhour ,3= ', fhour,
@@ -735,19 +582,11 @@
       if (fformat == 'netcdf') then
       VarName='cprat_ave'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,apcp,Zreverse,
-     &     iope,ionproc,iocomms,error)
-       call read_netcdf_p(ncid2,im,jm,1,VarName,cpcp,Zreverse,
-     &     iope,ionproc,iocomms,error)
+       call read_netcdf(ncid,im,jm,1,VarName,apcp,Zreverse,
+     &     error)
+       call read_netcdf(ncid2,im,jm,1,VarName,cpcp,Zreverse,
+     &     error)
         if (error /= 0) print*,'cprat_ave not found'
-       else
-      VarName='cprat_ave'
-      LayName='sfc'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             apcp,error)
-        call  read_nemsio(ffile2,im,jm,1,VarName,LayName,
-     +             cpcp,error)
-        if (error /= 0) print*,'cprat_ave2 not found'
        endif
           ap=fhour-fint
         do j=1,jm
@@ -761,15 +600,8 @@
       if (fformat == 'netcdf') then
       VarName='weasd'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,dum2d(:,:,11),
-     &                Zreverse,
-     &     iope,ionproc,iocomms,error)
-        if (error /= 0) print*,'weasd not found'
-       else
-      VarName='weasd'
-      LayName='sfc'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,11),error)
+       call read_netcdf(ncid,im,jm,1,VarName,dum2d(:,:,11),
+     &                Zreverse,error)
         if (error /= 0) print*,'weasd not found'
        endif
 
@@ -777,48 +609,27 @@
       if (fformat == 'netcdf') then
       VarName='tcdc_avelcl'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,
-     &               dum2d(:,:,12),Zreverse,
-     &     iope,ionproc,iocomms,error)
+       call read_netcdf(ncid,im,jm,1,VarName,
+     &               dum2d(:,:,12),Zreverse,error)
         if (error /= 0) print*,'tcdc_avelcl not found'
-       else
-      VarName='tcdc_ave'
-      LayName='low cld lay'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,12),error)
-        if (error /= 0) print*,'low cld lay not found'
        endif
 
 ! mid cloud fraction
       if (fformat == 'netcdf') then
       VarName='tcdc_avemcl'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,
-     &               dum2d(:,:,13),Zreverse,
-     &     iope,ionproc,iocomms,error)
+       call read_netcdf(ncid,im,jm,1,VarName,
+     &               dum2d(:,:,13),Zreverse,error)
         if (error /= 0) print*,'tcdc_avemcl not found'
-       else
-      VarName='tcdc_ave'
-      LayName='mid cld lay'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,13),error)
-        if (error /= 0) print*,'mid cld lay not found'
        endif
 
 ! high cloud fraction
       if (fformat == 'netcdf') then
       VarName='tcdc_avehcl'
       Zreverse='no'
-       call read_netcdf_p(ncid,im,jm,1,VarName,
-     &               dum2d(:,:,14),Zreverse,
-     &     iope,ionproc,iocomms,error)
+       call read_netcdf(ncid,im,jm,1,VarName,
+     &               dum2d(:,:,14),Zreverse,error)
         if (error /= 0) print*,'tcdc_avehcl not found'
-       else
-      VarName='tcdc_ave'
-      LayName='high cld lay'
-        call  read_nemsio(ffile,im,jm,1,VarName,LayName,
-     +             dum2d(:,:,14),error)
-        if (error /= 0) print*,'high cld lay not found'
        endif
 
         if(debugprint)
@@ -828,9 +639,6 @@
       if (fformat == 'netcdf') then
         error=nf90_close(ncid)
         error=nf90_close(ncid2)
-      else
-        call nemsio_close(ffile,iret=error)
-        call nemsio_close(ffile2,iret=error)
       endif
       call date_and_time(date,time,zone,clocking)
 !      print *,'10reading surface data end= ', clocking
@@ -1109,7 +917,6 @@ CC due to rounding and interpolation errors, correct it here -G.P. Lou:
 !
 !  prepare buffer data
 !
-        if(iope == 0) then
         call gfuncphys
         do np = 1, npoint
           pi3(np,1)=psn(np)*1000
@@ -1308,7 +1115,6 @@ C        print *, 'in meteorg nfile1= ', nfile1
 !!          write(nfile) data
           write(nfile) data2
         enddo  !End loop over stations np
-       endif
       call date_and_time(date,time,zone,clocking)
 !      print *,'13reading write data end= ', clocking
       print *,'13date, time, zone',date, time, zone
