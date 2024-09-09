@@ -2,7 +2,7 @@ help([[
 Build environment for GFS utilities on Hera
 ]])
 
-prepend_path("MODULEPATH", '/scratch1/NCEPDEV/nems/Alexander.Richert/spack-stack-py311-aug24/envs/test/install/modulefiles/Core')
+prepend_path("MODULEPATH", '/scratch1/NCEPDEV/global/David.Huber/SPACK/ss_1.8.0/envs/gsi-addon/install/modulefiles/Core')
 
 local stack_intel_ver=os.getenv("stack_intel_ver") or "2021.5.0"
 local stack_impi_ver=os.getenv("stack_impi_ver") or "2021.5.1"
