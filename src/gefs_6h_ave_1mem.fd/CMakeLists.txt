@@ -1,6 +1,6 @@
 list(APPEND fortran_src
   gefs_6h_ave_1mem.f90 
-  prlevel.f
+  prlevel.f90
   printinfr.f90
 )
 
