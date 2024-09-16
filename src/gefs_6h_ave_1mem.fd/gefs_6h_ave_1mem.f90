@@ -146,16 +146,9 @@ program gefs_6h_ave_1mem
 
 !search in pgrb2a
 
-!        datafile(nfi)=trim(file_dir)//'/gefs.'//trim(file_date)//'/00/'//trim(ens_mem)//'.t00z.pgrb2af'//trim(sfh)
-!        if(ifh == 000 .or. ifh == 003 ) then 
-        if( ifh == 003 ) then 
-           datafile(nfi)=trim(datapath)//'gefs.t00z.master.grb2f'//trim(sfh) ! only control data avail
-        else
-           datafile(nfi)=trim(datapath)//'gefs.t00z.master.grb2f'//trim(sfh)
-        endif
+       datafile(nfi)=trim(datapath)//'gefs.t00z.master.grb2f'//trim(sfh)
 
-
-      unit=100
+       unit=100
        call BAOPENR(unit, datafile(nfi), iret)
        if(iret /= 0 ) then
         write(*,*) "there is no GEFS forecast",datafile(nfi)
@@ -166,20 +159,16 @@ program gefs_6h_ave_1mem
        jids=-9999
        jids=-9999;jpdt=-9999; jgdt=-9999
        jdisc=-1; jgdtn=-1
+       jpdt(1)  = pdt%icat(ifid)
+       jpdt(2)  = pdt%iprm(ifid)
+       jpdt(10) = pdt%iffs(ifid)
+       jdisc   = disc(ifid)
 
        if (nfi /= 3 ) then
           jpdtn = pdt%npdt(ifid)  !template version num. 
-          jpdt(1)  = pdt%icat(ifid)
-          jpdt(2)  = pdt%iprm(ifid)
-          jpdt(10) = pdt%iffs(ifid)
-          jdisc   = disc(ifid)
        else
 !          ifid1=ifid + nfield1/2
           jpdtn =11  !template version num.
-          jpdt(1)  = pdt%icat(ifid)
-          jpdt(2)  = pdt%iprm(ifid)
-          jpdt(10) = pdt%iffs(ifid)
-          jdisc   = disc(ifid)
 !!          if (ifid ==14 ) jpdt(10) = 10
        endif
 
