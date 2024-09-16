@@ -1,4 +1,4 @@
-      program gefs_6h_ave_1mem
+program gefs_6h_ave_1mem
 ! main program: gefs_6h_ave_1mem
 ! Author: Hong Guan :2018-12-17
 ! REF: Eric Sinsky, Wei Li, Yali Mao, Bo Cui
@@ -98,7 +98,7 @@
       logical :: unpack=.true.
       integer :: jdisc      ! discipline#, table 0.0(met:0 hydro:1 land:2)
       integer :: day,month,year,hour,fhour
-      character(len=256) :: datafile(n_time),outfile,file_dir,out_dir,outfile03,outfile006
+      character(len=256) :: datafile(n_time),outfile,outfile03,outfile006
       character(len=8) :: file_date
 !      character(len=5) :: ens_mem
       integer :: unit, ifid,ifid1,nx,ny,iret,jret,i,k,ifh,nfi,maxgrd,ifd,ind,ens_id
@@ -109,6 +109,7 @@
       character(len=8) :: pabbrev
       character(len=30) :: labbrev
       character(len=30) :: labbrev_short
+      character(len=500) :: datapath = './'
 
       real, allocatable :: var_save(:,:) ! (maxgrd,nfi)
       real, allocatable :: var_save_acc(:) ! (maxgrd)
@@ -122,19 +123,15 @@
 
 
       call GET_COMMAND_ARGUMENT(1, file_date)
-      call get_environment_variable("file_dir", file_dir)
-      call get_environment_variable("out_dir", out_dir)
 !      call get_environment_variable("ens_mem", ens_mem)
-
-      print *,'file dir:',trim(file_dir)
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !open files for output grib2 (f03 and f006)
-       outfile03=trim(out_dir)//'gefs'//'.t00z.'//'pgrb2af003'
+       outfile03=trim(datapath)//'gefs'//'.t00z.'//'pgrb2af003'
        print *,outfile03
        call baopenwa(300,outfile03,iret) ! for add more than 1 members
-       outfile006=trim(out_dir)//'gefs'//'.t00z.'//'pgrb2af006'
+       outfile006=trim(datapath)//'gefs'//'.t00z.'//'pgrb2af006'
        print *,outfile006
        call baopenwa(200,outfile006,iret) ! for add more than 1 members
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -152,12 +149,9 @@
 !        datafile(nfi)=trim(file_dir)//'/gefs.'//trim(file_date)//'/00/'//trim(ens_mem)//'.t00z.pgrb2af'//trim(sfh)
 !        if(ifh == 000 .or. ifh == 003 ) then 
         if( ifh == 003 ) then 
-!           datafile(nfi)=trim(file_dir)//'gec00.t00z.master.grb2f'//trim(sfh) ! only control data avail
-           datafile(nfi)=trim(file_dir)//'gefs.t00z.master.grb2f'//trim(sfh) ! only control data avail
+           datafile(nfi)=trim(datapath)//'gefs.t00z.master.grb2f'//trim(sfh) ! only control data avail
         else
-!           datafile(nfi)=trim(file_dir)//trim(ens_mem)//'.t00z.master.grb2f'//trim(sfh)
-!           datafile(nfi)=trim(file_dir)//trim(ens_mem)//'.t00z.master.grb2f'//trim(sfh)
-           datafile(nfi)=trim(file_dir)//'gefs.t00z.master.grb2f'//trim(sfh)
+           datafile(nfi)=trim(datapath)//'gefs.t00z.master.grb2f'//trim(sfh)
         endif
 
 
