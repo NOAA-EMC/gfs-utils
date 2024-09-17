@@ -2,7 +2,7 @@ help([[
 Build environment for GFS utilities on Hera
 ]])
 
-prepend_path("MODULEPATH", "/scratch1/NCEPDEV/nems/role.epic/spack-stack/spack-stack-1.8.0/envs/ue-intel-2021.5.0/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/contrib/spack-stack/spack-stack-1.8.0/envs/ue-intel-2021.5.0/install/modulefiles/Core")
 
 local stack_intel_ver=os.getenv("stack_intel_ver") or "2021.5.0"
 local stack_impi_ver=os.getenv("stack_impi_ver") or "2021.5.1"
