@@ -259,10 +259,6 @@ program gefs_6h_ave_1mem
 
          if (pabbrev=='PRES' .or. pabbrev=='TMP') then
            do i=1,maxgrd
-!           if (var_save(i,1).gt.1.E20.and.var_save(i,3).gt.1.E20) var_save_acc(i)=var_save(i,3)
-!           if (var_save(i,1).gt.1.E20.and.var_save(i,3).lt.1.E20) var_save_acc(i)=var_save(i,3)
-!           if (var_save(i,1).lt.1.E20.and.var_save(i,3).gt.1.E20) var_save_acc(i)=var_save(i,1)
-!           if (var_save(i,1).lt.1.E20.and.var_save(i,3).lt.1.E20) var_save_acc(i)=(var_save(i,1)+var_save(i,3))/2.
            if (var_save(i,2).eq.0.0.and.var_save(i,3).eq.0.0) var_save_acc(i)=var_save(i,3)
            if (var_save(i,2).eq.0.0.and.var_save(i,3).gt.0.0) var_save_acc(i)=var_save(i,3)
            if (var_save(i,2).gt.0.0.and.var_save(i,3).eq.0.0) var_save_acc(i)=var_save(i,2)
@@ -297,10 +293,6 @@ program gefs_6h_ave_1mem
 !        if(pabbrev=='WATR') then
         if(pabbrev=='WATR' .or. pabbrev=='TSNOWP') then
            do i=1,maxgrd
-!             if (var_save(i,1).gt.1.E20.and.var_save(i,3).gt.1.E20) var_save_acc(i)=var_save(i,3)
-!             if (var_save(i,1).gt.1.E20.and.var_save(i,3).lt.1.E20) var_save_acc(i)=var_save(i,3)
-!             if (var_save(i,1).lt.1.E20.and.var_save(i,3).gt.1.E20) var_save_acc(i)=var_save(i,1)
-!             if (var_save(i,1).lt.1.E20.and.var_save(i,3).lt.1.E20) then
                  var_save_acc(i)=var_save(i,2)+var_save(i,3)
 !             endif
            enddo
@@ -329,13 +321,7 @@ program gefs_6h_ave_1mem
 
 !output 6h variables
 
-!reasign gfldo%fld
-!        gfldo%fld=var_save_acc(:)
         gfld%fld=var_save_acc(:)
-!reassign the ipdtmpl
-!       gfldo%ipdtmpl(17)=ens_id !!!! ensemble member: iens=0 ->CTL
-!       gfldo%ipdtmpl(9)=0 !forecast time
-!       gfldo%discipline=disc(ifid) !forecast time
        gfld%ipdtmpl(22)=6 !forecast time
        gfld%ipdtmpl(30)=6 !forecast time
        jret=0
@@ -373,12 +359,8 @@ program gefs_6h_ave_1mem
 
 !output 3-h variables
 
-!reasign gfldo%fld 
-!       gfldo`%fld=var_save_acc(:)
        gfld%fld=var_save_acc(:)
 !reassign the ipdtmpl
-!       gfldo%ipdtmpl(17)=ens_id !!!! ensemble member: iens=0 ->CTL
-!        write(15,*) gfld%ipdtmpl(19),gfld%ipdtmpl(27)
        gfld%ipdtmpl(9)=0 !forecast time
        gfld%ipdtmpl(22)=3 !forecast time
        gfld%ipdtmpl(30)=3 !forecast time
