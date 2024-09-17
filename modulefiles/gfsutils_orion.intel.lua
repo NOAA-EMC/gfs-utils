@@ -2,20 +2,17 @@ help([[
 Build environment for GFS utilities on Orion
 ]])
 
--- Spack Stack installation specs
-local ss_dir="/work/noaa/epic/role-epic/spack-stack/orion"
-local ss_ver=os.getenv("stack_ver") or "1.6.0"
-local ss_env=os.getenv("stack_env") or "gsi-addon-env-rocky9"
+--Compiler and MPI versions
+stack_intel_ver=os.getenv("stack_intel_ver") or "2021.9.0"
+stack_impi_ver=os.getenv("stack_impi_ver") or "2021.9.0"
 
-prepend_path("MODULEPATH", pathJoin(ss_dir, "spack-stack-" .. ss_ver, "envs", ss_env, "install/modulefiles/Core"))
+--Spack-stack root path and environment name
+stack_root=os.getenv("stack_root") or "/work/noaa/role-epic/spack-stack/orion"
+stack_env=os.getenv("stack_env") or "ue-intel-" .. stack_intel_ver
 
-local stack_intel_ver=os.getenv("stack_intel_ver") or "2021.9.0"
-local stack_impi_ver=os.getenv("stack_impi_ver") or "2021.9.0"
-local cmake_ver=os.getenv("cmake_ver") or "3.23.1"
-
-load(pathJoin("stack-intel", stack_intel_ver))
-load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
-load(pathJoin("cmake", cmake_ver))
+--Stack compiler and MPI modules to load
+stack_compiler=os.getenv("stack_compiler") or pathJoin("stack-intel", stack_intel_ver)
+stack_mpi=os.getenv("stack_mpi") or pathJoin("stack-intel-oneapi-mpi", stack_impi_ver)
 
 load("gfsutils_common")
 
