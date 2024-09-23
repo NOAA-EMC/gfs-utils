@@ -100,7 +100,6 @@ program gefs_6h_ave_1mem
       integer :: day,month,year,hour,fhour
       character(len=256) :: datafile(n_time),outfile,outfile03,outfile006
       character(len=8) :: file_date
-!      character(len=5) :: ens_mem
       integer :: unit, ifid,ifid1,nx,ny,iret,jret,i,k,ifh,nfi,maxgrd,ifd,ind,ens_id
       character(len=3) ::sfh
       character(len=2) ::sdy
@@ -135,20 +134,19 @@ program gefs_6h_ave_1mem
        print *,outfile006
        call baopenwa(200,outfile006,iret) ! for add more than 1 members
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
+      unit=10
       do ifid=1,nfield1
       nfi=1
       do ifh=003,006,3  !foercast hours
 
        nfi=nfi+1
+       unit=unit+1
        write(sfh,'(i3.3)') ifh
 
 !search in pgrb2a
 
        datafile(nfi)=trim(datapath)//'gefs.t00z.master.grb2f'//trim(sfh)
 
-       unit=100
        call BAOPENR(unit, datafile(nfi), iret)
        if(iret /= 0 ) then
         write(*,*) "there is no GEFS forecast",datafile(nfi)
@@ -156,7 +154,6 @@ program gefs_6h_ave_1mem
        write(*,*) unit, datafile(nfi), iret
 
        j = 0
-       jids=-9999
        jids=-9999;jpdt=-9999; jgdt=-9999
        jdisc=-1; jgdtn=-1
        jpdt(1)  = pdt%icat(ifid)
@@ -167,9 +164,7 @@ program gefs_6h_ave_1mem
        if (nfi /= 3 ) then
           jpdtn = pdt%npdt(ifid)  !template version num. 
        else
-!          ifid1=ifid + nfield1/2
           jpdtn =11  !template version num.
-!!          if (ifid ==14 ) jpdt(10) = 10
        endif
 
        call getgb2(unit,0,j,jdisc,jids,jpdtn,jpdt,jgdtn,jgdt,unpack,j,gfld,iret)
@@ -228,7 +223,6 @@ program gefs_6h_ave_1mem
       if(.not. allocated(var_save_acc)) allocate(var_save_acc(maxgrd))
       if(.not. allocated(var_save_USWRF)) allocate(var_save_USWRF(maxgrd))
       if(.not. allocated(var_save_DSWRF)) allocate(var_save_DSWRF(maxgrd))
-!      gfldo%fld=-999999.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !calculate the 00-6h ave/acc
@@ -249,7 +243,6 @@ program gefs_6h_ave_1mem
 
          var_save_acc(:)=(var_save(:,2)+var_save(:,3)*6./3.)/2.
 
-!         if (pabbrev=='DSWRF' .and. nfi==3 ) then
          if (pabbrev=='DSWRF' ) then
                  var_save_DSWRF(:)=var_save_acc(:)
          endif
@@ -266,35 +259,19 @@ program gefs_6h_ave_1mem
            enddo
          endif
 
-!         if (pabbrev=='TCDC' .or. pabbrev=='LCDC' .or. pabbrev=='MCDC' .or. pabbrev=='HCDC' .or. pabbrev=='ALBDO') then
-
          if (pabbrev=='ALBDO') then
            do i=1,maxgrd
            var_save_acc(i)=0.0
            if (var_save_DSWRF(i) .gt. 0.01 .and. var_save_USWRF(i).gt.0.01) then
                 var_save_acc(i)=100.*var_save_USWRF(i)/var_save_DSWRF(i)
-                if(var_save_acc(i) .gt. 100)write(15,*) i,var_save_DSWRF(i),var_save_USWRF(i),var_save_acc(i)
                 if(var_save_acc(i) .gt. 100) var_save_acc(i)=0.0
-!                if(var_save_acc(i) .gt. 100) write(15,*) i,var_save_DSWRF(i),var_save_USWRF(i),var_save_acc(i)
            endif
            enddo
          endif
 
-!         if (ifid==37 ) then
-!           do i=1,maxgrd
-!             if (var_save(i,1).gt.1.E20.and.var_save(i,3).gt.1.E20) then
-!                  var_save_acc(i)=var_save(i,3)
-!             else
-!                 var_save_acc(i)=(var_save(i,1)+var_save(i,3))/2.
-!             endif
-!           enddo
-!         endif
-
-!        if(pabbrev=='WATR') then
         if(pabbrev=='WATR' .or. pabbrev=='TSNOWP') then
            do i=1,maxgrd
                  var_save_acc(i)=var_save(i,2)+var_save(i,3)
-!             endif
            enddo
         endif
 
@@ -365,7 +342,6 @@ program gefs_6h_ave_1mem
        gfld%ipdtmpl(22)=3 !forecast time
        gfld%ipdtmpl(30)=3 !forecast time
        jret=0
-!       call putgb2(300,gfldo,jret)
        call putgb2(300,gfld,jret)
 
        write(*,*) '300 put',jret,gfldo%ipdtmpl
@@ -390,7 +366,6 @@ program gefs_6h_ave_1mem
         write(*,*) "there is no GEFS forecast",datafile(nfi)
        end if
 
-!      do ifid=41,43
       do ifid=40,42
        j = 0
        jids=-9999
@@ -428,8 +403,6 @@ program gefs_6h_ave_1mem
          call putgb2(200,gfld,jret)
          write(*,*) '0-6h apcp put',jret
 
-!         write(15,*) gfld%ipdtmpl(19)
-!         write(15,*) gfld%ipdtmpl(27)
          gfld%fld=apcp_3h(:)
          gfld%ipdtmpl(22)=3 !forecast time
          gfld%ipdtmpl(30)=3 !forecast time
@@ -486,9 +459,6 @@ program gefs_6h_ave_1mem
        endif
 
       enddo
-!       gfldo%ipdtmpl(17)=ens_id !!!! ensemble member: iens=0 ->CTL
-!       gfldo%ipdtmpl(9)=0 !forecast time
-
 
       deallocate(apcp_6h)
       deallocate(acpcp_6h)
