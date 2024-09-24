@@ -28,7 +28,9 @@ C        print *, nint1,nend1,nint3,nend3,jdate
         do np = 1, npoint
 C       OPEN BUFR OUTPUT FILE.
         write(fnbufr,fmto) dird(1:lss),istat(np),jdate
-        print *, ' fnbufr =', fnbufr
+        if(np==1.or.np==100) then
+          print *, ' fnbufr =', fnbufr
+        endif
         open(unit=19,file=fnbufr,form='unformatted', 
      &     status='new', iostat=ios)
         IF ( ios .ne. 0 ) THEN

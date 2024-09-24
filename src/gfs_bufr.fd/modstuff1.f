@@ -11,6 +11,7 @@
 !
 ! Program history log:
 !   1999-10-18  Mark Iredell
+!   2024-08-23  Bo Cui  Replace sigio_module with the simplified module modpr_module
 !
 ! Usage:  call modstuff(km,idvc,idsl,nvcoord,vcoord,ps,psx,psy,d,u,v,&
 !                       pd,pi,pm,aps,apm,os,om,px,py)
@@ -41,7 +42,7 @@
 !   Language: Fortran 90
 !
 !$$$
-    use sigio_module
+    use modpr_module
     implicit none
     integer,intent(in):: km,idvc,idsl,nvcoord
     real,intent(in):: vcoord(km+1,nvcoord)

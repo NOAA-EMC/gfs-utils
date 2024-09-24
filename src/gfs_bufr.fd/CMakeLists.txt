@@ -9,14 +9,14 @@ list(APPEND fortran_src
   meteorg.f
   mstadb.f
   newsig1.f
-  read_nemsio.f
-  #read_netcdf.f
-  read_netcdf_p.f
+  read_netcdf.f
+  #read_netcdf_p.f
   rsearch.f
   svp.f
   tdew.f
   terp3.f
   vintg.f
+  modpr_module.f90
 )
 
 list(APPEND fortran_src_free
@@ -40,10 +40,8 @@ set(exe_name gfs_bufr.x)
 add_executable(${exe_name} ${fortran_src} ${fortran_src_free})
 target_link_libraries(${exe_name} PRIVATE NetCDF::NetCDF_Fortran
                                           bacio::bacio_4
-                                          sigio::sigio
                                           sp::sp_4
                                           w3emc::w3emc_4
-                                          nemsio::nemsio
                                           bufr::bufr_4)
 
 if(OpenMP_Fortran_FOUND)
