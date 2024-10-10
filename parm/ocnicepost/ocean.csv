@@ -20,6 +20,7 @@
      'taux', 2 ,'Cu' , 'conserve' , 'tauy' , 'Cv'
      'tauy', 2 ,'Cv' , 'conserve' , 'taux' , 'Cu'
      'temp', 3 ,'Ct' , 'bilinear' , '', ''
+      'tob', 2 ,'Ct' , 'bilinear' , '', ''
        'so', 3 ,'Ct' , 'bilinear' , '', ''
        'uo', 3 ,'Cu' , 'bilinear' , 'vo' , 'Cv'
        'vo', 3 ,'Cv' , 'bilinear' , 'uo' , 'Cu'
