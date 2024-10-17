@@ -27,7 +27,7 @@ contains
     ! local variables
     integer            :: rc, ncid, varid, n
     character(len=240) :: wgtsfile
-    real               :: minlat = -79.75
+    real               :: minlat = -78.63       
 
     real, allocatable, dimension(:) :: out1d
 
