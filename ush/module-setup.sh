@@ -86,5 +86,16 @@ elif [[ $MACHINE_ID = discover* ]]; then
     . $SPACK_ROOT/share/spack/setup-env.sh
 
 else
-    echo WARNING: UNKNOWN PLATFORM 1>&2
+    if [[ ! -v PW_CSP ]]; then
+        echo WARNING: UNKNOWN PLATFORM 1>&2
+    elif [[ -z "${PW_CSP}" ]]; then
+        echo WARNING: UNKNOWN PLATFORM 1>&2
+    else
+        if [[ "${PW_CSP}" == "aws" || "${PW_CSP}" == "azure" || "${PW_CSP}" == "google" ]]; then
+            module purge
+        else
+            echo WARNING: UNKNOWN PLATFORM 1>&2
+        fi
+    fi
+
 fi
