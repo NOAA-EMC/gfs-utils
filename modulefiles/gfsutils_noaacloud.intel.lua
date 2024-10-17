@@ -6,9 +6,9 @@ prepend_path("MODULEPATH", "/contrib/spack-stack-rocky8/spack-stack-1.6.0/envs/g
 prepend_path("MODULEPATH", "/apps/modules/modulefiles")
 
 load("gnu")
-stack_intel_ver=os.getenv("stack_intel_ver") or "2021.10.0"
+local stack_intel_ver=os.getenv("stack_intel_ver") or "2021.10.0"
 load(pathJoin("stack-intel", stack_intel_ver))
-stack_impi_ver=os.getenv("stack_impi_ver") or "2021.10.0"
+local stack_impi_ver=os.getenv("stack_impi_ver") or "2021.10.0"
 load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
 unload("gnu")
 
