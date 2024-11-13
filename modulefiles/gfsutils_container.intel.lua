@@ -12,6 +12,6 @@ load(pathJoin("stack-intel", stack_intel_ver))
 load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
 load(pathJoin("cmake", cmake_ver))
 
-load("gfsutils_generic")
+load("gfsutils_common")
 
 whatis("Description: GFS utilities environment in container with Intel Compilers")
