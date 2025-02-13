@@ -609,7 +609,7 @@ contains
        integer(4) :: fortime, dij, npt
        CHARACTER(len=1),allocatable,dimension(:) :: cgrib
        real(4) :: tmpfld(size(field,1))
-k
+
        ! GRIB2 metadata arrays
        integer(4) :: listsec0(2), listsec1(13)
        integer(4) :: igdtnum, ipdtnum, idrtnum
