@@ -850,7 +850,7 @@ contains
    integer :: lunout, ierr
    integer :: fortime, dij, npt
    CHARACTER(len=1),allocatable,dimension(:) :: cgrib
-   real(4) :: tmpfld(size(field,1), size(field,2))
+   real(4) :: tmpfld(size(field,1))
 
    ! GRIB2 metadata arrays
    integer :: listsec0(2), listsec1(13)
