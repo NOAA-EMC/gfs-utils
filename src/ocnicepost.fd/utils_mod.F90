@@ -867,7 +867,7 @@ contains
    real, dimension(40) :: dep1
    real, dimension(28) :: dep2
    real, dimension(:), allocatable :: dep
-   
+     
    npt = dims(1) * dims(2)
 
    max_bytes = npt * 4
