@@ -730,8 +730,6 @@ contains
          mean_val = sum(field(:,n), mask = field(:,n) .ne. vfill) / count(field(:,n) .ne. vfill)
 
          if (debug) then
-            write(logunit, *) 'var_name, n: ', gcf(n)%var_name, n
-            write(logunit,*) 'size_bmp ,size_rgmask2d', size(bmp), size(rgmask2d)
             write(logunit, *) 'Variable_name, max, min, mean: ', gcf(n)%var_name, max_val, min_val, mean_val
          end if
 
