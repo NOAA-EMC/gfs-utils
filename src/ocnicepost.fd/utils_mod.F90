@@ -2,7 +2,7 @@ module utils_mod
 
   use netcdf
   use init_mod, only : debug, logunit, vardefs, fsrc, input_file, ftype
-  use ieee_arithmetic
+
 
 
   implicit none
@@ -590,7 +590,7 @@ contains
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !-----------------------------------------------------------------------------------
 
-  subroutine write_grib2_2d(fname, gcf, dims, nflds, field, rgmask2d, vfill)
+  subroutine write_grib2_2d(fname, gcf, dims, nflds, field, vfill)
    
        implicit none
    
@@ -599,7 +599,6 @@ contains
        integer(4),          intent(in) :: dims(2)
        integer(4),          intent(in) :: nflds
        real(4),             intent(inout) :: field(dims(1)*dims(2),nflds)
-       real(4),             intent(in) :: rgmask2d(dims(1) * dims(2))
        real(4),             intent(in) :: vfill
 
        ! internal variables
@@ -608,7 +607,7 @@ contains
        integer(4) :: lunout, ierr
        integer(4) :: fortime, dij, npt
        CHARACTER(len=1),allocatable,dimension(:) :: cgrib
-       real(4) :: tmpfld(size(field,1))
+       real(8) :: tmpfld(size(field,1))
 
        ! GRIB2 metadata arrays
        integer(4) :: listsec0(2), listsec1(13)
@@ -617,10 +616,10 @@ contains
        integer(4) :: jgdt(19), jpdt(15), idrtmpl(16)
        integer(4) :: igds(5)
        integer(4) :: numcoord, ibmap
-       real    :: coordlist
+       real(4)    :: coordlist
        integer(4) :: n, lon0, lon1, lat0, lat1
        integer(4) :: ideflist, idefnum
-       logical :: bmp(dims(1)*dims(2)) 
+       logical*1 :: bmp(dims(1)*dims(2)) 
 
        real :: max_val, min_val, mean_val, count_val
 
@@ -668,7 +667,7 @@ contains
        lat0 = -90000000
        lat1 = 90000000
 
-       ! Populate the jgdt array for Template 3.0 (changed parameters to current grib2 files)
+       ! Populate the jgdt array for Template 3.0 
        jgdt(1) = 6              
        jgdt(2) = 0              
        jgdt(3) = 0                
@@ -797,7 +796,7 @@ contains
          if (debug) write(logunit, *) 'idrtmpl: ', idrtmpl
 
          tmpfld=0 
-         tmpfld =field(:,n)
+         tmpfld=real(field(:,n), 8)
 
 
          write(logunit, *) 'Variable_name, max, min, mean, count: ', gcf(n)%var_name, max_val, min_val, mean_val, count_val
@@ -832,7 +831,7 @@ contains
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !-----------------------------------------------------------------------------------
 
-  subroutine write_grib2_3d(fname, gcf, dims, nflds, field, rgmask3d, vfill)
+  subroutine write_grib2_3d(fname, gcf, dims, nflds, field, vfill)
    
    implicit none
 
@@ -841,7 +840,6 @@ contains
    integer,          intent(in) :: dims(3)
    integer,          intent(in) :: nflds
    real,             intent(inout) :: field( dims(1) * dims(2) , dims(3) , nflds )
-   real,             intent(in) :: rgmask3d(dims(1) * dims(2) , dims(3))
    real,             intent(in) :: vfill
 
    ! internal variables
@@ -850,7 +848,7 @@ contains
    integer :: lunout, ierr
    integer :: fortime, dij, npt
    CHARACTER(len=1),allocatable,dimension(:) :: cgrib
-   real(4) :: tmpfld(size(field,1))
+   real(8) :: tmpfld(size(field,1))
 
    ! GRIB2 metadata arrays
    integer :: listsec0(2), listsec1(13)
@@ -861,12 +859,12 @@ contains
    integer :: numcoord, ibmap
    real :: coordlist
    integer :: ideflist, idefnum
-   logical :: bmp( dims(1) * dims(2) ) 
+   logical*1 :: bmp( dims(1) * dims(2) ) 
 
    integer :: n, lon0, lon1, lat0, lat1, nlay, lyr
-   real, dimension(40) :: dep1
-   real, dimension(28) :: dep2
-   real, dimension(:), allocatable :: dep
+   integer, dimension(40) :: dep1
+   integer, dimension(28) :: dep2
+   integer, dimension(:), allocatable :: dep
      
    npt = dims(1) * dims(2)
 
@@ -1055,8 +1053,7 @@ contains
      idrtlen=size(idrtmpl)
 
      tmpfld=0
-     tmpfld =field(:,lyr,n)
-
+     tmpfld=real(field(:,lyr,n), 8)
 
      call addfield(cgrib, max_bytes, ipdtnum, jpdt, ipdtlen, coordlist, numcoord, &
      idrtnum, idrtmpl, idrtlen, tmpfld, npt, ibmap, bmp, ierr)

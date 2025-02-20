@@ -284,11 +284,11 @@ program ocnicepost
       g2d(1:nbilin2d) = b2d
    end if
 
-   call write_grib2_2d(gout, g2d, (/nxr,nyr/), nconsd2d+nbilin2d, grib2d, rgmask2d, vfill)
+   call write_grib2_2d(gout, g2d, (/nxr,nyr/), nconsd2d+nbilin2d, grib2d, vfill)
 
    if (allocated(rgb3d)) then
       gout = trim(ftype)//'.'//trim(fdst)//'_3D.gb2'
-      call write_grib2_3d(gout, b3d, (/nxr,nyr,nlevs/), nbilin3d, rgb3d, rgmask3d, vfill)
+      call write_grib2_3d(gout, b3d, (/nxr,nyr,nlevs/), nbilin3d, rgb3d, vfill)
       if (debug) write(logunit, '(a)')'GRIB2 3D output file: '//trim(gout)
    end if
   end if
