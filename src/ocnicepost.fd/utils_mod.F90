@@ -621,7 +621,7 @@ contains
        integer(4) :: ideflist, idefnum
        logical*1 :: bmp(dims(1)*dims(2)) 
 
-       real :: max_val, min_val, mean_val, count_val
+       real(4):: max_val, min_val, mean_val, count_val
 
        npt = dims(1) * dims(2)
    
@@ -681,7 +681,7 @@ contains
        jgdt(11) = -1    
        jgdt(12) = lat0
        jgdt(13) = lon0
-       jgdt(14) = 48   !0
+       jgdt(14) = 48  
        jgdt(15) = lat1
        jgdt(16) = lon1
        jgdt(17) = dij
@@ -742,18 +742,18 @@ contains
 !        Create Section 4 parametrs    
          ipdtnum=0
 
-         jpdt(1)=gcf(n)%var_g5  ! parm number catagory
-         jpdt(2)=gcf(n)%var_g6  ! parm number
-         jpdt(3)=2              ! (0-analysis, 1-initialazation, 2-forecast, .. GRIB2 - CODE TABLE 4.3 )
-         jpdt(4)=0              !  
-         jpdt(5)=96             ! Code ON388 Table A- GFS
-         jpdt(6)=0              !    
-         jpdt(7)=0              ! 
-         jpdt(8)=1              ! unit (Hour=1)    6hour=11     (ask later) Table 4.4
-         jpdt(9)=fortime        ! forecast time
+         jpdt(1)=gcf(n)%var_g5   ! parm number catagory
+         jpdt(2)=gcf(n)%var_g6   ! parm number
+         jpdt(3)=2               ! (0-analysis, 1-initialazation, 2-forecast, .. GRIB2 - CODE TABLE 4.3 )
+         jpdt(4)=0               !  
+         jpdt(5)=96              ! Code ON388 Table A- GFS
+         jpdt(6)=0               !    
+         jpdt(7)=0               ! 
+         jpdt(8)=1               ! unit (Hour=1)    6hour=11     (ask later) Table 4.4
+         jpdt(9)=fortime         ! forecast time
          jpdt(10)=gcf(n)%var_g7  ! level ID (1-Ground or Water Surface, 101 mean sea level, 160 depth bellow mean sea level , 168-Ocean Model Layer,...)
          jpdt(11)=0              ! 
-         jpdt(12)=0             ! 
+         jpdt(12)=0              ! 
          jpdt(13)=0
          jpdt(14)=0
          jpdt(15)=0
@@ -766,14 +766,14 @@ contains
          numcoord=0
          coordlist=0.  ! needed for hybrid vertical coordinate
 
-         ibmap = 255     ! Bitmap indicator ( see Code Table 6.0 ) -255 no bitmap
+         ibmap = 0     ! Bitmap indicator ( see Code Table 6.0 ) -255 no bitmap
          bmp=.true.
 
          if (trim(gcf(n)%name_gb2) .eq. 'WTMP') then
             where ( field(:,n) .ne. vfill ) field(:,n) = field(:,n) + 273.15
          endif
 
-         where ( field(:,n) .eq. vfill )  field(:,n)= 9999.0
+         where ( field(:,n) .eq. vfill )  bmp(:)= .false.
 
          !        Create Section 5 parametrs   
          idrtnum = 0                            ! Template 5.2 (Grid Point Data - complex Packing)
@@ -782,9 +782,9 @@ contains
          ! Populate idrtmpl
          idrtmpl(1) = 0             ! Reference value (scaled value of the minimum data point)
          idrtmpl(2) = 0             ! Binary scale factor (scale by 2^E)
-         idrtmpl(3) = 2            ! Decimal scale factor (scale by 10^D)
+         idrtmpl(3) = 3             ! Decimal scale factor (scale by 10^D)
          idrtmpl(4) = 0             !
-         idrtmpl(5) = 0             ! 
+         idrtmpl(5) = 0             !
          idrtmpl(6) = 0             ! 
          ! Reserved fields
          idrtmpl(7:16) = 0          ! Reserved for future use 
@@ -833,36 +833,36 @@ contains
    
    implicit none
 
-   character(len=*), intent(in) :: fname
-   type(vardefs),    intent(in) :: gcf(:)
-   integer,          intent(in) :: dims(3)
-   integer,          intent(in) :: nflds
-   real,             intent(inout) :: field( dims(1) * dims(2) , dims(3) , nflds )
-   real,             intent(in) :: vfill
+   character(len=*),    intent(in) :: fname
+   type(vardefs),       intent(in) :: gcf(:)
+   integer(4),          intent(in) :: dims(3)
+   integer(4),          intent(in) :: nflds
+   real(4),             intent(inout) :: field( dims(1) * dims(2) , dims(3) , nflds )
+   real(4),             intent(in) :: vfill
 
    ! internal variables
-   integer :: max_bytes, lengrib
-   integer :: ref_time(6)
-   integer :: lunout, ierr
-   integer :: fortime, dij, npt
+   integer(4) :: max_bytes, lengrib
+   integer(4) :: ref_time(6)
+   integer(4) :: lunout, ierr
+   integer(4) :: fortime, dij, npt
    CHARACTER(len=1),allocatable,dimension(:) :: cgrib
    real(8) :: tmpfld(size(field,1))
 
    ! GRIB2 metadata arrays
-   integer :: listsec0(2), listsec1(13)
-   integer :: igdtnum, ipdtnum, idrtnum
-   integer :: igdtlen, ipdtlen, idrtlen
-   integer :: jgdt(19), jpdt(15), idrtmpl(16)
-   integer :: igds(5)
-   integer :: numcoord, ibmap
-   real :: coordlist
-   integer :: ideflist, idefnum
+   integer(4) :: listsec0(2), listsec1(13)
+   integer(4) :: igdtnum, ipdtnum, idrtnum
+   integer(4) :: igdtlen, ipdtlen, idrtlen
+   integer(4) :: jgdt(19), jpdt(15), idrtmpl(16)
+   integer(4) :: igds(5)
+   integer(4) :: numcoord, ibmap
+   real(4):: coordlist
+   integer(4) :: ideflist, idefnum
    logical*1 :: bmp( dims(1) * dims(2) ) 
 
-   integer :: n, lon0, lon1, lat0, lat1, nlay, lyr
-   integer, dimension(40) :: dep1
-   integer, dimension(28) :: dep2
-   integer, dimension(:), allocatable :: dep
+   integer(4) :: n, lon0, lon1, lat0, lat1, nlay, lyr
+   integer(4), dimension(40) :: dep1
+   integer(4), dimension(28) :: dep2
+   integer(4), dimension(:), allocatable :: dep
      
    npt = dims(1) * dims(2)
 
@@ -1026,12 +1026,14 @@ contains
      numcoord=0
      coordlist=0.  ! needed for hybrid vertical coordinate
 
-     ibmap=255     ! Bitmap indicator ( see Code Table 6.0 ) -255 no bitmap
+     ibmap=0     ! Bitmap indicator ( see Code Table 6.0 ) -255 no bitmap
      bmp=.true.
 
      if (trim(gcf(n)%name_gb2) .eq. 'WTMP') then
         where ( field(:,lyr,n) .ne. vfill ) field(:,lyr,n) = field(:,lyr,n) + 273.15
      endif
+
+     where ( field(:,lyr,n) .eq. vfill )  bmp(:)= .false.
 
      ! Assign Template 5
 
@@ -1055,6 +1057,7 @@ contains
 
      call addfield(cgrib, max_bytes, ipdtnum, jpdt, ipdtlen, coordlist, numcoord, &
      idrtnum, idrtmpl, idrtlen, tmpfld, npt, ibmap, bmp, ierr)
+
      if (ierr /=- 0) then
          write(0, *) 'Error adding field to GRIB2 message', ierr
          return
