@@ -643,7 +643,6 @@ contains
    
        listsec1(1) = gcf(1)%var_g3     ! Originating Centre (Common Code Table C-1)
        listsec1(2) = 0                 ! Originating Sub-centre (local table) EMC=4
-!       listsec1(3) = 32                 ! GRIB Master Tables Version Number (Code Table 1.0)-last one currently 32
        listsec1(3) = gcf(1)%var_g2     ! GRIB Master Tables Version Number (Code Table 1.0)
        listsec1(4) = 1                 ! GRIB Local Tables Version Number (Code Table 1.1)
        listsec1(5) = 1                 ! Significance of Reference Time (Code Table 1.2)
@@ -739,7 +738,7 @@ contains
              return
          end if
 
-!        Create Section 4 parametrs    
+         ! Create Section 4 parametrs    
          ipdtnum=0
 
          jpdt(1)=gcf(n)%var_g5   ! parm number catagory
@@ -775,8 +774,8 @@ contains
 
          where ( field(:,n) .eq. vfill )  bmp(:)= .false.
 
-         !        Create Section 5 parametrs   
-         idrtnum = 0                            ! Template 5.2 (Grid Point Data - complex Packing)
+         !  Create Section 5 parametrs   
+         idrtnum = 0                            ! Template 5.0 (Grid Point Data - simple Packing)
 
          idrtmpl(:)=0
          ! Populate idrtmpl
@@ -785,9 +784,9 @@ contains
          idrtmpl(3) = 3             ! Decimal scale factor (scale by 10^D)
          idrtmpl(4) = 0             !
          idrtmpl(5) = 0             !
-         idrtmpl(6) = 0             ! 
+         idrtmpl(6) = 0             !
          ! Reserved fields
-         idrtmpl(7:16) = 0          ! Reserved for future use 
+         idrtmpl(7:16) = 0          ! Reserved for future use
 
          idrtlen=size(idrtmpl)
 
@@ -932,7 +931,7 @@ contains
    lat0 = -90000000
    lat1 = 90000000
 
-       ! Populate the jgdt array for Template 3.0 (changed parameters to current grib2 files)
+   ! Populate the jgdt array for Template 3.0 (changed parameters to current grib2 files)
    jgdt(1) = 6              
    jgdt(2) = 0              
    jgdt(3) = 0                
@@ -999,7 +998,7 @@ contains
          return
      end if
 
-!        Create Section 4 parametrs    
+     !  Create Section 4 parametrs    
      ipdtnum=0
 
 
@@ -1029,7 +1028,7 @@ contains
      ibmap=0     ! Bitmap indicator ( see Code Table 6.0 ) -255 no bitmap
      bmp=.true.
 
-     if (trim(gcf(n)%name_gb2) .eq. 'WTMP') then
+     if (trim(gcf(n)%name_gb2) .eq. 'WTMP' ) then
         where ( field(:,lyr,n) .ne. vfill ) field(:,lyr,n) = field(:,lyr,n) + 273.15
      endif
 
@@ -1037,7 +1036,7 @@ contains
 
      ! Assign Template 5
 
-     idrtnum = 0                            ! Template 5.2 (Grid Point Data - complex Packing)
+     idrtnum = 0                ! Template 5.0 (Grid Point Data - simple Packing)
 
      idrtmpl(:)=0
      ! Populate idrtmpl

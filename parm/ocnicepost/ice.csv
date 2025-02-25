@@ -2,7 +2,6 @@
        'hi_h',2, 'Ct', 'bilinear', '', '', 'ICETK', 'Ice Thickness', 'm',10,2,7,0,2,1,1,0
        'hs_h',2, 'Ct', 'bilinear', '', '', 'SNVOLSI', 'Snow Volume Over Sea Ice per Unit Area', 'm3m-2',10,2,7,0,2,16,1,0
      'aice_h',2, 'Ct', 'bilinear', '', '', 'ICEC', 'Ice Cover', 'Proportion',10,2,7,0,2,0,1,0
-     'Tsfc_h',2, 'Ct', 'bilinear', '', '', 'ICETMP', 'Ice Temperature', 'K',10,2,7,0,2,8,1,0
      'uvel_h',2, 'Bu_x', 'bilinear', 'vvel_h', 'Bu_y', 'UICE', 'U-Component of Ice Drift', 'm/s',10,2,7,0,2,4,1,0
      'vvel_h',2, 'Bu_y', 'bilinear', 'uvel_h', 'Bu_x', 'VICE', 'V-Component of Ice Drift', 'm/s',10,2,7,0,2,5,1,0
    'frzmlt_h',2, 'Ct', 'conserve', '', '', 'FRZMLTPOT', 'freeze/melt potential', 'W m-2',10,2,7,0,2,27,1,0

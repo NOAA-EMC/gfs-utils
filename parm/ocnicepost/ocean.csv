@@ -14,6 +14,7 @@
       'SSV',2,'Cv' , 'bilinear' , 'SSU'  , 'Cu','VOGRD','V-Component of Current','m/s',10,1,7,0,1,3,101,0
      'taux',2,'Cu' , 'conserve' , 'tauy' , 'Cv','XCOMPSS','x-component Surface Stress','N/m^2',10,1,7,0,3,7,101,0
      'tauy',2,'Cv' , 'conserve' , 'taux' , 'Cu','YCOMPSS','y-component Surface Stress','N/m^2',10,1,7,0,3,7,101,0
+     'tob', 2,'Ct' , 'bilinear' , '', '','WTMP','Ocean Bottom Water Temperature','K',10,1,7,0,3,0,9,0
      'temp',3,'Ct' , 'bilinear' , '', '','WTMP','Water Temperature','K',10,1,7,0,3,0,160,0
        'so',3,'Ct' , 'bilinear' , '', '','SALIN','3-D Salinity','psu',10,0,7,1,4,193,160,0
        'uo',3,'Cu' , 'bilinear' , 'vo' , 'Cv','UOGRD','U-Component of Current','m/s',10,1,7,0,1,2,160,0
