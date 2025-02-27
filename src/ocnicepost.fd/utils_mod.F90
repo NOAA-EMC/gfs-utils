@@ -732,7 +732,7 @@ contains
             write(logunit, *) 'Variable_name, max, min, mean: ', gcf(n)%var_name, max_val, min_val, mean_val
          end if
 
-         call addgrid(cgrib, max_bytes, igds, jgdt, igdtlen, ideflist, idefnum, ierr) ! there is an internal error here 
+         call addgrid(cgrib, max_bytes, igds, jgdt, igdtlen, ideflist, idefnum, ierr) 
          if (ierr /= 0) then
              write(0, *) 'Error adding grid to GRIB2 message', ierr
              return
@@ -992,7 +992,7 @@ contains
 
      if (debug) write(logunit, *) 'n, nflds, npt, lay: ', n, nflds, npt, lyr, gcf(n)%discription_gb2, gcf(n)%var_fillvalue
 
-     call addgrid(cgrib, max_bytes, igds, jgdt, igdtlen, ideflist, idefnum, ierr) ! there is an internal error here 
+     call addgrid(cgrib, max_bytes, igds, jgdt, igdtlen, ideflist, idefnum, ierr) 
      if (ierr /= 0) then
          write(0, *) 'Error adding grid to GRIB2 message', ierr
          return
@@ -1129,9 +1129,9 @@ end subroutine write_grib2_3d
       read(units_str(13:30), '(I4,1X,I2,1X,I2,1X,I2,1X,I2,1X,I2)') &          
        ref_year, ref_month, ref_day, ref_hour, ref_min, ref_sec
    else
-      read(units_str(12:29), '(I4,1X,I2,1X,I2,1X,I2,1X,I2,1X,I2)') &       ! remove it once ice time unit changed
+      read(units_str(12:29), '(I4,1X,I2,1X,I2,1X,I2,1X,I2,1X,I2)') &       
       ref_year, ref_month, ref_day, ref_hour, ref_min, ref_sec
-     forecast_hour=24*forecast_hour ! remove it once ice time unit changed)
+     forecast_hour=24*forecast_hour 
    end if
 
    ref_time(1) = ref_year
