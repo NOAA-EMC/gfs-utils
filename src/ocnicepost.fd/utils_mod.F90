@@ -625,7 +625,7 @@ contains
 
        npt = dims(1) * dims(2)
    
-       max_bytes = npt * 4  ! Estimated max bytes
+       max_bytes = npt * 4  
        bmp=.true.
 
        call getlun(lunout)
@@ -765,10 +765,10 @@ contains
          numcoord=0
          coordlist=0.  ! needed for hybrid vertical coordinate
 
-         ibmap = 0     ! Bitmap indicator ( see Code Table 6.0 ) -255 no bitmap
+         ibmap = 0     ! Bitmap indicator ( see Code Table 6.0 ) 
          bmp=.true.
 
-         if (trim(gcf(n)%name_gb2) .eq. 'WTMP') then
+         if ((trim(gcf(n)%name_gb2) .eq. 'WTMP' ) .or.  (trim(gcf(n)%name_gb2) .eq. 'ICETMP' )) then 
             where ( field(:,n) .ne. vfill ) field(:,n) = field(:,n) + 273.15
          endif
 
@@ -1025,10 +1025,10 @@ contains
      numcoord=0
      coordlist=0.  ! needed for hybrid vertical coordinate
 
-     ibmap=0     ! Bitmap indicator ( see Code Table 6.0 ) -255 no bitmap
+     ibmap=0     ! Bitmap indicator ( see Code Table 6.0 )
      bmp=.true.
 
-     if (trim(gcf(n)%name_gb2) .eq. 'WTMP' ) then
+     if ((trim(gcf(n)%name_gb2) .eq. 'WTMP' ) .or.  (trim(gcf(n)%name_gb2) .eq. 'ICETMP' )) then 
         where ( field(:,lyr,n) .ne. vfill ) field(:,lyr,n) = field(:,lyr,n) + 273.15
      endif
 
