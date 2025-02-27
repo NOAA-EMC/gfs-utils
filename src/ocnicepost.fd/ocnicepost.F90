@@ -262,7 +262,7 @@ program ocnicepost
 !--------------------------------------------------------
 
   if(grib2) then
-   gout = trim(ftype)//'.'//trim(fdst)//'.gb2'
+   gout = trim(ftype)//'.'//trim(fdst)//'.grb2'
    if (debug) write(logunit, '(a)')'GRIB2 2D output file: '//trim(gout)
 
    if (allocated(rgb2d) .and. allocated(rgc2d)) then
@@ -287,7 +287,7 @@ program ocnicepost
    call write_grib2_2d(gout, g2d, (/nxr,nyr/), nconsd2d+nbilin2d, grib2d, vfill)
 
    if (allocated(rgb3d)) then
-      gout = trim(ftype)//'.'//trim(fdst)//'_3D.gb2'
+      gout = trim(ftype)//'.'//trim(fdst)//'_3D.grb2'
       call write_grib2_3d(gout, b3d, (/nxr,nyr,nlevs/), nbilin3d, rgb3d, vfill)
       if (debug) write(logunit, '(a)')'GRIB2 3D output file: '//trim(gout)
    end if
