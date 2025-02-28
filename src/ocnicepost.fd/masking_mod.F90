@@ -27,7 +27,7 @@ contains
     ! local variables
     integer            :: rc, ncid, varid, n
     character(len=240) :: wgtsfile
-    real               :: minlat = -78.63       
+    real               :: minlat = -78.00    ! This is masking Antarctica which is not masked in the weighting file
 
     real, allocatable, dimension(:) :: out1d
 
@@ -80,7 +80,7 @@ contains
 
        if (debug) then
           write(logunit,'(a,2g14.4)')'mask min/max on destination grid ',minval(rgmask3d),maxval(rgmask3d)
-          call dumpnc(trim(ftype)//'.'//trim(fdst)//'.rgmask3d.nc', 'rgmask3d', dims=(/nxr,nyr,nlevs/), &
+          call dumpnc(trim(ftype)//'.'//trim(fdst)//'.rgmask3d.nc', 'rgmask3d', dims=(/nxr,nyr,nlevs/), &  
                field=rgmask3d)
        end if
     else
@@ -93,7 +93,7 @@ contains
 
        if (debug) then
           write(logunit,'(a,2g14.4)')'mask min/max on destination grid ',minval(rgmask2d),maxval(rgmask2d)
-          call dumpnc(trim(ftype)//'.'//trim(fdst)//'.rgmask2d.nc', 'rgmask2d', dims=(/nxr,nyr/),       &
+          call dumpnc(trim(ftype)//'.'//trim(fdst)//'.rgmask2d.nc', 'rgmask2d', dims=(/nxr,nyr/),       &    
                field=rgmask2d)
        end if
     end if

@@ -1,7 +1,9 @@
 module utils_mod
 
   use netcdf
-  use init_mod, only : debug, logunit, vardefs, fsrc
+  use init_mod, only : debug, logunit, vardefs, fsrc, input_file, ftype
+
+
 
   implicit none
 
@@ -39,6 +41,8 @@ module utils_mod
   public packarrays
   public remap
   public dumpnc
+  public write_grib2_2d
+  public write_grib2_3d
   public nf90_err
 
 contains
@@ -578,6 +582,568 @@ contains
 
   end subroutine dumpnc1d
 
+
+
+  !-----------------------------------------------------------------------------------
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Write Grib2 2D !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!This subroutine write Grib2 file modified messages!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !-----------------------------------------------------------------------------------
+
+  subroutine write_grib2_2d(fname, gcf, dims, nflds, field, vfill)
+   
+       implicit none
+   
+       character(len=*),    intent(in) :: fname
+       type(vardefs),       intent(in) :: gcf(:) 
+       integer(4),          intent(in) :: dims(2)
+       integer(4),          intent(in) :: nflds
+       real(4),             intent(inout) :: field(dims(1)*dims(2),nflds)
+       real(4),             intent(in) :: vfill
+
+       ! internal variables
+       integer(4) :: max_bytes, lengrib
+       integer(4) :: ref_time(6)
+       integer(4) :: lunout, ierr
+       integer(4) :: fortime, dij, npt
+       CHARACTER(len=1),allocatable,dimension(:) :: cgrib
+       real(8) :: tmpfld(size(field,1))
+
+       ! GRIB2 metadata arrays
+       integer(4) :: listsec0(2), listsec1(13)
+       integer(4) :: igdtnum, ipdtnum, idrtnum
+       integer(4) :: igdtlen, ipdtlen, idrtlen
+       integer(4) :: jgdt(19), jpdt(15), idrtmpl(16)
+       integer(4) :: igds(5)
+       integer(4) :: numcoord, ibmap
+       real(4)    :: coordlist
+       integer(4) :: n, lon0, lon1, lat0, lat1
+       integer(4) :: ideflist, idefnum
+       logical*1 :: bmp(dims(1)*dims(2)) 
+
+       real(4):: max_val, min_val, mean_val, count_val
+
+       npt = dims(1) * dims(2)
+   
+       max_bytes = npt * 4  
+       bmp=.true.
+
+       call getlun(lunout)
+       call baopenw(lunout, trim(fname), ierr)
+       if (ierr /= 0) then
+           write(0, *) 'Error opening grib2 file ', trim(fname)
+           return
+       end if
+   
+       call retrieve_time( fortime , ref_time )
+
+       ! Initialize GRIB2 message sections
+       listsec0(1) = gcf(1)%var_g1     ! Discipline - GRIB Master Table Number (Code Table 0.0)
+       listsec0(2) = 2                 ! GRIB Edition Number (currently 2)
+   
+       listsec1(1) = gcf(1)%var_g3     ! Originating Centre (Common Code Table C-1)
+       listsec1(2) = 0                 ! Originating Sub-centre (local table) EMC=4
+       listsec1(3) = gcf(1)%var_g2     ! GRIB Master Tables Version Number (Code Table 1.0)
+       listsec1(4) = 1                 ! GRIB Local Tables Version Number (Code Table 1.1)
+       listsec1(5) = 1                 ! Significance of Reference Time (Code Table 1.2)
+       listsec1(6) = ref_time(1)       ! Reference Time - Year -4digits
+       listsec1(7) = ref_time(2)       ! Reference Time - Month
+       listsec1(8) = ref_time(3)       ! Reference Time - Day
+       listsec1(9) = ref_time(4)       ! Reference Time - Hour
+       listsec1(10) = ref_time(5)      ! Reference Time - Minute
+       listsec1(11) = ref_time(6)      ! Reference Time - Second
+       listsec1(12) = 0                ! Production status of data (Code Table 1.3)
+       listsec1(13) = 1                ! Type of processed data (Code Table 1.4)
+
+       ! set grid res
+       if (dims(1) == 1440 .and. dims(2) == 721) dij= 250000     ! 1/4deg rectilinear
+       if (dims(1) == 720  .and. dims(2) == 361) dij= 500000     ! 1/2deg rectilinear
+       if (dims(1) == 360  .and. dims(2) == 181) dij= 1000000     ! 1deg rectilinear
+       if (dims(1) == 72   .and. dims(2) == 36) dij= 5000000      ! 5deg rectilinear
+
+       lon0 = 0 
+       lon1 = 360000000 - dij
+       lat0 = -90000000
+       lat1 = 90000000
+
+       ! Populate the jgdt array for Template 3.0 
+       jgdt(1) = 6              
+       jgdt(2) = 0              
+       jgdt(3) = 0                
+       jgdt(4) = 0                 
+       jgdt(5) = 0                  
+       jgdt(6) = 0                
+       jgdt(7) = 0                 
+       jgdt(8) = dims(1)             
+       jgdt(9) = dims(2)        
+       jgdt(10) = 0
+       jgdt(11) = -1    
+       jgdt(12) = lat0
+       jgdt(13) = lon0
+       jgdt(14) = 48  
+       jgdt(15) = lat1
+       jgdt(16) = lon1
+       jgdt(17) = dij
+       jgdt(18) = dij
+       jgdt(19) = 64 
+
+       igdtnum=0
+       ! Define igds GRIB2 - SECTION 3
+       igds(1) = 0          ! Source of grid definition 
+       igds(2) = npt        ! Number of grid points
+       igds(3) = 0          ! Number of octets for each additional grid points definition
+       igds(4) = 0          ! Interpretation of list for optional points definition
+       igds(5) = igdtnum    ! GRIB2 - CODE TABLE 3.1
+
+       igdtlen=size(jgdt)
+
+       if (debug) then
+         write(logunit, *) 'listsec0, listsec1: ', listsec0, listsec1
+         write(logunit, *) 'igdtnum, igdtlen: ', igdtnum, igdtlen
+         write(logunit, *) 'jgdt: ', jgdt
+         write(logunit, *) 'igds: ', igds
+         write(logunit, *) 'dij: ', dij
+         write(logunit, *) 'max_bytes: ', max_bytes
+         write(logunit, *) 'forcast time: ', fortime
+         write(logunit, *) 'refference time: ', ref_time
+       end if
+
+       ideflist=0
+       idefnum=0
+
+       do n=1,nflds
+
+         allocate(cgrib(max_bytes))
+
+         listsec0(1) = gcf(n)%var_g1
+
+         call gribcreate(cgrib, max_bytes, listsec0, listsec1, ierr) 
+         if (ierr /= 0) then
+            write(0, *) 'Error initializing GRIB2 message', ierr
+            return
+         end if
+
+       ! Compute max, min, and mean
+         max_val = maxval(field(:,n), mask = field(:,n) .ne. vfill)
+         min_val = minval(field(:,n), mask = field(:,n) .ne. vfill)
+         mean_val = sum(field(:,n), mask = field(:,n) .ne. vfill) / count(field(:,n) .ne. vfill)
+
+         if (debug) then
+            write(logunit, *) 'Variable_name, max, min, mean: ', gcf(n)%var_name, max_val, min_val, mean_val
+         end if
+
+         call addgrid(cgrib, max_bytes, igds, jgdt, igdtlen, ideflist, idefnum, ierr) 
+         if (ierr /= 0) then
+             write(0, *) 'Error adding grid to GRIB2 message', ierr
+             return
+         end if
+
+         ! Create Section 4 parametrs    
+         ipdtnum=0
+
+         jpdt(1)=gcf(n)%var_g5   ! parm number catagory
+         jpdt(2)=gcf(n)%var_g6   ! parm number
+         jpdt(3)=2               ! (0-analysis, 1-initialazation, 2-forecast, .. GRIB2 - CODE TABLE 4.3 )
+         jpdt(4)=0               !  
+         jpdt(5)=96              ! Code ON388 Table A- GFS
+         jpdt(6)=0               !    
+         jpdt(7)=0               ! 
+         jpdt(8)=1               ! unit (Hour=1)    6hour=11     (ask later) Table 4.4
+         jpdt(9)=fortime         ! forecast time
+         jpdt(10)=gcf(n)%var_g7  ! level ID (1-Ground or Water Surface, 101 mean sea level, 160 depth bellow mean sea level , 168-Ocean Model Layer,...)
+         jpdt(11)=0              ! 
+         jpdt(12)=0              ! 
+         jpdt(13)=0
+         jpdt(14)=0
+         jpdt(15)=0
+
+
+         if (debug) write(logunit, *) 'ipdtnum=', ipdtnum, ', jpdt= ', jpdt(1:16)
+
+         ipdtlen=size(jpdt)
+
+         numcoord=0
+         coordlist=0.  ! needed for hybrid vertical coordinate
+
+         ibmap = 0     ! Bitmap indicator ( see Code Table 6.0 ) 
+         bmp=.true.
+
+         if ((trim(gcf(n)%name_gb2) .eq. 'WTMP' ) .or.  (trim(gcf(n)%name_gb2) .eq. 'ICETMP' )) then 
+            where ( field(:,n) .ne. vfill ) field(:,n) = field(:,n) + 273.15
+         endif
+
+         where ( field(:,n) .eq. vfill )  bmp(:)= .false.
+
+         !  Create Section 5 parametrs   
+         idrtnum = 0                            ! Template 5.0 (Grid Point Data - simple Packing)
+
+         idrtmpl(:)=0
+         ! Populate idrtmpl
+         idrtmpl(1) = 0             ! Reference value (scaled value of the minimum data point)
+         idrtmpl(2) = 0             ! Binary scale factor (scale by 2^E)
+         idrtmpl(3) = 3             ! Decimal scale factor (scale by 10^D)
+         idrtmpl(4) = 0             !
+         idrtmpl(5) = 0             !
+         idrtmpl(6) = 0             !
+         ! Reserved fields
+         idrtmpl(7:16) = 0          ! Reserved for future use
+
+         idrtlen=size(idrtmpl)
+
+         if (debug) write(logunit, *) 'idrtmpl: ', idrtmpl
+
+         tmpfld=0 
+         tmpfld=real(field(:,n), 8)
+
+
+         write(logunit, *) 'Variable_name, max, min, mean, count: ', gcf(n)%var_name, max_val, min_val, mean_val, count_val
+
+         call addfield(cgrib, max_bytes, ipdtnum, jpdt, ipdtlen, coordlist, numcoord, &
+         idrtnum, idrtmpl, idrtlen, tmpfld, npt, ibmap, bmp, ierr)
+         if (ierr /= 0) then
+             write(0, *) 'Error adding field to GRIB2 message', ierr
+             return
+         end if
+
+         call gribend(cgrib, max_bytes, lengrib, ierr)
+         if (debug) write(logunit, *) 'gribend status=', ierr
+         if (debug) write(logunit, *) 'length of the final GRIB2 message in octets =', lengrib
+         call wryte(lunout, lengrib, cgrib)
+
+         deallocate(cgrib)
+      
+       end do
+
+       call baclose(lunout, ierr)
+
+       return
+
+  end subroutine write_grib2_2d
+
+
+
+  !-----------------------------------------------------------------------------------
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Write Grib2 3D!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!This subroutine write Grib2 file modified messages!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !-----------------------------------------------------------------------------------
+
+  subroutine write_grib2_3d(fname, gcf, dims, nflds, field, vfill)
+   
+   implicit none
+
+   character(len=*),    intent(in) :: fname
+   type(vardefs),       intent(in) :: gcf(:)
+   integer(4),          intent(in) :: dims(3)
+   integer(4),          intent(in) :: nflds
+   real(4),             intent(inout) :: field( dims(1) * dims(2) , dims(3) , nflds )
+   real(4),             intent(in) :: vfill
+
+   ! internal variables
+   integer(4) :: max_bytes, lengrib
+   integer(4) :: ref_time(6)
+   integer(4) :: lunout, ierr
+   integer(4) :: fortime, dij, npt
+   CHARACTER(len=1),allocatable,dimension(:) :: cgrib
+   real(8) :: tmpfld(size(field,1))
+
+   ! GRIB2 metadata arrays
+   integer(4) :: listsec0(2), listsec1(13)
+   integer(4) :: igdtnum, ipdtnum, idrtnum
+   integer(4) :: igdtlen, ipdtlen, idrtlen
+   integer(4) :: jgdt(19), jpdt(15), idrtmpl(16)
+   integer(4) :: igds(5)
+   integer(4) :: numcoord, ibmap
+   real(4):: coordlist
+   integer(4) :: ideflist, idefnum
+   logical*1 :: bmp( dims(1) * dims(2) ) 
+
+   integer(4) :: n, lon0, lon1, lat0, lat1, nlay, lyr
+   integer(4), dimension(40) :: dep1
+   integer(4), dimension(28) :: dep2
+   integer(4), dimension(:), allocatable :: dep
+     
+   npt = dims(1) * dims(2)
+
+   max_bytes = npt * 4
+   bmp=.true.
+
+   call getlun(lunout)
+   call baopenw(lunout, trim(fname), ierr)
+   if (ierr /= 0) then
+       write(0, *) 'Error opening grib2 file ', trim(fname)
+       return
+   end if
+
+   call retrieve_time( fortime , ref_time )
+
+   ! Initialize GRIB2 message sections
+   listsec0(1) = gcf(1)%var_g1     ! Discipline - GRIB Master Table Number (Code Table 0.0)
+   listsec0(2) = 2                 ! GRIB Edition Number (currently 2)
+
+   listsec1(1) = gcf(1)%var_g3     ! Originating Centre (Common Code Table C-1)
+   listsec1(2) = 0                 ! Originating Sub-centre (local table) EMC=4
+   listsec1(3) = gcf(1)%var_g2     ! GRIB Master Tables Version Number (Code Table 1.0)
+   listsec1(4) = 1                 ! GRIB Local Tables Version Number (Code Table 1.1)
+   listsec1(5) = 1                 ! Significance of Reference Time (Code Table 1.2)
+   listsec1(6) = ref_time(1)       ! Reference Time - Year -4digits
+   listsec1(7) = ref_time(2)       ! Reference Time - Month
+   listsec1(8) = ref_time(3)       ! Reference Time - Day
+   listsec1(9) = ref_time(4)       ! Reference Time - Hour
+   listsec1(10) = ref_time(5)      ! Reference Time - Minute
+   listsec1(11) = ref_time(6)      ! Reference Time - Second
+   listsec1(12) = 0                ! Production status of data (Code Table 1.3)
+   listsec1(13) = 1                ! Type of processed data (Code Table 1.4)
+
+   dep1=(/ 5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 105, 115, 125, 135, 145, 155,&
+    165, 175, 185, 195, 205, 215, 226, 241, 267, 309, 374, 467, 594, 757, 960,&
+     1204, 1490, 1817, 2184, 2587, 3024, 3489, 3977, 4481 /)
+
+   dep2=(/ 5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 105, 115, 125, 135, 145, 155,&
+    165, 175, 185, 195, 205, 215, 226, 241, 267, 309, 374, 467 /)
+
+   if (dims(1) == 1440 .and. dims(2) == 721) then   ! 1/4deg rectilinear
+      dij = 250000
+      nlay = 40
+      dep = dep1
+   end if
+  
+   if (dims(1) == 720 .and. dims(2) == 361) then   ! 1/2deg rectilinear
+      dij = 500000
+      nlay = 40
+      dep = dep1
+   end if
+  
+   if (dims(1) == 360 .and. dims(2) == 181) then   ! 1deg rectilinear
+      dij = 1000000
+      nlay = 40
+      dep = dep1
+   end if
+  
+   if (dims(1) == 72  .and. dims(2) == 36 ) then   ! 5deg rectilinear
+      dij = 5000000
+      nlay = 25
+      dep = dep2   
+   end if
+
+   lon0 = 0
+   lon1 = 360000000 - dij
+   lat0 = -90000000
+   lat1 = 90000000
+
+   ! Populate the jgdt array for Template 3.0 (changed parameters to current grib2 files)
+   jgdt(1) = 6              
+   jgdt(2) = 0              
+   jgdt(3) = 0                
+   jgdt(4) = 0                 
+   jgdt(5) = 0                  
+   jgdt(6) = 0                
+   jgdt(7) = 0                 
+   jgdt(8) = dims(1)             
+   jgdt(9) = dims(2)        
+   jgdt(10) = 0
+   jgdt(11) = -1   
+   jgdt(12) = lat0
+   jgdt(13) = lon0
+   jgdt(14) = 48   
+   jgdt(15) = lat1
+   jgdt(16) = lon1
+   jgdt(17) = dij
+   jgdt(18) = dij
+   jgdt(19) = 64 
+
+   igdtnum=0
+   ! Define igds GRIB2 - SECTION 3
+   igds(1) = 0          ! Source of grid definition 
+   igds(2) = npt        ! Number of grid points
+   igds(3) = 0          ! Number of octets for each additional grid points definition
+   igds(4) = 0          ! Interpretation of list for optional points definition
+   igds(5) = igdtnum    ! GRIB2 - CODE TABLE 3.1
+
+   igdtlen=size(jgdt)
+
+   if (debug) then
+      write(logunit, *) 'listsec0, listsec1: ', listsec0, listsec1
+      write(logunit, *) 'igdtnum, igdtlen: ', igdtnum, igdtlen
+      write(logunit, *) 'jgdt: ', jgdt
+      write(logunit, *) 'igds: ', igds
+      write(logunit, *) 'dij: ', dij
+      write(logunit, *) 'max_bytes: ', max_bytes
+      write(logunit, *) 'forcast time: ', fortime
+      write(logunit, *) 'refference time: ', ref_time
+   end if
+
+   ideflist=0
+   idefnum=0
+   
+   do lyr=1,nlay
+
+    do n=1,nflds
+
+     allocate(cgrib(max_bytes))
+
+     listsec0(1) = gcf(n)%var_g1
+
+     call gribcreate(cgrib, max_bytes, listsec0, listsec1, ierr) 
+     if (ierr /= 0) then
+        write(0, *) 'Error initializing GRIB2 message', ierr
+        return
+     end if
+
+     if (debug) write(logunit, *) 'n, nflds, npt, lay: ', n, nflds, npt, lyr, gcf(n)%discription_gb2, gcf(n)%var_fillvalue
+
+     call addgrid(cgrib, max_bytes, igds, jgdt, igdtlen, ideflist, idefnum, ierr) 
+     if (ierr /= 0) then
+         write(0, *) 'Error adding grid to GRIB2 message', ierr
+         return
+     end if
+
+     !  Create Section 4 parametrs    
+     ipdtnum=0
+
+
+     jpdt(1)=gcf(n)%var_g5   ! parm number catagory
+     jpdt(2)=gcf(n)%var_g6   ! parm number
+     jpdt(3)=2               ! (0-analysis, 1-initialazation, 2-forecast, .. GRIB2 - CODE TABLE 4.3 )
+     jpdt(4)=0               !  
+     jpdt(5)=96              ! Code ON388 Table A- GFS
+     jpdt(6)=0               !    
+     jpdt(7)=0               ! 
+     jpdt(8)=1               ! unit (Hour=1)    6hour=11     (ask later) Table 4.4
+     jpdt(9)=fortime         ! forecast hour
+     jpdt(10)=gcf(n)%var_g7  ! level ID (1-Ground or Water Surface, 101 mean sea level, 160 depth bellow mean sea level , 168-Ocean Model Layer,...)
+     jpdt(11)=0              ! scale factor
+     jpdt(12)=dep(lyr)       ! scale value
+     jpdt(13)=255
+     jpdt(14)=0
+     jpdt(15)=0
+
+     if (debug) write(logunit, *) 'ipdtnum=', ipdtnum, ', jpdt= ', jpdt(1:15)
+
+     ipdtlen=size(jpdt)
+
+     numcoord=0
+     coordlist=0.  ! needed for hybrid vertical coordinate
+
+     ibmap=0     ! Bitmap indicator ( see Code Table 6.0 )
+     bmp=.true.
+
+     if ((trim(gcf(n)%name_gb2) .eq. 'WTMP' ) .or.  (trim(gcf(n)%name_gb2) .eq. 'ICETMP' )) then 
+        where ( field(:,lyr,n) .ne. vfill ) field(:,lyr,n) = field(:,lyr,n) + 273.15
+     endif
+
+     where ( field(:,lyr,n) .eq. vfill )  bmp(:)= .false.
+
+     ! Assign Template 5
+
+     idrtnum = 0                ! Template 5.0 (Grid Point Data - simple Packing)
+
+     idrtmpl(:)=0
+     ! Populate idrtmpl
+     idrtmpl(1) = 0             ! Reference value (scaled value of the minimum data point)
+     idrtmpl(2) = 0             ! Binary scale factor (scale by 2^E)
+     idrtmpl(3) = 3             ! Decimal scale factor (scale by 10^D)
+     idrtmpl(4) = 0             !
+     idrtmpl(5) = 0             ! 
+     idrtmpl(6) = 0             ! 
+     ! Reserved fields
+     idrtmpl(7:16) = 0          ! Reserved for future use 
+
+     idrtlen=size(idrtmpl)
+
+     tmpfld=0
+     tmpfld=real(field(:,lyr,n), 8)
+
+     call addfield(cgrib, max_bytes, ipdtnum, jpdt, ipdtlen, coordlist, numcoord, &
+     idrtnum, idrtmpl, idrtlen, tmpfld, npt, ibmap, bmp, ierr)
+
+     if (ierr /=- 0) then
+         write(0, *) 'Error adding field to GRIB2 message', ierr
+         return
+     end if
+
+     call gribend(cgrib, max_bytes, lengrib, ierr)
+     if (debug) write(logunit, *) 'gribend status=', ierr
+     if (debug) write(logunit, *) 'length of the final GRIB2 message in octets =', lengrib
+     call wryte(lunout, lengrib, cgrib)
+
+     deallocate(cgrib)
+  
+    end do
+   end do
+
+   call baclose(lunout, ierr)
+
+   return
+
+end subroutine write_grib2_3d
+
+
+!--------------------------------------------------------------------------------------
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!To get a lun used for bacio!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !--------------------------------------------------------------------------------------
+  subroutine getlun(lun)
+   integer, intent(out) :: lun
+   logical :: is_open
+   lun = 50  
+   do
+       inquire(unit=lun, opened=is_open)
+       if (.not. is_open) then
+           return  
+       else
+           lun = lun + 1
+       end if
+   end do
+  end subroutine getlun
+
+
+  !--------------------------------------------------------------------------------------
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!Retrieve Time From Input File!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !--------------------------------------------------------------------------------------
+
+  subroutine retrieve_time(forecast_hour, ref_time)
+
+   implicit none
+
+   integer, intent(out) :: forecast_hour                  ! Forecast hour as an integer
+   integer, dimension(6), intent(out) :: ref_time         ! Array for GRIB2 reference time: [year, month, day, hour, minute, second]
+
+   integer :: ncid, time_varid, T1_varid, T2_varid
+   character(len=30) :: units_str
+   double precision :: T1, T2
+
+   integer :: ref_year, ref_month, ref_day, ref_hour, ref_min, ref_sec
+   integer :: year, month, day, hour
+   double precision :: hours_offset
+
+   call nf90_err(nf90_open(trim(input_file), nf90_nowrite, ncid), 'opening '//input_file)
+   call nf90_err(nf90_inq_varid(ncid, 'time', time_varid), 'get variable ID: time')
+   call nf90_err(nf90_get_var(ncid, time_varid, forecast_hour), 'get variable time')
+   call nf90_err(nf90_get_att(ncid, time_varid, 'units', units_str), 'get attribute: units')
+
+   if (trim(ftype) == 'ocean') then
+      read(units_str(13:30), '(I4,1X,I2,1X,I2,1X,I2,1X,I2,1X,I2)') &          
+       ref_year, ref_month, ref_day, ref_hour, ref_min, ref_sec
+   else
+      read(units_str(12:29), '(I4,1X,I2,1X,I2,1X,I2,1X,I2,1X,I2)') &       
+      ref_year, ref_month, ref_day, ref_hour, ref_min, ref_sec
+     forecast_hour=24*forecast_hour 
+   end if
+
+   ref_time(1) = ref_year
+   ref_time(2) = ref_month
+   ref_time(3) = ref_day
+   ref_time(4) = ref_hour
+   ref_time(5) = ref_min
+   ref_time(6) = ref_sec
+
+  end subroutine retrieve_time
+
+
   !----------------------------------------------------------
   ! handle netcdf errors
   !----------------------------------------------------------
@@ -594,4 +1160,5 @@ contains
       stop 99
     end if
   end subroutine nf90_err
+  
 end module utils_mod

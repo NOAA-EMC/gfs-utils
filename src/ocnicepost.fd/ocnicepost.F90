@@ -27,16 +27,17 @@ program ocnicepost
   use netcdf
   use init_mod   , only : nxt, nyt, nlevs, nxr, nyr, outvars, readnml, readcsv
   use init_mod   , only : wgtsdir, ftype, fsrc, fdst, input_file, cosvar, sinvar, angvar
-  use init_mod   , only : do_ocnpost, debug, logunit
+  use init_mod   , only : do_ocnpost, debug, logunit, write_grib2, write_netcdf
+  use init_mod   , only : vardefs
   use arrays_mod , only : b2d, c2d, b3d, rgb2d, rgc2d, rgb3d, dstlon, dstlat, setup_packing
   use arrays_mod , only : nbilin2d, nbilin3d, nconsd2d, bilin2d, bilin3d, consd2d
   use masking_mod, only : mask2d, mask3d, rgmask2d, rgmask3d, remap_masks
-  use utils_mod  , only : getfield, packarrays, remap, dumpnc, nf90_err
+  use utils_mod  , only : getfield, packarrays, remap, dumpnc, nf90_err, write_grib2_2d, write_grib2_3d
 
   implicit none
 
   character(len=120) :: wgtsfile
-  character(len=120) :: fout
+  character(len=120) :: fout, gout
 
   ! dimensions, units and variables from source file used in creation of
   ! output netcdf
@@ -48,6 +49,10 @@ program ocnicepost
   ! work arrays for output netcdf
   real, allocatable, dimension(:,:)   :: out2d !< 2D destination grid output array
   real, allocatable, dimension(:,:,:) :: out3d !< 3D destination grid output array
+
+  ! arrays for output grib2
+  real, allocatable, dimension(:,:)   :: grib2d    !< 2D destination grib2 concat array
+  type(vardefs), allocatable, dimension(:) :: g2d  !< concatinated variable metadata for 2D source fields remap
 
   real(kind=8)       :: timestamp
   character(len= 40) :: timeunit, timecal
@@ -131,6 +136,8 @@ program ocnicepost
   end if
 
   call remap_masks(vfill)
+
+
 
   ! --------------------------------------------------------
   ! create packed arrays for mapping and remap packed arrays
@@ -250,9 +257,48 @@ program ocnicepost
           sqrt(rgb2d(:,idx2)**2 + rgb2d(:,idx3)**2)
   end if
 
+!--------------------------------------------------------
+! Write the grib2 files
+!--------------------------------------------------------
+
+  if(write_grib2) then
+   gout = trim(ftype)//'.'//trim(fdst)//'.grb2'
+   if (debug) write(logunit, '(a)')'GRIB2 2D output file: '//trim(gout)
+
+   if (allocated(rgb2d) .and. allocated(rgc2d)) then
+      allocate(grib2d(nxr*nyr,nconsd2d+nbilin2d), source=0.0)
+      allocate(g2d(1:nconsd2d+nbilin2d)) 
+      grib2d(:, 1:nbilin2d) = rgb2d
+      grib2d(:, nbilin2d+1:nconsd2d+nbilin2d) = rgc2d
+      g2d(1:nbilin2d) = b2d
+      g2d(nbilin2d+1:nconsd2d+nbilin2d) = c2d
+   else if (allocated(rgb2d)) then
+      allocate(grib2d(nxr*nyr,nconsd2d), source=0.0)
+      allocate(g2d(1:nconsd2d))
+      grib2d(:, 1:nconsd2d) = rgc2d
+      g2d(1:nconsd2d) = c2d
+   else if (allocated(rgc2d)) then
+      allocate(grib2d(nxr*nyr,nbilin2d), source=0.0)
+      allocate(g2d(1:nbilin2d))
+      grib2d(:, 1:nbilin2d) = rgb2d
+      g2d(1:nbilin2d) = b2d
+   end if
+
+   call write_grib2_2d(gout, g2d, (/nxr,nyr/), nconsd2d+nbilin2d, grib2d, vfill)
+
+   if (allocated(rgb3d)) then
+      gout = trim(ftype)//'.'//trim(fdst)//'_3D.grb2'
+      call write_grib2_3d(gout, b3d, (/nxr,nyr,nlevs/), nbilin3d, rgb3d, vfill)
+      if (debug) write(logunit, '(a)')'GRIB2 3D output file: '//trim(gout)
+   end if
+  end if
+
+
   ! --------------------------------------------------------
   ! write the mapped fields
   ! --------------------------------------------------------
+
+ if (write_netcdf) then
 
   allocate(out2d(nxr,nyr)); out2d = 0.0
   allocate(out3d(nxr,nyr,nlevs)); out3d = 0.0
@@ -357,6 +403,7 @@ program ocnicepost
         call nf90_err(nf90_put_var(ncid,   varid, out2d), 'put variable: '//vname)
      end do
   end if
+
   if (allocated(rgb3d)) then
      do n = 1,nbilin3d
         out3d(:,:,:) = reshape(rgb3d(:,:,n), (/nxr,nyr,nlevs/))
@@ -369,6 +416,8 @@ program ocnicepost
   call nf90_err(nf90_close(ncid), 'close: '// trim(fout))
   write(logunit,'(a)')trim(fout)//' done'
 
-  stop
+ end if
+
+ stop
 
 end program ocnicepost

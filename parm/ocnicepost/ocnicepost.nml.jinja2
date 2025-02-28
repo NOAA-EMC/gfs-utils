@@ -7,5 +7,7 @@
   sinvar = "{{ sinvar }}",
   cosvar = "{{ cosvar }}",
   angvar = "{{ angvar }}",
+  write_grib2 = {{ write_grib2 | default('.true.') }}
+  write_netcdf = {{ write_netcdf | default('.false.') }}
   debug = {{ debug | default('.false.') }}
 /

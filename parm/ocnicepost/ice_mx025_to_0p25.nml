@@ -7,5 +7,7 @@ maskvar='tmask'
 sinvar=''
 cosvar=''
 angvar='ANGLET'
+write_grib2=.true.
+write_netcdf=.false.
 debug=.false.
 /
