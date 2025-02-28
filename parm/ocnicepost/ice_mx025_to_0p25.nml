@@ -8,6 +8,6 @@ sinvar=''
 cosvar=''
 angvar='ANGLET'
 grib2=.true.
-netcdf=.false.
+netcdff=.false.
 debug=.false.
 /

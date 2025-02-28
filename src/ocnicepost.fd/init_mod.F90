@@ -53,7 +53,7 @@ module init_mod
 
   integer :: logunit    !< The log unit
   logical :: grib2      !< If true, write grib2 message
-  logical :: netcdf        !< If true, write netCDF flies
+  logical :: netcdff        !< If true, write netCDF flies
   logical :: debug      !< If true, print debug messages and intermediate files
   logical :: do_ocnpost !< If true, the source file is ocean, otherwise ice
 
@@ -67,7 +67,7 @@ contains
     integer :: srcdims(2), dstdims(2)
 
     namelist /ocnicepost_nml/ ftype, srcdims, wgtsdir, dstdims, maskvar, sinvar, cosvar, &
-         angvar, grib2, netcdf, debug
+         angvar, grib2, netcdff, debug
 
     ! --------------------------------------------------------
     ! read the name list
