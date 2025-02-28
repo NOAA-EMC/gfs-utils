@@ -298,7 +298,7 @@ program ocnicepost
   ! write the mapped fields
   ! --------------------------------------------------------
 
- if (ncf) then
+ if (netcdf) then
 
   allocate(out2d(nxr,nyr)); out2d = 0.0
   allocate(out3d(nxr,nyr,nlevs)); out3d = 0.0
