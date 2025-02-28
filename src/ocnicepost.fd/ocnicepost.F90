@@ -27,7 +27,7 @@ program ocnicepost
   use netcdf
   use init_mod   , only : nxt, nyt, nlevs, nxr, nyr, outvars, readnml, readcsv
   use init_mod   , only : wgtsdir, ftype, fsrc, fdst, input_file, cosvar, sinvar, angvar
-  use init_mod   , only : do_ocnpost, debug, logunit, grib2, ncf
+  use init_mod   , only : do_ocnpost, debug, logunit, grib2, netcdf
   use init_mod   , only : vardefs
   use arrays_mod , only : b2d, c2d, b3d, rgb2d, rgc2d, rgb3d, dstlon, dstlat, setup_packing
   use arrays_mod , only : nbilin2d, nbilin3d, nconsd2d, bilin2d, bilin3d, consd2d
