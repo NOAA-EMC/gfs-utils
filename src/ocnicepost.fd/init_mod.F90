@@ -51,11 +51,11 @@ module init_mod
   integer :: nxr        !< The x-dimension of the destination rectilinear grid
   integer :: nyr        !< The y-dimension of the destination rectilinear grid
 
-  integer :: logunit    !< The log unit
-  logical :: grib2      !< If true, write grib2 message
-  logical :: netcdff        !< If true, write netCDF flies
-  logical :: debug      !< If true, print debug messages and intermediate files
-  logical :: do_ocnpost !< If true, the source file is ocean, otherwise ice
+  integer :: logunit          !< The log unit
+  logical :: write_grib2      !< If true, write grib2 message
+  logical :: write_netcdf     !< If true, write netCDF flies
+  logical :: debug            !< If true, print debug messages and intermediate files
+  logical :: do_ocnpost       !< If true, the source file is ocean, otherwise ice
 
 contains
 
@@ -67,7 +67,7 @@ contains
     integer :: srcdims(2), dstdims(2)
 
     namelist /ocnicepost_nml/ ftype, srcdims, wgtsdir, dstdims, maskvar, sinvar, cosvar, &
-         angvar, grib2, netcdff, debug
+         angvar, write_grib2, write_netcdf, debug
 
     ! --------------------------------------------------------
     ! read the name list
