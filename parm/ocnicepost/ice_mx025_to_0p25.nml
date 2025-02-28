@@ -8,6 +8,6 @@ sinvar=''
 cosvar=''
 angvar='ANGLET'
 write_grib2=.true.
-write_netcdff=.false.
+write_netcdf=.false.
 debug=.false.
 /
