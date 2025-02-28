@@ -67,7 +67,7 @@ contains
     integer :: srcdims(2), dstdims(2)
 
     namelist /ocnicepost_nml/ ftype, srcdims, wgtsdir, dstdims, maskvar, sinvar, cosvar, &
-         angvar, grib2, ncf, debug
+         angvar, grib2, netcdf, debug
 
     ! --------------------------------------------------------
     ! read the name list
