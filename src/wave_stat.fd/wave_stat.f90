@@ -29,7 +29,7 @@
       integer :: ymdc,fhr,nnme,nnsc
       integer :: parcode(3)
       integer :: istop
-      real,allocatable :: dumy1d(:)
+      real(8),allocatable :: dumy1d(:)
 ! Grid
       real    :: rdlon(3),rdlat(3)
       integer :: nlola(2)
