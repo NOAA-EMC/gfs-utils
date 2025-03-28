@@ -869,7 +869,7 @@ contains
    bmp=.true.
 
    call getlun(lunout)
-   call baopenw(lunout, trim(fname), ierr)
+   call baopenwa(lunout, trim(fname), ierr)
    if (ierr /= 0) then
        write(0, *) 'Error opening grib2 file ', trim(fname)
        return
