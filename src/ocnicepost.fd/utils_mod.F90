@@ -772,6 +772,9 @@ contains
             where ( field(:,n) .ne. vfill ) field(:,n) = field(:,n) + 273.15
          endif
 
+         if ((trim(gcf(n)%) .eq. 'THFLX')) then
+            field(:,n)=field(:,n)+field(:,n-2)
+
          where ( field(:,n) .eq. vfill )  bmp(:)= .false.
 
          !  Create Section 5 parametrs   
