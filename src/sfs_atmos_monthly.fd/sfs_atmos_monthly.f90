@@ -5,9 +5,9 @@ program sfs_atmos_monthly
 ! MAIN PROGRAM:  sfs_atmos_monthly    calculate monthly mean.
 !   PRGMMR: K. ASMAR        ORG: NCEP/EMC     DATE: 05-08-2025
 !
-! ABSTRACT: This program takes as input 31 grib2 files of SFS
-!            post-processed atmospheric products at 24-hrly
-!            forcasts and calculates the monthly mean.
+! ABSTRACT: This program takes as input ~31 grib2 files of SFS
+!           post-processed atmospheric products at 24-hrly
+!           forecasts and calculates the monthly mean.
 !
 ! PROGRAM HISTORY LOG:
 !   05-08-25  K. Asmar      Origination and implement at NCEP.
@@ -242,8 +242,8 @@ program sfs_atmos_monthly
   	else if (fhr==2976) then
     	   ipdtmpl(9)=3
   	else
-    	   ipdtmpl(9)=100   !!! TODO need a better way to deal with wrong files
-   	print*,'fhr not found'
+    	   ipdtmpl(9)=100   !!! TODO may need a better way to deal with wrong files
+   	   print*,'fhr not found'
   	endif
 
       	yy = listsec1(6)                  
