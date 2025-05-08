@@ -32,3 +32,5 @@ add_subdirectory(ensppf.fd)
 add_subdirectory(ensstat.fd)
 add_subdirectory(wave_stat.fd)
 add_subdirectory(gefs_6h_ave_1mem.fd)
+
+add_subdirectory(sfs_atmos_monthly.fd)
