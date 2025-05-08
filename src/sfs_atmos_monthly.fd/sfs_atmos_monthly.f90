@@ -75,7 +75,7 @@ program sfs_atmos_monthly
   			dummy(:),fout(:)
   type(gribfield) :: gfld,gfld2
   character(len=1),allocatable,dimension(:) :: cgrib_in,cgrib_out
-  character(len=255),dimension(31) :: ingrib   
+  character(len=255),dimension(50) :: ingrib   
   character*255 :: outfile
   namelist /namens/ ingrib,outfile,nfiles
 !**********************************************************************
