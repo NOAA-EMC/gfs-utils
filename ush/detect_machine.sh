@@ -58,7 +58,7 @@ fi
 # Overwrite auto-detect with MACHINE if set
 MACHINE_ID=${MACHINE:-${MACHINE_ID}}
 
-# if in container, reset MACHINE_ID.
+# Overwirte auto-detect of MACHINE_ID if in container
 if [[ -d /opt/spack-stack ]]; then
   # We are in a container
   MACHINE_ID=container
