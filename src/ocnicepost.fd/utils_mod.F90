@@ -776,7 +776,7 @@ contains
          if (trim(gcf(n)%name_gb2) == 'THFLX') then
             idx = findloc(trim(gcf(:)%name_gb2) == 'NSWRF', .true.)
             if (idx > 0) then
-               field(:,n) = field(:,n) + field(:,idx)
+               where ( field(:, n) .ne. vfill .and. field(:, idx) .ne vfill ) field(:, n) = field(:, n) + field(:, idx)
             else
               print *, "Fatal error: NSWRF must be in parameter list"
               stop 99
