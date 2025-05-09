@@ -125,7 +125,7 @@ program sfs_atmos_monthly
       ! only do this once: get no. of grid points and allocate means array
       if((icount==1).and.(m==1))then
       	npts=gfld%ngrdpts ! do this once
-        allocate(means(5000,npts)) !,source=0.0)  ! enough rows to get all fields
+        allocate(means(5000,npts))  ! enough rows to get all fields
       endif
       
 ! III. loop through ALL files to get this same message field
@@ -186,7 +186,7 @@ program sfs_atmos_monthly
   icount=0 ! count no. of each grib2 message, starts at lskip+1
   fcount=0 ! count no. of each grib2 field (some messages have more than one)
   do  ! start grib message unpacking for input file
-    call skgb(41,iseek,mseek,lskip,lgrib)  ! w3 routine to search for next grib message
+    call skgb(nfiles+10,iseek,mseek,lskip,lgrib)  ! w3 routine to search for next grib message
          if (lgrib==0) exit    ! end loop at EOF or problem
          if (lgrib>currlen) then
             if (allocated(cgrib_in)) deallocate(cgrib_in)
@@ -194,7 +194,7 @@ program sfs_atmos_monthly
             currlen=lgrib
          endif
        
-    call baread(41,lskip,lgrib,lengrib_in,cgrib_in)
+    call baread(nfiles+10,lskip,lgrib,lengrib_in,cgrib_in)
     iseek=lskip+lgrib  ! for next message in loop
     icount=icount+1      
     
