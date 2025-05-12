@@ -63,7 +63,7 @@ program sfs_atmos_monthly
   integer :: numfields,numlocal,maxlocal
   integer :: nfiles,npts,icount,fcount
   integer(4) :: max_bytes,igds(5)
-  integer :: yy,mm,dd,fhr
+  integer :: yy,mm,dd,fhr,factor
   integer :: listsec0(3),listsec1(13)
   integer, parameter :: mseek=32000
   real :: spval=9.99e20  
@@ -233,18 +233,8 @@ program sfs_atmos_monthly
 
   	! Establish 0-1, 1-2, 2-3. or 3-4 monthy ave based on fhr of this last file
   	! ipdtmpl(9) -- Forecast time in units defined by octet 18
- 	if (fhr==744) then
-    	   ipdtmpl(9)=0
-  	else if (fhr==1488) then
-    	   ipdtmpl(9)=1
-  	else if (fhr==2232) then
-    	   ipdtmpl(9)=2
-  	else if (fhr==2976) then
-    	   ipdtmpl(9)=3
-  	else
-    	   ipdtmpl(9)=100   !!! TODO may need a better way to deal with wrong files
-   	   print*,'fhr not found'
-  	endif
+	factor=fhr/31/24
+	ipdtmpl(9)=factor-1
 
       	yy = listsec1(6)                  
       	mm = listsec1(7)                 
