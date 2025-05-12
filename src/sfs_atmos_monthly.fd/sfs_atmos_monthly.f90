@@ -302,7 +302,3 @@ program sfs_atmos_monthly
 
   stop
 end program sfs_atmos_monthly
-
-
-
-
