@@ -608,6 +608,7 @@ contains
        integer(4) :: fortime, dij, npt
        CHARACTER(len=1),allocatable,dimension(:) :: cgrib
        real(8) :: tmpfld(size(field,1))
+       intiger(4) :: idx
 
        ! GRIB2 metadata arrays
        integer(4) :: listsec0(2), listsec1(13)
@@ -771,6 +772,17 @@ contains
          if ((trim(gcf(n)%name_gb2) .eq. 'WTMP' ) .or.  (trim(gcf(n)%name_gb2) .eq. 'ICETMP' )) then 
             where ( field(:,n) .ne. vfill ) field(:,n) = field(:,n) + 273.15
          endif
+
+         if (trim(gcf(n)%name_gb2) == 'THFLX') then
+            idx = findloc(trim(gcf(:)%name_gb2) == 'NSWRF', .true.)
+            if (idx > 0) then
+               where ( field(:, n) .ne. vfill .and. field(:, idx) .ne vfill ) field(:, n) = field(:, n) + field(:, idx)
+            else
+              print *, "Fatal error: NSWRF must be in parameter list"
+              stop 99
+            end if
+         end if
+
 
          where ( field(:,n) .eq. vfill )  bmp(:)= .false.
 
