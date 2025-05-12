@@ -276,7 +276,7 @@ program sfs_atmos_monthly
 
 	if (gfld%idrtnum==3) then ! complex packing and spatial differencing
 	  idrstmpl(:)=0
-	  if(gfld%idrtmpl(3)>6)then  ! large decimal scale factor when needed
+	  if((gfld%idrtmpl(3)>6) .or. (gfld%idrtmpl(3)<0))then  ! large or negative decimal scale factor when needed
 	    idrstmpl(3)=gfld%idrtmpl(3)
 	  else
             idrstmpl(3)=3
