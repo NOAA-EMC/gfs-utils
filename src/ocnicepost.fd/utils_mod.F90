@@ -608,7 +608,7 @@ contains
        integer(4) :: fortime, dij, npt
        CHARACTER(len=1),allocatable,dimension(:) :: cgrib
        real(8) :: tmpfld(size(field,1))
-       intiger(4) :: idx
+       integer(4) :: idx, i
 
        ! GRIB2 metadata arrays
        integer(4) :: listsec0(2), listsec1(13)
@@ -774,13 +774,18 @@ contains
          endif
 
          if (trim(gcf(n)%name_gb2) == 'THFLX') then
-            idx = findloc(trim(gcf(:)%name_gb2) == 'NSWRF', .true.)
-            if (idx > 0) then
-               where ( field(:, n) .ne. vfill .and. field(:, idx) .ne vfill ) field(:, n) = field(:, n) + field(:, idx)
-            else
+           do i = 1, size(gcf)
+             if (trim(gcf(i)%name_gb2) .eq. 'NSWRF') then
+                idx = i
+                 exit
+             end if
+           end do
+           if (idx > 0) then
+               where ( field(:, n) .ne. vfill .and. field(:, idx) .ne. vfill ) field(:, n) = field(:, n) + field(:, idx)
+           else
               print *, "Fatal error: NSWRF must be in parameter list"
               stop 99
-            end if
+           end if
          end if
 
 
@@ -808,7 +813,7 @@ contains
          tmpfld=real(field(:,n), 8)
 
 
-         write(logunit, *) 'Variable_name, max, min, mean, count: ', gcf(n)%var_name, max_val, min_val, mean_val, count_val
+         if (debug) write(logunit, *) 'Variable_name, max, min, mean, count: ', gcf(n)%var_name, max_val, min_val, mean_val, count_val
 
          call addfield(cgrib, max_bytes, ipdtnum, jpdt, ipdtlen, coordlist, numcoord, &
          idrtnum, idrtmpl, idrtlen, tmpfld, npt, ibmap, bmp, ierr)
