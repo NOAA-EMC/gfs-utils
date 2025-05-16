@@ -617,7 +617,7 @@ contains
        integer(4) :: jgdt(19), jpdt(15), idrtmpl(16)
        integer(4) :: igds(5)
        integer(4) :: numcoord, ibmap
-       real(4)    :: coordlist
+       real(8)    :: coordlist
        integer(4) :: n, lon0, lon1, lat0, lat1
        integer(4) :: ideflist, idefnum
        logical*1 :: bmp(dims(1)*dims(2)) 
@@ -724,14 +724,6 @@ contains
             return
          end if
 
-       ! Compute max, min, and mean
-         max_val = maxval(field(:,n), mask = field(:,n) .ne. vfill)
-         min_val = minval(field(:,n), mask = field(:,n) .ne. vfill)
-         mean_val = sum(field(:,n), mask = field(:,n) .ne. vfill) / count(field(:,n) .ne. vfill)
-
-         if (debug) then
-            write(logunit, *) 'Variable_name, max, min, mean: ', gcf(n)%var_name, max_val, min_val, mean_val
-         end if
 
          call addgrid(cgrib, max_bytes, igds, jgdt, igdtlen, ideflist, idefnum, ierr) 
          if (ierr /= 0) then
@@ -767,21 +759,25 @@ contains
          coordlist=0.  ! needed for hybrid vertical coordinate
 
          ibmap = 0     ! Bitmap indicator ( see Code Table 6.0 ) 
-         bmp=.true.
+         bmp=.false.
 
          if ((trim(gcf(n)%name_gb2) .eq. 'WTMP' ) .or.  (trim(gcf(n)%name_gb2) .eq. 'ICETMP' )) then 
             where ( field(:,n) .ne. vfill ) field(:,n) = field(:,n) + 273.15
          endif
 
          if (trim(gcf(n)%name_gb2) == 'THFLX') then
+           idx=-1      
            do i = 1, size(gcf)
              if (trim(gcf(i)%name_gb2) .eq. 'NSWRF') then
-                idx = i
-                 exit
+              idx = i
+              exit
              end if
            end do
            if (idx > 0) then
-               where ( field(:, n) .ne. vfill .and. field(:, idx) .ne. vfill ) field(:, n) = field(:, n) + field(:, idx)
+              where ( (field(:, n) .ne. vfill) .and. (field(:, idx) .ne. vfill) ) 
+                  field(:, n) = field(:, n) + field(:, idx)
+                  bmp(:)=.true.
+              end where
            else
               print *, "Fatal error: NSWRF must be in parameter list"
               stop 99
@@ -789,7 +785,7 @@ contains
          end if
 
 
-         where ( field(:,n) .eq. vfill )  bmp(:)= .false.
+         where ( field(:,n) .ne. vfill )  bmp(:)= .true.
 
          !  Create Section 5 parametrs   
          idrtnum = 0                            ! Template 5.0 (Grid Point Data - simple Packing)
@@ -812,8 +808,14 @@ contains
          tmpfld=0 
          tmpfld=real(field(:,n), 8)
 
+         ! Compute max, min, and mean
+         max_val = maxval(field(:,n), mask = field(:,n) .ne. vfill)
+         min_val = minval(field(:,n), mask = field(:,n) .ne. vfill)
+         mean_val = sum(field(:,n), mask = field(:,n) .ne. vfill) / count(field(:,n) .ne. vfill)
 
-         if (debug) write(logunit, *) 'Variable_name, max, min, mean, count: ', gcf(n)%var_name, max_val, min_val, mean_val, count_val
+         if (debug) then
+            write(logunit, *) 'Variable_name, max, min, mean: ', gcf(n)%var_name, max_val, min_val, mean_val
+         end if
 
          call addfield(cgrib, max_bytes, ipdtnum, jpdt, ipdtlen, coordlist, numcoord, &
          idrtnum, idrtmpl, idrtlen, tmpfld, npt, ibmap, bmp, ierr)
@@ -871,7 +873,7 @@ contains
    integer(4) :: jgdt(19), jpdt(15), idrtmpl(16)
    integer(4) :: igds(5)
    integer(4) :: numcoord, ibmap
-   real(4):: coordlist
+   real(8):: coordlist
    integer(4) :: ideflist, idefnum
    logical*1 :: bmp( dims(1) * dims(2) ) 
 
