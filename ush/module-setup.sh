@@ -1,15 +1,7 @@
 #!/bin/bash
 set -u
 
-if [[ $MACHINE_ID = jet* ]] ; then
-    # We are on NOAA Jet
-    if ( ! eval module help > /dev/null 2>&1 ) ; then
-        source /apps/lmod/lmod/init/bash
-    fi
-    export LMOD_SYSTEM_DEFAULT_MODULES=contrib
-    module reset
-
-elif [[ $MACHINE_ID = hera* ]] ; then
+if [[ $MACHINE_ID = hera* ]] ; then
     # We are on NOAA Hera
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         source /apps/lmod/lmod/init/bash
@@ -31,14 +23,6 @@ elif [[ $MACHINE_ID = hercules* ]] ; then
         source /apps/other/lmod/lmod/init/bash
     fi
     export LMOD_SYSTEM_DEFAULT_MODULES=contrib
-    module reset
-
-elif [[ $MACHINE_ID = s4* ]] ; then
-    # We are on SSEC Wisconsin S4
-    if ( ! eval module help > /dev/null 2>&1 ) ; then
-        source /usr/share/lmod/lmod/init/bash
-    fi
-    export LMOD_SYSTEM_DEFAULT_MODULES=license_intel
     module reset
 
 elif [[ $MACHINE_ID = wcoss2 ]]; then
