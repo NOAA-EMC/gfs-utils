@@ -608,6 +608,7 @@ contains
        integer(4) :: fortime, dij, npt
        CHARACTER(len=1),allocatable,dimension(:) :: cgrib
        real(8) :: tmpfld(size(field,1))
+
        integer(4) :: idx, i
 
        ! GRIB2 metadata arrays
@@ -724,7 +725,6 @@ contains
             return
          end if
 
-
          call addgrid(cgrib, max_bytes, igds, jgdt, igdtlen, ideflist, idefnum, ierr) 
          if (ierr /= 0) then
              write(0, *) 'Error adding grid to GRIB2 message', ierr
@@ -749,7 +749,6 @@ contains
          jpdt(13)=0
          jpdt(14)=0
          jpdt(15)=0
-
 
          if (debug) write(logunit, *) 'ipdtnum=', ipdtnum, ', jpdt= ', jpdt(1:16)
 
@@ -783,7 +782,6 @@ contains
               stop 99
            end if
          end if
-
 
          where ( field(:,n) .ne. vfill )  bmp(:)= .true.
 
