@@ -778,7 +778,7 @@ contains
                   bmp(:)=.true.
               end where
            else
-              print *, "Fatal error: NSWRF must be in parameter list"
+              write(0,'(a)')'FATAL ERROR: NSWRF must be in parameter list'
               stop 99
            end if
          end if
