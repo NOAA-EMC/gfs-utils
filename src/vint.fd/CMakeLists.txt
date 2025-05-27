@@ -10,7 +10,7 @@ endif()
 
 set(exe_name vint.x)
 add_executable(${exe_name} ${fortran_src})
-if(LINK_W3EMC)
+if(g2_VERSION VERSION_LESS 3.4.9)
   target_link_libraries(${exe_name} PRIVATE bacio::bacio_4
                                             w3emc::w3emc_d
                                             g2::g2_d)
