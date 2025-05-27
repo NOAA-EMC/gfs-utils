@@ -257,39 +257,6 @@ program ocnicepost
           sqrt(rgb2d(:,idx2)**2 + rgb2d(:,idx3)**2)
   end if
 
-!--------------------------------------------------------
-! Write the grib2 files
-!--------------------------------------------------------
-
-  if(write_grib2) then
-   if (allocated(rgb2d) .and. allocated(rgc2d)) then
-      allocate(grib2d(nxr*nyr,nconsd2d+nbilin2d), source=0.0)
-      allocate(g2d(1:nconsd2d+nbilin2d)) 
-      grib2d(:, 1:nbilin2d) = rgb2d
-      grib2d(:, nbilin2d+1:nconsd2d+nbilin2d) = rgc2d
-      g2d(1:nbilin2d) = b2d
-      g2d(nbilin2d+1:nconsd2d+nbilin2d) = c2d
-   else if (allocated(rgb2d)) then
-      allocate(grib2d(nxr*nyr,nconsd2d), source=0.0)
-      allocate(g2d(1:nconsd2d))
-      grib2d(:, 1:nconsd2d) = rgc2d
-      g2d(1:nconsd2d) = c2d
-   else if (allocated(rgc2d)) then
-      allocate(grib2d(nxr*nyr,nbilin2d), source=0.0)
-      allocate(g2d(1:nbilin2d))
-      grib2d(:, 1:nbilin2d) = rgb2d
-      g2d(1:nbilin2d) = b2d
-   end if
-
-   gout = trim(ftype)//'.'//trim(fdst)//'.grib2'
-   if (debug) write(logunit, '(a)')'GRIB2 output file: '//trim(gout)
-   call write_grib2_2d(gout, g2d, (/nxr,nyr/), nconsd2d+nbilin2d, grib2d, vfill)
-
-   if (allocated(rgb3d)) then
-      call write_grib2_3d(gout, b3d, (/nxr,nyr,nlevs/), nbilin3d, rgb3d, vfill)
-   end if
-  end if
-
 
   ! --------------------------------------------------------
   ! write the mapped fields
@@ -414,6 +381,39 @@ program ocnicepost
   write(logunit,'(a)')trim(fout)//' done'
 
  end if
+
+!--------------------------------------------------------
+! Write the grib2 files
+!--------------------------------------------------------
+
+  if(write_grib2) then
+   if (allocated(rgb2d) .and. allocated(rgc2d)) then
+      allocate(grib2d(nxr*nyr,nconsd2d+nbilin2d), source=0.0)
+      allocate(g2d(1:nconsd2d+nbilin2d)) 
+      grib2d(:, 1:nbilin2d) = rgb2d
+      grib2d(:, nbilin2d+1:nconsd2d+nbilin2d) = rgc2d
+      g2d(1:nbilin2d) = b2d
+      g2d(nbilin2d+1:nconsd2d+nbilin2d) = c2d
+   else if (allocated(rgb2d)) then
+      allocate(grib2d(nxr*nyr,nconsd2d), source=0.0)
+      allocate(g2d(1:nconsd2d))
+      grib2d(:, 1:nconsd2d) = rgc2d
+      g2d(1:nconsd2d) = c2d
+   else if (allocated(rgc2d)) then
+      allocate(grib2d(nxr*nyr,nbilin2d), source=0.0)
+      allocate(g2d(1:nbilin2d))
+      grib2d(:, 1:nbilin2d) = rgb2d
+      g2d(1:nbilin2d) = b2d
+   end if
+
+   gout = trim(ftype)//'.'//trim(fdst)//'.grib2'
+   if (debug) write(logunit, '(a)')'GRIB2 output file: '//trim(gout)
+   call write_grib2_2d(gout, g2d, (/nxr,nyr/), nconsd2d+nbilin2d, grib2d, vfill)
+
+   if (allocated(rgb3d)) then
+      call write_grib2_3d(gout, b3d, (/nxr,nyr,nlevs/), nbilin3d, rgb3d, vfill)
+   end if
+  end if
 
  stop
 
