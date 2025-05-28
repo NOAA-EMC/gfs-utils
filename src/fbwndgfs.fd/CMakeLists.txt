@@ -12,7 +12,6 @@ set(exe_name fbwndgfs.x)
 add_executable(${exe_name} ${fortran_src})
 target_link_libraries(${exe_name} PRIVATE bacio::bacio_8
                                           ip::ip_8
-                                          sp::sp_8
                                           w3emc::w3emc_8)
 
 if(w3emc_VERSION VERSION_GREATER_EQUAL 2.10)

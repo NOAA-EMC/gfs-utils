@@ -12,7 +12,7 @@ set(exe_name tocsbufr.x)
 add_executable(${exe_name} ${fortran_src})
 target_link_libraries(${exe_name} PRIVATE bacio::bacio_4
                                           sigio::sigio
-                                          sp::sp_4
+                                          ip::ip_4
                                           w3emc::w3emc_4
                                           bufr::bufr_4)
 

@@ -14,7 +14,6 @@ add_executable(${exe_name} ${fortran_src})
 target_link_libraries(${exe_name} PRIVATE NetCDF::NetCDF_Fortran
                                           landsfcutil::landsfcutil_d
                                           ip::ip_d
-                                          sp::sp_d
                                           bacio::bacio_4
                                           w3emc::w3emc_4
                                           wgrib2::wgrib2)

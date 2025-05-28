@@ -40,7 +40,7 @@ set(exe_name gfs_bufr.x)
 add_executable(${exe_name} ${fortran_src} ${fortran_src_free})
 target_link_libraries(${exe_name} PRIVATE NetCDF::NetCDF_Fortran
                                           bacio::bacio_4
-                                          sp::sp_4
+                                          ip::ip_4
                                           w3emc::w3emc_4
                                           bufr::bufr_4)
 
