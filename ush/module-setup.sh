@@ -50,8 +50,15 @@ elif [[ $MACHINE_ID = stampede* ]] ; then
     fi
     module purge
 
-elif [[ $MACHINE_ID = gaea* ]] ; then
-    # We are on GAEA.
+elif [[ ${MACHINE_ID} = gaeac6 ]]; then
+    # We are on GAEA C6.
+    if ( ! eval module help > /dev/null 2>&1 ) ; then
+        source /opt/cray/pe/lmod/lmod/init/bash
+    fi
+    module reset
+
+elif [[ $MACHINE_ID = gaeac5 ]] ; then
+    # We are on GAEA C5.
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         # We cannot simply load the module command.  The GAEA
         # /etc/profile modifies a number of module-related variables
