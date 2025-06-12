@@ -16,6 +16,7 @@ load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
 -- unload("gnu")
 
 load(pathJoin("cmake", cmake_ver))
+setenv("bufr_ver", "12.0.1")
 load("gfsutils_common")
 
 whatis("Description: GFS utilities environment in container with Intel Compilers")
