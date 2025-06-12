@@ -54,11 +54,9 @@ elif [[ $MACHINE_ID = cheyenne* ]] ; then
 
 elif [[ $MACHINE_ID = container ]] ; then
     # We are in a container
-    # if ( ! eval module help > /dev/null 2>&1 ) ; then
-        source /usr/lmod/lmod/init/bash
-    # fi
+    # Always source the lmod init script to override the system module paths and instead use the container modules
+    source /usr/lmod/lmod/init/bash
     module purge
-    unset MODULEPATH
 
 elif [[ $MACHINE_ID = stampede* ]] ; then
     # We are on TACC Stampede
