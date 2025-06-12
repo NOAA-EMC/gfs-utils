@@ -58,12 +58,6 @@ fi
 # Overwrite auto-detect with MACHINE if set
 MACHINE_ID=${MACHINE:-${MACHINE_ID}}
 
-# Overwirte auto-detect of MACHINE_ID if in container
-if [[ -d /opt/spack-stack ]]; then
-  # We are in a container
-  MACHINE_ID=container
-fi
-
 # If MACHINE_ID is no longer UNKNNOWN, return it
 if [[ "${MACHINE_ID}" != "UNKNOWN" ]]; then
   return
@@ -99,6 +93,13 @@ elif [[ -d /gpfs/f6 ]]; then
 elif [[ -d /data/prod ]]; then
   # We are on SSEC's S4
   MACHINE_ID=s4
+elif [[ -d /opt/spack-stack ]]; then
+  if [[ -v SINGULARITY_CONTAINER ]]; then
+    # We are in a container
+    MACHINE_ID=container
+  else
+    echo WARNING: UNKNOWN PLATFORM 1>&2
+  fi
 else
   echo WARNING: UNKNOWN PLATFORM 1>&2
 fi
