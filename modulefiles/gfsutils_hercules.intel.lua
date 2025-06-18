@@ -12,4 +12,8 @@ load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
 
 load("gfsutils_common")
 
+setenv("CC","mpiicc")
+setenv("CXX","mpiicpc")
+setenv("FC","mpiifort")
+
 whatis("Description: GFS utilities environment on Hercules with Intel Compilers")
