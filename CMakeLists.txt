@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(gfsutils
         VERSION 1.0.0
-        LANGUAGES Fortran)
+        LANGUAGES Fortran C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_DIRECTORY_LABELS ${PROJECT_NAME})
@@ -19,7 +19,7 @@ if(NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release|RelWithDebInfo|MinSizeRel)$")
                                                "MinSizeRel" "RelWithDebInfo")
 endif()
 
-if(NOT CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU|Intel)$")
+if(NOT CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU|Intel|IntelLLVM)$")
   message(WARNING "${CMAKE_Fortran_COMPILER_ID} is not supported.")
 endif()
 
