@@ -16,7 +16,7 @@ load(pathJoin("stack-cray-mpich", stack_cray_mpich_ver))
 load("gfsutils_common")
 load("nccmp/1.9.0.1")
 
---unload("cray-libsci")
+unload("cray-libsci")
 
 setenv("CC","cc")
 setenv("CXX","CC")
