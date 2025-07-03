@@ -2,7 +2,7 @@ help([[
 Build environment for GFS utilities on Hera
 ]])
 
-prepend_path("MODULEPATH", "/contrib/spack-stack/spack-stack-1.9.1/envs/ue-oneapi-2024.2.1/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/contrib/spack-stack/spack-stack-1.9.2/envs/ue-oneapi-2024.2.1/install/modulefiles/Core")
 
 local cmake_ver=os.getenv("cmake_ver") or "3.27.9"
 

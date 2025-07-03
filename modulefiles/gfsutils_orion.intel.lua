@@ -2,7 +2,7 @@ help([[
 Build environment for GFS utilities on Orion
 ]])
 
-prepend_path("MODULEPATH", "/apps/contrib/spack-stack/spack-stack-1.9.1/envs/ue-oneapi-2024.1.0/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/apps/contrib/spack-stack/spack-stack-1.9.2/envs/ue-oneapi-2024.1.0/install/modulefiles/Core")
 
 local stack_oneapi_ver=os.getenv("stack_oneapi_ver") or "2024.1.0"
 local stack_impi_ver=os.getenv("stack_impi_ver") or "2021.13"
