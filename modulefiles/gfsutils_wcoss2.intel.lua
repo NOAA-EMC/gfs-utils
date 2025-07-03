@@ -11,6 +11,8 @@ local cmake_ver= os.getenv("cmake_ver") or "3.20.2"
 local jasper_ver=os.getenv("jasper_ver") or "2.0.25"
 local zlib_ver=os.getenv("zlib_ver") or "1.2.11"
 local libpng_ver=os.getenv("libpng_ver") or "1.6.37"
+local hdf5_ver=os.getenv("hdf5_ver") or "1.14.0"
+local pnetcdf_ver=os.getenv("pnetcdf_ver") or "1.12.2"
 local netcdf_ver=os.getenv("netcdf_ver") or "4.9.2"
 
 local bufr_ver=os.getenv("bufr_ver") or "12.1.0"
@@ -36,7 +38,9 @@ load(pathJoin("jasper", jasper_ver))
 load(pathJoin("zlib", zlib_ver))
 load(pathJoin("libpng", libpng_ver))
 
-load(pathJoin("netcdf-B", netcdf_ver))
+load(pathJoin("hdf5-D", netcdf_ver))
+load(pathJoin("pnetcdf-D", pnetcdf_ver))
+load(pathJoin("netcdf-D", netcdf_ver))
 
 load(pathJoin("bufr", bufr_ver))
 load(pathJoin("bacio", bacio_ver))
