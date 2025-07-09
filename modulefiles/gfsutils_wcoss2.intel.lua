@@ -26,7 +26,7 @@ local wrf_io_ver=os.getenv("wrf_io_ver") or "1.2.0"
 local g2_ver=os.getenv("g2_ver") or "3.4.5"
 local landsfcutil_ver=os.getenv("landsfcutil_ver") or "2.4.1"
 local wgrib2_ver=os.getenv("wgrib2_ver") or "2.0.8"
-local wgrib2_ver=os.getenv("ncio_ver") or "1.1.2"
+local ncio_ver=os.getenv("ncio_ver") or "1.1.2"
 
 load(pathJoin("PrgEnv-intel", PrgEnv_intel_ver))
 load(pathJoin("intel", intel_ver))
@@ -38,7 +38,7 @@ load(pathJoin("jasper", jasper_ver))
 load(pathJoin("zlib", zlib_ver))
 load(pathJoin("libpng", libpng_ver))
 
-load(pathJoin("hdf5-D", netcdf_ver))
+load(pathJoin("hdf5-D", hdf5_ver))
 load(pathJoin("pnetcdf-D", pnetcdf_ver))
 load(pathJoin("netcdf-D", netcdf_ver))
 
