@@ -10,8 +10,8 @@
                 'rain_h',2,'Ct', 'bilinear' ,'','','', 'rainfall rate (cpl)' , 'cm/day' ,0,0,0,0,0,0,0,0
                 'sst_h',2,'Ct', 'bilinear' ,'','','', 'sea surface temperature' , 'C' ,0,0,0,0,0,0,0,0
                 'sss_h',2,'Ct', 'bilinear' ,'','','', 'sea surface salinity' , 'ppt' ,0,0,0,0,0,0,0,0
-                'uocn_h',2,'Bu_x', 'bilinear' ,'vocn_h','Bu_y','', 'ocean current (x)' , 'm/s' ,0,0,0,0,0,0,0,0
-                'vocn_h',2,'Bu_y', 'bilinear' ,'uocn_h','Bu_x','', 'ocean current (y)' , 'm/s' ,0,0,0,0,0,0,0,0
+                'uocn_h',2,'Ct', 'bilinear' ,'','','', 'ocean current (x)' , 'm/s' ,0,0,0,0,0,0,0,0
+                'vocn_h',2,'Ct', 'bilinear' ,'','','', 'ocean current (y)' , 'm/s' ,0,0,0,0,0,0,0,0
                 'frzmlt_h',2,'Ct','conserve','','','', 'freeze/melt potential' , 'W/m^2' ,0,0,0,0,0,0,0,0
                 'scale_factor_h',2,'Ct', 'bilinear' ,'','','', 'shortwave scaling factor' , '1' ,0,0,0,0,0,0,0,0
                 'fswabs_h',2,'Ct','conserve','','','', 'snow/ice/ocn absorbed solar flux (cpl)' , 'W/m^2' ,0,0,0,0,0,0,0,0
@@ -58,6 +58,6 @@
                 'hpond_h',2,'Ct', 'bilinear' ,'','','', 'mean melt pond depth over sea ice' , 'm' ,0,0,0,0,0,0,0,0
                 'ipond_h',2,'Ct', 'bilinear' ,'','','', 'mean pond ice thickness over sea ice' , 'm' ,0,0,0,0,0,0,0,0
                 'apeff_h',2,'Ct', 'bilinear' ,'','','', 'radiation-effective pond area fraction of sea ice' , '1' ,0,0,0,0,0,0,0,0
-                'uatm_h',2,'Bu_x', 'bilinear' ,'vatm_h','Bu_y','', 'atm velocity (x)' , 'm/s' ,0,0,0,0,0,0,0,0
-                'vatm_h',2,'Bu_y', 'bilinear' ,'uatm_h','Bu_x','', 'atm velocity (y)' , 'm/s' ,0,0,0,0,0,0,0,0
+                'uatm_h',2,'Ct', 'bilinear' ,'','','', 'atm velocity (x)' , 'm/s' ,0,0,0,0,0,0,0,0
+                'vatm_h',2,'Ct', 'bilinear' ,'','','', 'atm velocity (y)' , 'm/s' ,0,0,0,0,0,0,0,0
 
