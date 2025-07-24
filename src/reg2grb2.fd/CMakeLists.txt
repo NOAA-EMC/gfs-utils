@@ -1,6 +1,6 @@
 list(APPEND fortran_src
-reg2grb2.f
-regdiag.f
+reg2grb2.f90
+regdiag.f90
 )
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")

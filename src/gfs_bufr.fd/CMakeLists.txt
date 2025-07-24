@@ -20,12 +20,12 @@ list(APPEND fortran_src
 )
 
 list(APPEND fortran_src_free
-  calpreciptype.f
-  funcphys.f
-  gslp.f
-  machine.f
-  modstuff1.f
-  physcons.f
+  calpreciptype.f90
+  funcphys.f90
+  gslp.f90
+  machine.f90
+  modstuff1.f90
+  physcons.f90
 )
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
