@@ -14,4 +14,11 @@ load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
 
 load("gfsutils_common")
 
+setenv("CC", "mpiicx")
+setenv("CXX", "mpiicpx")
+setenv("FC", "mpiifort")
+setenv("I_MPI_CC", "icx")
+setenv("I_MPI_CXX", "icpx")
+setenv("I_MPI_F90", "ifort")
+
 whatis("Description: GFS utilities environment in container with Intel Compilers")
