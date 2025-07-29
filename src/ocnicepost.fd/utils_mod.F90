@@ -750,7 +750,7 @@ contains
          jpdt(14)=0
          jpdt(15)=0
 
-         if (debug) write(logunit, *) 'ipdtnum=', ipdtnum, ', jpdt= ', jpdt(1:16)
+         if (debug) write(logunit, *) 'ipdtnum=', ipdtnum, ', jpdt= ', jpdt(1:size(jpdt))
 
          ipdtlen=size(jpdt)
 
