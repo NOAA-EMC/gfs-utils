@@ -16,7 +16,7 @@ if(TARGET wgrib2::wgrib2_ftn_api)
   set(wgrib2_target wgrib2::wgrib2_ftn_api)
 elseif(TARGET wgrib2::wgrib2)
   set(wgrib2_target wgrib2::wgrib2)
-else
+else()
   message(FATAL_ERROR "No target for wgrib2 found")
 endif()
 
