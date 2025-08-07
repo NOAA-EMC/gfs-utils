@@ -16,7 +16,7 @@ target_link_libraries(${exe_name} PRIVATE NetCDF::NetCDF_Fortran
                                           ip::ip_d
                                           bacio::bacio_4
                                           w3emc::w3emc_4
-                                          wgrib2::wgrib2)
+                                          wgrib2::wgrib2_ftn_api)
 
 if(OpenMP_Fortran_FOUND)
   target_link_libraries(${exe_name} PRIVATE OpenMP::OpenMP_Fortran)
