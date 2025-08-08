@@ -28,6 +28,10 @@ case $(hostname -f) in
   hfe1[0-2]) MACHINE_ID=hera ;; ### hera10-12
   hecflow01) MACHINE_ID=hera ;; ### heraecflow01
 
+  ufe0[1-9]) MACHINE_ID=ursa ;; ### ursa01-09
+  ufe1[0-6]) MACHINE_ID=ursa ;; ### ursa10-16
+  uecflow01) MACHINE_ID=ursa ;; ### ursaecflow01
+
   Orion-login-[1-4].HPC.MsState.Edu) MACHINE_ID=orion ;; ### orion1-4
 
   [Hh]ercules-login-[1-4].[Hh][Pp][Cc].[Mm]s[Ss]tate.[Ee]du) MACHINE_ID=hercules ;; ### hercules1-4
@@ -60,9 +64,15 @@ elif [[ -d /lfs/h3 ]]; then
 elif [[ -d /lfs/h1 && ! -d /lfs/h3 ]]; then
   # We are on NOAA TDS Acorn
   MACHINE_ID=acorn
-elif [[ -d /scratch1 ]]; then
-  # We are on NOAA Hera
-  MACHINE_ID=hera
+elif [[ -d /scratch3 ]]; then
+  # We are on NOAA Hera or Ursa
+  mount=$(findmnt -n -o SOURCE /home)   
+  if [[ ${mount} =~ "ursa" ]]; then
+    # We are on ursa
+    MACHINE_ID=ursa
+  elif [[ ${mount} =~ "hera" ]]; then
+    MACHINE_ID=hera
+  fi
 elif [[ -d /work ]]; then
   # We are on MSU Orion or Hercules
   mount=$(findmnt -n -o SOURCE /home)
