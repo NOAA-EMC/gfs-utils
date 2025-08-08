@@ -1,7 +1,8 @@
 #!/bin/bash
+# shellcheck disable=SC1091
 set -u
 
-if [[ $MACHINE_ID = hera* ]] ; then
+if [[ ${MACHINE_ID} = hera* ]] ; then
     # We are on NOAA Hera
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         source /apps/lmod/lmod/init/bash
@@ -9,7 +10,7 @@ if [[ $MACHINE_ID = hera* ]] ; then
     export LMOD_SYSTEM_DEFAULT_MODULES=contrib
     module reset
 
-elif [[ $MACHINE_ID = ursa* ]] ; then
+elif [[ ${MACHINE_ID} = ursa* ]] ; then
     # We are on NOAA Ursa
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         source /apps/lmod/lmod/init/bash
@@ -18,7 +19,7 @@ elif [[ $MACHINE_ID = ursa* ]] ; then
     module reset
 
 
-elif [[ $MACHINE_ID = orion* ]] ; then
+elif [[ ${MACHINE_ID} = orion* ]] ; then
     # We are on Orion
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         source /apps/lmod/lmod/init/bash
@@ -26,7 +27,7 @@ elif [[ $MACHINE_ID = orion* ]] ; then
     export LMOD_SYSTEM_DEFAULT_MODULES=contrib
     module reset
 
-elif [[ $MACHINE_ID = hercules* ]] ; then
+elif [[ ${MACHINE_ID} = hercules* ]] ; then
     # We are on Hercules
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         source /apps/other/lmod/lmod/init/bash
@@ -34,11 +35,11 @@ elif [[ $MACHINE_ID = hercules* ]] ; then
     export LMOD_SYSTEM_DEFAULT_MODULES=contrib
     module reset
 
-elif [[ $MACHINE_ID = wcoss2 ]]; then
+elif [[ ${MACHINE_ID} == wcoss2 ]]; then
     # We are on WCOSS2
     module reset
 
-elif [[ $MACHINE_ID = container ]] ; then
+elif [[ ${MACHINE_ID} == container ]] ; then
     # We are in a container
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         # shellcheck disable=1091
@@ -46,7 +47,7 @@ elif [[ $MACHINE_ID = container ]] ; then
     fi
     module purge
 
-elif [[ ${MACHINE_ID} = gaeac6 ]]; then
+elif [[ ${MACHINE_ID} == gaeac6 ]]; then
     # We are on GAEA C6.
     if ( ! eval module help > /dev/null 2>&1 ) ; then
         # shellcheck disable=1091
@@ -54,11 +55,11 @@ elif [[ ${MACHINE_ID} = gaeac6 ]]; then
     fi
     module reset
 
-elif [[ ${MACHINE_ID} = noaacloud ]] ; then
+elif [[ ${MACHINE_ID} == noaacloud ]] ; then
     # We are on NOAA Cloud
     module purge
 
 else
-    echo WARNING: UNKNOWN PLATFORM 1>&2
+    echo "WARNING: UNKNOWN PLATFORM" 1>&2
 
 fi
