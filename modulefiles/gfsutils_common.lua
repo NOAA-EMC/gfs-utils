@@ -5,21 +5,22 @@ Load common modules to build GFS utilities on all machines
 local netcdf_c_ver=os.getenv("netcdf_c_ver") or "4.9.2"
 local netcdf_fortran_ver=os.getenv("netcdf_fortran_ver") or "4.6.1"
 
-local bufr_ver=os.getenv("bufr_ver") or "11.7.0"
+local bufr_ver=os.getenv("bufr_ver") or "12.1.0"
 local bacio_ver=os.getenv("bacio_ver") or "2.4.1"
 local w3emc_ver=os.getenv("w3emc_ver") or "2.10.0"
-local sp_ver=os.getenv("sp_ver") or "2.5.0"
-local ip_ver=os.getenv("ip_ver") or "4.3.0"
-local sigio_ver=os.getenv("sigio_ver") or "2.3.2"
+local ip_ver=os.getenv("ip_ver") or "5.1.0"
+local sigio_ver=os.getenv("sigio_ver") or "2.3.3"
 local nemsio_ver=os.getenv("nemsio_ver") or "2.5.4"
 local nemsiogfs_ver=os.getenv("nemsiogfs_ver") or "2.5.3"
 local wrf_io_ver=os.getenv("wrf_io_ver") or "1.2.0"
 local ncio_ver=os.getenv("ncio_ver") or "1.1.2"
-local g2_ver=os.getenv("g2_ver") or "3.4.5"
-local landsfcutil_ver=os.getenv("landsfcutil_ver") or "2.4.1"
-local wgrib2_ver=os.getenv("wgrib2_ver") or "2.0.8"
+local g2_ver=os.getenv("g2_ver") or "3.5.1"
+local landsfcutil_ver=os.getenv("landsfcutil_ver") or "2.4.2"
+local wgrib2_ver=os.getenv("wgrib2_ver") or "3.6.0"
 local libpng_ver=os.getenv("libpng_ver") or "1.6.37"
+local cmake_ver=os.getenv("cmake_ver") or "3.27.9"
 
+load(pathJoin("cmake", cmake_ver))
 load(pathJoin("libpng", libpng_ver))
 
 load(pathJoin("netcdf-c", netcdf_c_ver))
@@ -28,7 +29,6 @@ load(pathJoin("netcdf-fortran", netcdf_fortran_ver))
 load(pathJoin("bufr", bufr_ver))
 load(pathJoin("bacio", bacio_ver))
 load(pathJoin("w3emc", w3emc_ver))
-load(pathJoin("sp", sp_ver))
 load(pathJoin("ip", ip_ver))
 load(pathJoin("sigio", sigio_ver))
 load(pathJoin("sfcio", sfcio_ver))

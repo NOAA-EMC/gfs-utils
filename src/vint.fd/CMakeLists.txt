@@ -10,13 +10,7 @@ endif()
 
 set(exe_name vint.x)
 add_executable(${exe_name} ${fortran_src})
-if(LINK_W3EMC)
-  target_link_libraries(${exe_name} PRIVATE bacio::bacio_4
-                                            w3emc::w3emc_d
-                                            g2::g2_d)
-else()
-  target_link_libraries(${exe_name} PRIVATE bacio::bacio_4
-                                            g2::g2_d)
-endif()
+target_link_libraries(${exe_name} PRIVATE bacio::bacio_4
+                                          g2::g2_d)
 
 install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
