@@ -497,6 +497,7 @@
 
  use netcdf
  use io
+ use sp_mod, only: splat
 
  implicit none
 

@@ -399,13 +399,8 @@ C   CONVERT EARTH COORDINATES OF STATION TO GRID COORDINATES
                   DO 110 J = 1,NRSTNS
 C                     CALL GDSWIZ(KGDS,-1,1,FILL,XPTS(J),YPTS(J),
 C     &                    ALON(J),ALAT(J),IRET,0,DUM,DUM)
-#ifdef W3EMC_V2_10
                      CALL GDSWZD_GRIB1(KGDS,-1,1,FILL,XPTS(J),YPTS(J),
      &                    ALON(J),ALAT(J),IRET)
-#else
-                     CALL GDSWZD(KGDS,-1,1,FILL,XPTS(J),YPTS(J),
-     &                    ALON(J),ALAT(J),IRET)
-#endif
                      ISTN(J) = XPTS(J)
                      JSTN(J) = YPTS(J)
 C                    PRINT 111,STNID(J),ALAT(J),ALON(J),ISTN(J),JSTN(J)
@@ -911,7 +906,8 @@ C
          INTEGER       L
          INTEGER       N
          INTEGER       NEXT
-         INTEGER       WBLANK
+         INTEGER(kind=8) WBLANK
+         INTEGER(kind=8) IWORDS
 C
          CHARACTER * 1 LINE(*)
          CHARACTER * 1 NBLK(*)
@@ -919,7 +915,7 @@ C
 C
          SAVE
 C
-         DATA  WBLANK/Z'2020202020202020'/
+         DATA  WBLANK/Z'20'/
 C        DATA  WBLANK/Z''/
 C   
 C TEST VALUE OF NEXT.

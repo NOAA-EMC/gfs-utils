@@ -4,7 +4,7 @@
 #
 #   - wgrib2::wgrib2      - library and include directory, all in a single target.
 #   - WGRIB2_INCLUDE_DIR  - include directory
-#   - WGRIB2_LIBRARIES    - wgrib2 library
+#   - WGRIB2_LIBRARIES|WGRIB2_LIB - wgrib2 library
 #   - WGRIB2API_LIBRARIES - wgrib2_api library (if using NCEPLibs-wgrib2 cmake build system)
 #   - WGRIB2_EXE          - wgrib2 executable
 #
@@ -30,7 +30,7 @@ find_path(
 
 find_library(
   WGRIB2_LIBRARIES
-  NAMES libwgrib2.a
+  NAMES libwgrib2.a libwgrib2.so
   HINTS ${WGRIB2_LIBRARY_DIRS}
         ${wgrib2_ROOT} $ENV{wgrib2_ROOT}
         ${wgrib2_PATH} $ENV{wgrib2_PATH}
@@ -40,7 +40,7 @@ find_library(
 
 find_library(
   WGRIB2API_LIBRARIES
-  NAMES libwgrib2_api.a
+  NAMES libwgrib2_api.a libwgrib2_api.so libwgrib2_ftn_api.a libwgrib2_ftn_api.so
   HINTS ${WGRIB2_LIBRARY_DIRS}
         ${wgrib2_ROOT} $ENV{wgrib2_ROOT}
         ${wgrib2_PATH} $ENV{wgrib2_PATH}
