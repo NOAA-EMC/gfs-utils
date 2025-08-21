@@ -99,5 +99,3 @@ elif [[ -d /gpfs/f6 ]]; then
 else
   echo WARNING: UNKNOWN PLATFORM 1>&2
 fi
-
-export MACHINE_ID
