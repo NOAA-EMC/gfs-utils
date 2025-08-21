@@ -37,8 +37,7 @@ mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}"
 set -x
 # shellcheck disable=SC2086
 cmake ${CMAKE_OPTS} "${DIR_ROOT}"
-#make -j "${BUILD_JOBS:-8}" VERBOSE="${BUILD_VERBOSE:-}"
-make VERBOSE="${BUILD_VERBOSE:-}"
+make -j "${BUILD_JOBS:-8}" VERBOSE="${BUILD_VERBOSE:-}"
 make install
 set +x
 
