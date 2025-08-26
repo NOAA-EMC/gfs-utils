@@ -5,9 +5,16 @@
 # GENERATE MONTHLY/DAILY MEAN GRIB2 FILES ON INTERPOLATED 360-x181 LAT-LON  GRID 
 # FOR SFS MASTER DATA FILES
 
+# THIS SCRIPT WILL BE CALLED FROM G-W JOBS, WHERE THE FOLLOWING VARIABLES WILL BE
+# PREDETERIMED:
+
+###  memdir: path to directory with the SFS master files for a member
+###  gmerge: path to gmerge (from wgrib2) executable file
+###  monthly_dir: path to directory where monthly means will be saved
+
 #####################################################################################
 
-firstfile=$memdir/sfs*master.grb2f000
+firstfile=$memdir/sfs.t00z.master.grb2f000
 
 # get validation date of first file
 vt_init=`wgrib2 $firstfile -d 1 -vt`
