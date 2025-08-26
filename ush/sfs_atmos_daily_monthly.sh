@@ -17,8 +17,8 @@
 firstfile=$memdir/sfs.t00z.master.grb2f000
 
 # get validation date of first file
-vt_init=`wgrib2 $firstfile -d 1 -vt`
-mm_init=`echo $vt_init | cut -c12-13`
+vt_init=$(wgrib2 $firstfile -d 1 -vt)
+mm_init=${vt_init:11:2}`
 
 #### Set index for finding month of validation date for loops
 months_in_year=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12")
