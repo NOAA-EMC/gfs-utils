@@ -26,8 +26,8 @@ declare -a filevars=( "dlwrfsfc" "dswrfsfc" "ulwrfsfc" "uswrfsfc" "ulwrftoa" "lh
 
 # get validation date of first file
 firstfile="$MEMDIR/sfs.t${CC}z.master.grb2f000"
-vt_init="$(wgrib2 ${firstfile} -d 1 -vt)"
-vt_date="${vt_init:7:10}"  # for filename
+vt_init="$(wgrib2 "${firstfile}" -d 1 -vt)"
+vt_date="${vt_init:7:10}"  
 
 for (( i=0; i<${#vars[@]}; i++)); do
   
@@ -36,10 +36,10 @@ for (( i=0; i<${#vars[@]}; i++)); do
 
   filename="${filevar}.${ENS}.${vt_date}.6hourly.grb2"
  
-  cat $(eval "ls -v $MEMDIR/*") | wgrib2 - -match "${var}" -grib "$OUTDIR/IN.grb"
+  cat $(eval "ls -v ${MEMDIR}/*") | wgrib2 - -match "${var}" -grib "${OUTDIR}/IN.grb"
 
-  wgrib2 "$OUTDIR/IN.grb" -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "$OUTDIR/$filename"
-  rm "$OUTDIR/IN.grb"
+  wgrib2 "${OUTDIR}/IN.grb" -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/$filename"
+  rm "${OUTDIR}/IN.grb"
 
 done
 
