@@ -11,7 +11,7 @@
 ###  memdir: path to directory with the SFS master files for a member
 ###  cc: cycle of memdir data
 ###  ens: ensemble member of memdir data
-###  gmerge: path to gmerge (from wgrib2) executable file
+###  gmerge: path to gmerge executable file
 ###  monthly_dir: path to directory where monthly means will be saved
 
 #####################################################################################
@@ -77,7 +77,7 @@ do
   #merge the min/max variables into daily periods
   $gmerge - $list | wgrib2 - -match ' (ave|min|max|acc) ' -merge_fcst 4 $monthly_dir/acc.daily.${ens}/IN.grb
 
-  # get the monthly averages of the daily min/max values (these are already interpolated)
+  # get the monthly averages of the daily min/max values, which are already interpolated
   wgrib2 $monthly_dir/acc.daily.${ens}/IN.grb -fcst_ave 24hr $monthly_dir/acc.monthly.${ens}/IN.grb
 
   #interpolate
@@ -91,16 +91,15 @@ do
   rm $monthly_dir/acc.monthly.${ens}/IN.grb
   rm $monthly_dir/acc.monthly.${ens}/OUT.grb
 
-  # monthly averages for instantaneous forecasts (not ave,acc,min,max)
+  # monthly averages for instantaneous forecasts 
   $gmerge - $listinst | wgrib2 - -not ' (ave|min|max|acc) ' -fcst_ave 6hr $monthly_dir/inst.monthly.${ens}/IN.grb
   
-  #interpolate
+  # interpolate
   wgrib2 $monthly_dir/inst.monthly.${ens}/IN.grb | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i $monthly_dir/inst.monthly.${ens}/IN.grb -grib $monthly_dir/inst.monthly.${ens}/OUT.grb                                 
   wgrib2 $monthly_dir/inst.monthly.${ens}/OUT.grb -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 $monthly_dir/inst.monthly.${ens}/inst.monthly.${filename_start}${filemm}${filename_end}
 
   rm $monthly_dir/inst.monthly.${ens}/IN.grb
   rm $monthly_dir/inst.monthly.${ens}/OUT.grb
-
 
   # daily averages for instantaneous variables
   for j in $(seq $fhi 24 $fhf)
@@ -115,7 +114,7 @@ do
   daily_end=$(($(($fhi-6))))
   list_daily=`ls -v $monthly_dir/inst.daily.${ens}/daily_*.grb`
 
-  #### merge all days into single grib2 file (use end_hr for this) and remove uneeded files
+  #### merge all days into single grib2 file and remove unneeded files
   $gmerge - $list_daily > $monthly_dir/inst.daily.${ens}/IN.grb
   rm $monthly_dir/inst.daily.${ens}/daily*.grb
 
@@ -126,9 +125,7 @@ do
   rm $monthly_dir/inst.daily.${ens}/IN.grb
   rm $monthly_dir/inst.daily.${ens}/OUT.grb
 
-
 done
-
 
 # loop from start of calendar year to valid date month
 for (( i=0; i<$start_idx; i++))
@@ -151,10 +148,10 @@ do
   #merge the min/max variables into daily periods
   $gmerge - $list | wgrib2 - -match ' (ave|min|max|acc) ' -merge_fcst 4 $monthly_dir/acc.daily.${ens}/IN.grb
 
-  # get the monthly averages of the daily min/max values (these are already interpolated)
+  # get the monthly averages of the daily min/max values, which are already interpolated
   wgrib2 $monthly_dir/acc.daily.${ens}/IN.grb -fcst_ave 24hr $monthly_dir/acc.monthly.${ens}/IN.grb
 
-  #interpolate
+  # interpolate
   wgrib2 $monthly_dir/acc.daily.${ens}/IN.grb | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i $monthly_dir/acc.daily.${ens}/IN.grb -grib $monthly_dir/acc.daily.${ens}/OUT.grb
   wgrib2 $monthly_dir/acc.daily.${ens}/OUT.grb -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 $monthly_dir/acc.daily.${ens}/acc.daily.${filename_start_next}${filemm}${filename_end}
   wgrib2 $monthly_dir/acc.monthly.${ens}/IN.grb | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i $monthly_dir/acc.monthly.${ens}/IN.grb -grib $monthly_dir/acc.monthly.${ens}/OUT.grb
@@ -165,16 +162,15 @@ do
   rm $monthly_dir/acc.monthly.${ens}/IN.grb
   rm $monthly_dir/acc.monthly.${ens}/OUT.grb
 
-  # monthly averages for instantaneous forecasts (not ave,acc,min,max)
+  # monthly averages for instantaneous forecasts 
   $gmerge - $listinst | wgrib2 - -not ' (ave|min|max|acc) ' -fcst_ave 6hr $monthly_dir/inst.monthly.${ens}/IN.grb
   
-  #interpolate
+  # interpolate
   wgrib2 $monthly_dir/inst.monthly.${ens}/IN.grb | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i $monthly_dir/inst.monthly.${ens}/IN.grb -grib $monthly_dir/inst.monthly.${ens}/OUT.grb                                 
   wgrib2 $monthly_dir/inst.monthly.${ens}/OUT.grb -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 $monthly_dir/inst.monthly.${ens}/inst.monthly.${filename_start_next}${filemm}${filename_end}
 
   rm $monthly_dir/inst.monthly.${ens}/IN.grb
   rm $monthly_dir/inst.monthly.${ens}/OUT.grb
-
 
   # daily averages for instantaneous variables
   for j in $(seq $fhi 24 $fhf)
@@ -189,11 +185,11 @@ do
   daily_end=$(($(($fhi-6))))
   list_daily=`ls -v $monthly_dir/inst.daily.${ens}/daily_*.grb`
 
-  #### merge all days into single grib2 file (use end_hr for this) and remove uneeded files
+  #### merge all days into single grib2 file and remove unneeded files
   $gmerge - $list_daily > $monthly_dir/inst.daily.${ens}/IN.grb
   rm $monthly_dir/inst.daily.${ens}/daily*.grb
 
-  #interpolate
+  # interpolate
   wgrib2 $monthly_dir/inst.daily.${ens}/IN.grb | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i $monthly_dir/inst.daily.${ens}/IN.grb -grib $monthly_dir/inst.daily.${ens}/OUT.grb                          
   wgrib2 $monthly_dir/inst.daily.${ens}/OUT.grb -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 $monthly_dir/inst.daily.${ens}/inst.daily.${filename_start_next}${filemm}${filename_end}
 
