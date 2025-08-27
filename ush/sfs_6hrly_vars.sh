@@ -26,7 +26,7 @@ declare -a filevars=( "dlwrfsfc" "dswrfsfc" "ulwrfsfc" "uswrfsfc" "ulwrftoa" "lh
 
 # get validation date of first file
 firstfile="$memdir/sfs.t${cc}z.master.grb2f000"
-vt_init="$(wgrib2 $firstfile -d 1 -vt)"
+vt_init="$(wgrib2 ${firstfile} -d 1 -vt)"
 vt_date="${vt_init:7:10}"  # for filename
 
 for (( i=0; i<${#vars[@]}; i++)); do
