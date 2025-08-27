@@ -25,7 +25,7 @@ declare -a filevars=( "dlwrfsfc" "dswrfsfc" "ulwrfsfc" "uswrfsfc" "ulwrftoa" "lh
 "spfh925mb" "tmp50mb" "tmp200mb" "tmp500mb" "tmp700mb" "tmp850mb" "tcdc" "icec" "tsoil10cm" "soilm" "watr" "weasd" "land" "hgtsfc" "wind10m" "wind200mb" "wind500mb" "wind700mb" "wind850mb" "wind925mb" "flux" )
 
 # get validation date of first file
-firstfile="$MEMDIR/sfs.t${CC}z.master.grb2f000"
+firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
 vt_init="$(wgrib2 "${firstfile}" -d 1 -vt)"
 vt_date="${vt_init:7:10}"  
 
