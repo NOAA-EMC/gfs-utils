@@ -22,7 +22,7 @@ firstfile=$MEMDIR/sfs.t${CC}z.master.grb2f000
 vt_init=$(wgrib2 $firstfile -d 1 -vt)
 vt_date=${vt_init:7:10}  # for filename
 yy_init=${vt_init:7:4}
-yy_init_next=$(($(($yy_init+1))))
+yy_init_next=$((yy_init+1))
 mm_init=${vt_init:11:2}
 
 # set filenames for valid date year and following year
@@ -56,7 +56,7 @@ done
 daysf=0   # day no. at end of month
 
 # loop from valid date month to end of calendar year
-for (( i=$start_idx; i<${#months_in_year[@]}; i++))
+for (( i=start_idx; i<${#months_in_year[@]}; i++ ))
 do
   daysf=$((daysf+month_days_in_year[i]))
   daysi=$((daysf-month_days_in_year[i]))
@@ -67,8 +67,8 @@ do
 
   ### Make list of files for the whole month
   ### For FCST MONTHLY, 6 hours less on the FIRST file
-  list=`seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $fhi 6 $fhf`
-  listinst=`seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $fhiinst 6 $fhf`
+  list=$(seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $fhi 6 $fhf)
+  listinst=$(seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $fhiinst 6 $fhf)
   
   # month of loop for filename
   filemm="${months_in_year[$i]}"
@@ -105,13 +105,11 @@ do
   do
     start_hr=$((j-6))
     end_hr=$((j+24-6))
-    list_6hrly=`seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $start_hr 6 $end_hr`
+    list_6hrly=$(seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $start_hr 6 $end_hr)
     $GMERGE - $list_6hrly | wgrib2 - -match  "MSLET|PRMSL|PWAT|PRES:surface|TMP:2 m above|:TMP:surface|SPFH:2 m above|DPT:2 m above|UGRD:10 m above|VGRD:10 m above|HGT:(2|10|50|100|200|500|700|850|1000) mb|(PVORT|TMP):(450|550|650) K|(UGRD|VGRD):(2|10|50|100|200|500|600|700|850|925|1000) mb|SPFH:(100|200|300|500|600|700|850|925|1000) mb|VVEL:500 mb|TMP:(2|10|50|100|200|250|300|500|600|700|850|925|1000) mb|TOZNE|ICEC|ICETK|(TSOIL|SOILW):(0-0.1|0.1-0.4|0.4-1|1-2) m|WEASD|PEVPR|LAND|HGT:surface|CSDLF:surface|CSDSF:surface|CSUSF:surface|NDDSF:surface|VDDSF:surface|SOILM:0-0.2|TMP:1 hybrid" -fcst_ave 6hr $OUTDIR/inst.daily.${ENS}/daily_${end_hr}.grb
   done
 
-  daily_start=$((fhf+24-6))
-  daily_end=$((fhi-6))
-  list_daily=`ls -v $OUTDIR/inst.daily.${ENS}/daily_*.grb`
+  list_daily=$(ls -v $OUTDIR/inst.daily.${ENS}/daily_*.grb)
 
   #### merge all days into single grib2 file and remove unneeded files
   $GMERGE - $list_daily > $OUTDIR/inst.daily.${ENS}/IN.grb
@@ -127,7 +125,7 @@ do
 done
 
 # loop from start of calendar year to valid date month
-for (( i=0; i<$start_idx; i++))
+for (( i=0; i<start_idx; i++ ))
 do
   daysf=$((daysf+month_days_in_year[i]))
   daysi=$((daysf-month_days_in_year[i]))
@@ -138,8 +136,8 @@ do
 
   ### Make list of files for the whole month
   ### For FCST MONTHLY, 6 hours less on the FIRST file
-  list=`seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $fhi 6 $fhf`
-  listinst=`seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $fhiinst 6 $fhf`
+  list=$(seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $fhi 6 $fhf)
+  listinst=$(seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $fhiinst 6 $fhf)
 
   # month of loop for filename
   filemm="${months_in_year[$i]}"
@@ -176,13 +174,11 @@ do
   do
     start_hr=$((j-6))
     end_hr=$((j+24-6)) 
-    list_6hrly=`seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $start_hr 6 $end_hr`
+    list_6hrly=$(seq -f $MEMDIR/sfs.t00z.master.grb2f%03.0f $start_hr 6 $end_hr)
     $GMERGE - $list_6hrly | wgrib2 - -match  "MSLET|PRMSL|PWAT|PRES:surface|TMP:2 m above|:TMP:surface|SPFH:2 m above|DPT:2 m above|UGRD:10 m above|VGRD:10 m above|HGT:(2|10|50|100|200|500|700|850|1000) mb|(PVORT|TMP):(450|550|650) K|(UGRD|VGRD):(2|10|50|100|200|500|600|700|850|925|1000) mb|SPFH:(100|200|300|500|600|700|850|925|1000) mb|VVEL:500 mb|TMP:(2|10|50|100|200|250|300|500|600|700|850|925|1000) mb|TOZNE|ICEC|ICETK|(TSOIL|SOILW):(0-0.1|0.1-0.4|0.4-1|1-2) m|WEASD|PEVPR|LAND|HGT:surface|CSDLF:surface|CSDSF:surface|CSUSF:surface|NDDSF:surface|VDDSF:surface|SOILM:0-0.2|TMP:1 hybrid" -fcst_ave 6hr $OUTDIR/inst.daily.${ENS}/daily_${end_hr}.grb
   done
 
-  daily_start=$((fhf+24-6))      
-  daily_end=$((fhi-6))  
-  list_daily=`ls -v $OUTDIR/inst.daily.${ENS}/daily_*.grb`
+  list_daily=$(ls -v $OUTDIR/inst.daily.${ENS}/daily_*.grb)
 
   #### merge all days into single grib2 file and remove unneeded files
   $GMERGE - $list_daily > $OUTDIR/inst.daily.${ENS}/IN.grb
