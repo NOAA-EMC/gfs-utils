@@ -33,7 +33,7 @@ filename_end=".grib.${CC}Z.grb2"
 
 #### Set index for finding month of validation date for loops
 months_in_year=("01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11" "12")
-start_idx=$(($mm_init-1))
+start_idx=$((mm_init-1))
 
 #### check for leap year
 itime=$(wgrib2 -t $firstfile|head -1|cut -d= -f2)
