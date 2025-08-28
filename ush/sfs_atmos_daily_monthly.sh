@@ -19,7 +19,7 @@
 firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
 
 # get validation date of first file
-vt_init="$(wgrib2 $firstfile -d 1 -vt)"
+vt_init="$(wgrib2 ${firstfile} -d 1 -vt)"
 vt_date=${vt_init:7:10}  # for filename
 yy_init=${vt_init:7:4}
 yy_init_next=$((yy_init+1))
@@ -35,7 +35,7 @@ months_in_year=("01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11" "12")
 start_idx=$((mm_init-1))
 
 #### check for leap year
-itime="$(wgrib2 -t $firstfile|head -1|cut -d= -f2)"
+itime="$(wgrib2 -t ${firstfile}|head -1|cut -d= -f2)"
 for i in {1..12}
 do
   yyyy=${itime:0:4}
@@ -113,7 +113,7 @@ do
 
   #### merge all days into single grib2 file and remove unneeded files
   $GMERGE - $list_daily > "${OUTDIR}/inst.daily.${ENS}/IN.grb"
-  rm "${OUTDIR}"/inst.daily.${ENS}/daily*.grb
+  rm "${OUTDIR}"/inst.daily."${ENS}"/daily*.grb
 
   #interpolate
   wgrib2 "${OUTDIR}/inst.daily.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/inst.daily.${ENS}/IN.grb" -grib "${OUTDIR}/inst.daily.${ENS}/OUT.grb"                          
@@ -178,11 +178,11 @@ do
     $GMERGE - $list_6hrly | wgrib2 - -match  "MSLET|PRMSL|PWAT|PRES:surface|TMP:2 m above|:TMP:surface|SPFH:2 m above|DPT:2 m above|UGRD:10 m above|VGRD:10 m above|HGT:(2|10|50|100|200|500|700|850|1000) mb|(PVORT|TMP):(450|550|650) K|(UGRD|VGRD):(2|10|50|100|200|500|600|700|850|925|1000) mb|SPFH:(100|200|300|500|600|700|850|925|1000) mb|VVEL:500 mb|TMP:(2|10|50|100|200|250|300|500|600|700|850|925|1000) mb|TOZNE|ICEC|ICETK|(TSOIL|SOILW):(0-0.1|0.1-0.4|0.4-1|1-2) m|WEASD|PEVPR|LAND|HGT:surface|CSDLF:surface|CSDSF:surface|CSUSF:surface|NDDSF:surface|VDDSF:surface|SOILM:0-0.2|TMP:1 hybrid" -fcst_ave 6hr "${OUTDIR}/inst.daily.${ENS}/daily_${end_hr}.grb"
   done
 
-  list_daily=$(ls -v "${OUTDIR}"/inst.daily.${ENS}/daily_*.grb)
+  list_daily=$(ls -v "${OUTDIR}"/inst.daily."${ENS}"/daily_*.grb)
 
   #### merge all days into single grib2 file and remove unneeded files
   $GMERGE - $list_daily > "${OUTDIR}/inst.daily.${ENS}/IN.grb"
-  rm "${OUTDIR}"/inst.daily.${ENS}/daily*.grb
+  rm "${OUTDIR}"/inst.daily."${ENS}"/daily*.grb
 
   # interpolate
   wgrib2 "${OUTDIR}/inst.daily.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/inst.daily.${ENS}/IN.grb" -grib "${OUTDIR}/inst.daily.${ENS}/OUT.grb"                          
