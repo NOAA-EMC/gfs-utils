@@ -35,7 +35,9 @@ for (( i=0; i<${#vars[@]}; i++)); do
   filevar="${filevars[$i]}"
 
   filename="${filevar}.${ENS}.${vt_date}.6hourly.grb2"
- 
+
+   # shellcheck disable=SC2046
+   # shellcheck disable=SC2002
   cat $(eval "ls -v ${MEMDIR}/*") | wgrib2 - -match "${var}" -grib "${OUTDIR}/IN.grb"
 
   wgrib2 "${OUTDIR}/IN.grb" -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/${filename}"
