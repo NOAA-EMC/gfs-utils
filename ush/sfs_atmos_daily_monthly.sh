@@ -1,9 +1,12 @@
 #!/bin/bash
 
-######################################################################################
+###########################################################################################
 
 # GENERATE MONTHLY/DAILY MEAN GRIB2 FILES ON INTERPOLATED 360-x181 LAT-LON  GRID 
-# FOR SFS MASTER DATA FILES
+# FOR SFS MASTER 6-HOURLY DATA FILES. THIS SCRIPT GENERATES 4 DIFFERENT KINDS OF DATASETS:
+# DAILY AND MONTHLY GRIB2 FILES FOR ACC/AVE/MIN/MAX AND INSTANTANEOUS VALUES
+# FOR ACC/AVE/MIN/MAX VARIABLES, THE DAILY ACC/AVE/MIN/MAX IS FIRST COMPUTED FROM
+# THE 6-HOURLY AND THE MONTHLY IS COMPUTED FROM THOSE DAILY ACC/AVE/MIN/MAX RESULTS
 
 # THIS SCRIPT WILL BE CALLED FROM G-W JOBS, WHERE THE FOLLOWING VARIABLES WILL BE
 # PREDETERIMED:
@@ -14,7 +17,7 @@
 ###  GMERGE: path to gmerge executable file
 ###  OUTDIR: path to directory where monthly means will be saved
 
-#####################################################################################
+##########################################################################################
 
 firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
 
@@ -66,7 +69,7 @@ do
   fhf=$((daysf*24))    # final fhr for end of month
 
   ### Make list of files for the whole month
-  ### For FCST MONTHLY, 6 hours less on the FIRST file
+  ### For instantaneous values, 6 hours less on the FIRST file, no need for acc time interval
   list=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhi 6 $fhf)
   listinst=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhiinst 6 $fhf)
   
@@ -135,7 +138,7 @@ do
   fhf=$((daysf*24))    # final fhr for end of month   
 
   ### Make list of files for the whole month
-  ### For FCST MONTHLY, 6 hours less on the FIRST file
+  ### For instantaneous values, 6 hours less on the FIRST file, no need for acc time interval
   list=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhi 6 $fhf)
   listinst=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhiinst 6 $fhf)
 
