@@ -24,7 +24,6 @@ vt_date=${vt_init:7:10}  # for filename
 yy_init=${vt_init:7:4}
 yy_init_next=$(($(($yy_init+1))))
 mm_init=${vt_init:11:2}
-CC_init=${vt_init:15:6}
 
 # set filenames for valid date year and following year
 filename_start="${ENS}.${vt_date}.${yy_init}"
@@ -62,9 +61,9 @@ do
   daysf=$((daysf+month_days_in_year[i]))
   daysi=$((daysf-month_days_in_year[i]))
 
-  fhi=$(($(($daysi*24+6))))  # initial fhr for start of month (acc values)
-  fhiinst=$(($(($fhi-6))))   # initial fhr for start of month (inst values)
-  fhf=$(($(($daysf))*24))    # final fhr for end of month
+  fhi=$((daysi*24+6))  # initial fhr for start of month (acc values)
+  fhiinst=$((fhi-6))   # initial fhr for start of month (inst values)
+  fhf=$((daysf*24))    # final fhr for end of month
 
   ### Make list of files for the whole month
   ### For FCST MONTHLY, 6 hours less on the FIRST file
@@ -133,9 +132,9 @@ do
   daysf=$((daysf+month_days_in_year[i]))
   daysi=$((daysf-month_days_in_year[i]))
 
-  fhi=$(($(($daysi*24+6))))  # initial fhr for start of month (acc values)
-  fhiinst=$(($(($fhi-6))))   # initial fhr for start of month (inst values)
-  fhf=$(($(($daysf))*24))    # final fhr for end of month
+  fhi=$((daysi*24+6))  # initial fhr for start of month (acc values)      
+  fhiinst=$((fhi-6))   # initial fhr for start of month (inst values)      
+  fhf=$((daysf*24))    # final fhr for end of month   
 
   ### Make list of files for the whole month
   ### For FCST MONTHLY, 6 hours less on the FIRST file
