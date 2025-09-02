@@ -83,8 +83,8 @@ contains
         if (trim(vars(n)%var_grid) == 'Bu_x')fields(:,n) = vecpair(:,1) ! ice vectors
         ! separate loop for y vector before vecpair deallocation
 !        do nn=1,nflds
-	  if (trim(vars(nn)%var_grid) == 'Cv')fields(:,nn) = vecpair(:,2)   ! ocn vectors
-          if (trim(vars(nn)%var_grid) == 'Bu_y')fields(:,nn) = vecpair(:,2) ! ice vectors
+	  if (trim(vars(n)%var_grid) == 'Cv')fields(:,n) = vecpair(:,2)   ! ocn vectors
+          if (trim(vars(n)%var_grid) == 'Bu_y')fields(:,n) = vecpair(:,2) ! ice vectors
 !	enddo
         deallocate(vecpair)
       end if
