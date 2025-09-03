@@ -169,7 +169,7 @@ do
 
   # monthly averages for instantaneous forecasts 
   # shellcheck disable=SC2086
-  $GMERGE - ${listinst} | wgrib2 - -not ' (ave|min|max|acc) ' -fcst_ave 6hr "${OUTDIR}/inst.monthly.${ENS}/IN.grb"
+  ${GMERGE} - ${listinst} | wgrib2 - -not ' (ave|min|max|acc) ' -fcst_ave 6hr "${OUTDIR}/inst.monthly.${ENS}/IN.grb"
   
   # interpolate: bilinear
   wgrib2 "${OUTDIR}/inst.monthly.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/inst.monthly.${ENS}/IN.grb" -grib "${OUTDIR}/inst.monthly.${ENS}/OUT.grb" 
