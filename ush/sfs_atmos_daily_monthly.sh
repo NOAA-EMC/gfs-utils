@@ -78,7 +78,8 @@ do
 
   #merge the min/max/acc/ave variables into daily periods
   # shellcheck disable=SC2086
-  $GMERGE - ${list} | wgrib2 - -match ' (ave|min|max|acc) ' -merge_fcst 4 "${OUTDIR}/acc.daily.${ENS}/IN.grb"
+  # shellcheck disable=SC2086
+  ${GMERGE} - ${list} | wgrib2 - -match ' (ave|min|max|acc) ' -merge_fcst 4 "${OUTDIR}/acc.daily.${ENS}/IN.grb"
 
   # get the monthly averages of the daily min/max/acc/ave values
   wgrib2 "${OUTDIR}/acc.daily.${ENS}/IN.grb" -fcst_ave 24hr "${OUTDIR}/acc.monthly.${ENS}/IN.grb"
@@ -96,7 +97,8 @@ do
 
   # monthly averages for instantaneous forecasts 
   # shellcheck disable=SC2086
-  $GMERGE - ${listinst} | wgrib2 - -not ' (ave|min|max|acc) ' -fcst_ave 6hr "${OUTDIR}/inst.monthly.${ENS}/IN.grb"
+  # shellcheck disable=SC2086
+  ${GMERGE} - ${listinst} | wgrib2 - -not ' (ave|min|max|acc) ' -fcst_ave 6hr "${OUTDIR}/inst.monthly.${ENS}/IN.grb"
   
   # interpolate: bilinear 
   wgrib2 "${OUTDIR}/inst.monthly.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/inst.monthly.${ENS}/IN.grb" -grib "${OUTDIR}/inst.monthly.${ENS}/OUT.grb"                                 
