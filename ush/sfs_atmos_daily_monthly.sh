@@ -192,7 +192,7 @@ do
 
   #### merge all days into single grib2 file and remove unneeded files
   # shellcheck disable=SC2086
-  $GMERGE - ${list_daily} > "${OUTDIR}/inst.daily.${ENS}/IN.grb"
+  ${GMERGE} - ${list_daily} > "${OUTDIR}/inst.daily.${ENS}/IN.grb"
   rm "${OUTDIR}"/inst.daily."${ENS}"/daily*.grb
 
   # interpolate: bilinear 
