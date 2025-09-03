@@ -80,10 +80,10 @@ do
   # shellcheck disable=SC2086
   $GMERGE - ${list} | wgrib2 - -match ' (ave|min|max|acc) ' -merge_fcst 4 "${OUTDIR}/acc.daily.${ENS}/IN.grb"
 
-  # get the monthly averages of the daily min/max/acc/ave values, which are already interpolated
+  # get the monthly averages of the daily min/max/acc/ave values
   wgrib2 "${OUTDIR}/acc.daily.${ENS}/IN.grb" -fcst_ave 24hr "${OUTDIR}/acc.monthly.${ENS}/IN.grb"
 
-  #interpolate: bilinear for most, except acc/ave precipiation variables which use neighbor interpolation
+  #interpolate: bilinear for most, except acc/ave precipitation variables which use budget interpolation
   wgrib2 "${OUTDIR}/acc.daily.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/acc.daily.${ENS}/IN.grb" -grib "${OUTDIR}/acc.daily.${ENS}/OUT.grb"
   wgrib2 "${OUTDIR}/acc.daily.${ENS}/OUT.grb" -if ':(PRATE|CPRAT|CPOFP|TSNOWP|ACPCP|APCP|NCPCP):' -new_grid_interpolation budget -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/acc.daily.${ENS}/acc.daily.${filename_start}${filemm}${filename_end}"
   wgrib2 "${OUTDIR}/acc.monthly.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/acc.monthly.${ENS}/IN.grb" -grib "${OUTDIR}/acc.monthly.${ENS}/OUT.grb"
@@ -98,7 +98,7 @@ do
   # shellcheck disable=SC2086
   $GMERGE - ${listinst} | wgrib2 - -not ' (ave|min|max|acc) ' -fcst_ave 6hr "${OUTDIR}/inst.monthly.${ENS}/IN.grb"
   
-  # interpolate: bilinear for most, except soil variables which use budget interpolation
+  # interpolate: bilinear for most, except soil variables which use neighbor interpolation
   wgrib2 "${OUTDIR}/inst.monthly.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/inst.monthly.${ENS}/IN.grb" -grib "${OUTDIR}/inst.monthly.${ENS}/OUT.grb"                                 
   wgrib2 "${OUTDIR}/inst.monthly.${ENS}/OUT.grb" -if ':(SOILL|TSOIL|SOILW):' -new_grid_interpolation neighbor -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/inst.monthly.${ENS}/inst.monthly.${filename_start}${filemm}${filename_end}"
 
@@ -122,7 +122,7 @@ do
   $GMERGE - ${list_daily} > "${OUTDIR}/inst.daily.${ENS}/IN.grb"
   rm "${OUTDIR}"/inst.daily."${ENS}"/daily*.grb
 
-  #interpolate: bilinear for most, except soil variables which use budget interpolation
+  #interpolate: bilinear for most, except soil variables which use neighbor interpolation
   wgrib2 "${OUTDIR}/inst.daily.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/inst.daily.${ENS}/IN.grb" -grib "${OUTDIR}/inst.daily.${ENS}/OUT.grb"                          
   wgrib2 "${OUTDIR}/inst.daily.${ENS}/OUT.grb" -if ':(SOILL|TSOIL|SOILW):' -new_grid_interpolation neighbor -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/inst.daily.${ENS}/inst.daily.${filename_start}${filemm}${filename_end}"
 
@@ -153,10 +153,10 @@ do
   # shellcheck disable=SC2086
   $GMERGE - ${list} | wgrib2 - -match ' (ave|min|max|acc) ' -merge_fcst 4 "${OUTDIR}/acc.daily.${ENS}/IN.grb"
 
-  # get the monthly averages of the daily min/max/acc/ave values, which are already interpolated
+  # get the monthly averages of the daily min/max/acc/ave values
   wgrib2 "${OUTDIR}/acc.daily.${ENS}/IN.grb" -fcst_ave 24hr "${OUTDIR}/acc.monthly.${ENS}/IN.grb"
 
-  #interpolate: bilinear for most, except acc/ave precipiation variables which use neighbor interpolation
+  #interpolate: bilinear for most, except acc/ave precipitation variables which use budget interpolation
   wgrib2 "${OUTDIR}/acc.daily.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/acc.daily.${ENS}/IN.grb" -grib "${OUTDIR}/acc.daily.${ENS}/OUT.grb"
   wgrib2 "${OUTDIR}/acc.daily.${ENS}/OUT.grb" -if ':(PRATE|CPRAT|CPOFP|TSNOWP|ACPCP|APCP|NCPCP):' -new_grid_interpolation budget -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/acc.daily.${ENS}/acc.daily.${filename_start_next}${filemm}${filename_end}"
   wgrib2 "${OUTDIR}/acc.monthly.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/acc.monthly.${ENS}/IN.grb" -grib "${OUTDIR}/acc.monthly.${ENS}/OUT.grb"
@@ -171,7 +171,7 @@ do
   # shellcheck disable=SC2086
   $GMERGE - ${listinst} | wgrib2 - -not ' (ave|min|max|acc) ' -fcst_ave 6hr "${OUTDIR}/inst.monthly.${ENS}/IN.grb"
   
-  # interpolate: bilinear for most, except soil variables which use budget interpolation
+  # interpolate: bilinear for most, except soil variables which use neighbor interpolation
   wgrib2 "${OUTDIR}/inst.monthly.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/inst.monthly.${ENS}/IN.grb" -grib "${OUTDIR}/inst.monthly.${ENS}/OUT.grb" 
   wgrib2 "${OUTDIR}/inst.monthly.${ENS}/OUT.grb" -if ':(SOILL|TSOIL|SOILW):' -new_grid_interpolation neighbor -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/inst.monthly.${ENS}/inst.monthly.${filename_start_next}${filemm}${filename_end}"
 
@@ -195,7 +195,7 @@ do
   $GMERGE - ${list_daily} > "${OUTDIR}/inst.daily.${ENS}/IN.grb"
   rm "${OUTDIR}"/inst.daily."${ENS}"/daily*.grb
 
-  # interpolate: bilinear for most, except soil variables which use budget interpolation
+  # interpolate: bilinear for most, except soil variables which use neighbor interpolation
   wgrib2 "${OUTDIR}/inst.daily.${ENS}/IN.grb" | sed -e 's/:UFLX:/:UFLXa:/' -e 's/:VFLX:/:UFLXb:/' | sort -t: -k3,3 -k6n,6 -k5,5 -k4,4 | wgrib2 -i "${OUTDIR}/inst.daily.${ENS}/IN.grb" -grib "${OUTDIR}/inst.daily.${ENS}/OUT.grb"                          
   wgrib2 "${OUTDIR}/inst.daily.${ENS}/OUT.grb" -if ':(SOILL|TSOIL|SOILW):' -new_grid_interpolation neighbor -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/inst.daily.${ENS}/inst.daily.${filename_start_next}${filemm}${filename_end}"
 
