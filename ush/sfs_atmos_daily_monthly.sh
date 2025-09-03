@@ -151,7 +151,7 @@ do
 
   #merge the min/max/acc/ave variables into daily periods
   # shellcheck disable=SC2086
-  $GMERGE - ${list} | wgrib2 - -match ' (ave|min|max|acc) ' -merge_fcst 4 "${OUTDIR}/acc.daily.${ENS}/IN.grb"
+  ${GMERGE} - ${list} | wgrib2 - -match ' (ave|min|max|acc) ' -merge_fcst 4 "${OUTDIR}/acc.daily.${ENS}/IN.grb"
 
   # get the monthly averages of the daily min/max/acc/ave values
   wgrib2 "${OUTDIR}/acc.daily.${ENS}/IN.grb" -fcst_ave 24hr "${OUTDIR}/acc.monthly.${ENS}/IN.grb"
