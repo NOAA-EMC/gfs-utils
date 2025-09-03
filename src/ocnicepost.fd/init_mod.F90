@@ -4,7 +4,7 @@ module init_mod
 
   public
 
-  real, parameter :: maxvars = 50              !< The maximum number of fields expected in a source file
+  real, parameter :: maxvars = 70              !< The maximum number of fields expected in a source file
 
   type :: vardefs
        character(len= 20)   :: var_name          !< A variable's variable name
