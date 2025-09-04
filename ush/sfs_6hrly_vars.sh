@@ -41,7 +41,7 @@ for (( i=0; i<${#vars[@]}; i++)); do
   cat $(eval "ls -v ${MEMDIR}/*") | wgrib2 - -match "${var}" -grib "${OUTDIR}/IN.grb"
 
   # interpolate: bilinear for all except PRATE which uses budget
-  wgrib2 "${OUTDIR}/IN.grb" -if ':(PRATE|CPRAT|CPOFP|TSNOWP|ACPCP|APCP|NCPCP):' -new_grid_interpolation budget -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/${filename}"
+  wgrib2 "${OUTDIR}/IN.grb" -if ':PRATE:' -new_grid_interpolation budget -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/${filename}"
   rm "${OUTDIR}/IN.grb"
 
 done
