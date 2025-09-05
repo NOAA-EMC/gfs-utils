@@ -1,0 +1,63 @@
+! variable name,dimension,grid location,remapping method,vector pair,grid location of vector pair,gb2 varname,discription,unit,gc1,gc2,gc3,gc4,gc5,gc6,gc7,gc8
+   		'Tsfc_h',2,'Ct' , 'bilinear' , '', '','','snow/ice surface temperature' ,'C' ,0,0,0,0,0,0,0,0
+   		'aice_h',2,'Ct' , 'bilinear' , '', '','','ice area  (aggregate)' ,'1' ,0,0,0,0,0,0,0,0
+   		'uvel_h',2,'Bu_x' , 'bilinear' ,'vvel_h','Bu_y','','ice velocity (x)','m/s' ,0,0,0,0,0,0,0,0
+   		'vvel_h',2,'Bu_y' , 'bilinear' ,'uvel_h','Bu_x','','ice velocity (y)','m/s' ,0,0,0,0,0,0,0,0
+                'sice_h',2,'Ct', 'bilinear' ,'','','', 'bulk ice salinity' , 'ppt' ,0,0,0,0,0,0,0,0
+                'fswdn_h',2,'Ct','conserve','','','', 'down solar flux' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'flwdn_h',2,'Ct','conserve','','','', 'down longwave flux' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'snow_h',2,'Ct', 'bilinear' ,'','','', 'snowfall rate (cpl)' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'rain_h',2,'Ct', 'bilinear' ,'','','', 'rainfall rate (cpl)' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'sst_h',2,'Ct', 'bilinear' ,'','','', 'sea surface temperature' , 'C' ,0,0,0,0,0,0,0,0
+                'sss_h',2,'Ct', 'bilinear' ,'','','', 'sea surface salinity' , 'ppt' ,0,0,0,0,0,0,0,0
+                'uocn_h',2,'Ct', 'bilinear' ,'','','', 'ocean current (x)' , 'm/s' ,0,0,0,0,0,0,0,0
+                'vocn_h',2,'Ct', 'bilinear' ,'','','', 'ocean current (y)' , 'm/s' ,0,0,0,0,0,0,0,0
+                'frzmlt_h',2,'Ct','conserve','','','', 'freeze/melt potential' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'scale_factor_h',2,'Ct', 'bilinear' ,'','','', 'shortwave scaling factor' , '1' ,0,0,0,0,0,0,0,0
+                'fswabs_h',2,'Ct','conserve','','','', 'snow/ice/ocn absorbed solar flux (cpl)' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'albsni_h',2,'Ct', 'bilinear' ,'','','', 'snow/ice broad band albedo' , '%' ,0,0,0,0,0,0,0,0
+                'alvdr_h',2,'Ct', 'bilinear' ,'','','', 'visible direct albedo' , '%' ,0,0,0,0,0,0,0,0
+                'alidr_h',2,'Ct', 'bilinear' ,'','','', 'near IR direct albedo' , '%' ,0,0,0,0,0,0,0,0
+                'alvdf_h',2,'Ct', 'bilinear' ,'','','', 'visible diffuse albedo' , '%' ,0,0,0,0,0,0,0,0
+                'alidf_h',2,'Ct', 'bilinear' ,'','','', 'near IR diffuse albedo' , '%' ,0,0,0,0,0,0,0,0
+                'flat_h',2,'Ct','conserve','','','', 'latent heat flux (cpl)' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'fsens_h',2,'Ct','conserve','','','', 'sensible heat flux (cpl)' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'flwup_h',2,'Ct','conserve','','','', 'upward longwave flux (cpl)' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'evap_h',2,'Ct', 'bilinear' ,'','','', 'evaporative water flux (cpl)' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'Tair_h',2,'Ct', 'bilinear' ,'','','', 'air temperature' , 'C' ,0,0,0,0,0,0,0,0
+                'Tref_h',2,'Ct', 'bilinear' ,'','','', '2m reference temperature' , 'C' ,0,0,0,0,0,0,0,0
+                'Qref_h',2,'Ct', 'bilinear' ,'','','', '2m reference specific humidity' , 'g/kg' ,0,0,0,0,0,0,0,0
+                'congel_h',2,'Ct', 'bilinear' ,'','','', 'congelation ice growth' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'frazil_h',2,'Ct', 'bilinear' ,'','','', 'frazil ice growth' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'snoice_h',2,'Ct', 'bilinear' ,'','','', 'snow-ice formation' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'dsnow_h',2,'Ct', 'bilinear' ,'','','', 'snow formation' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'strocnx_h',2,'Bu_x','conserve','strocny_h','Bu_y','', 'ocean/ice stress (x)' , 'N/m^2' ,0,0,0,0,0,0,0,0
+                'strocny_h',2,'Bu_y','conserve','strocnx_h','Bu_x','', 'ocean/ice stress (y)' , 'N/m^2' ,0,0,0,0,0,0,0,0
+                'meltt_h',2,'Ct', 'bilinear' ,'','','', 'top ice melt' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'melts_h',2,'Ct', 'bilinear' ,'','','', 'top snow melt' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'meltb_h',2,'Ct', 'bilinear' ,'','','', 'basal ice melt' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'meltl_h',2,'Ct', 'bilinear' ,'','','', 'lateral ice melt' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'fresh_h',2,'Ct', 'bilinear' ,'','','', 'freshwtr flx ice to ocn (cpl)' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'fsalt_h',2,'Ct','conserve','','','', 'salt flux ice to ocn (cpl)' , 'kg/m^2/s' ,0,0,0,0,0,0,0,0
+                'fbot_h',2,'Ct','conserve','','','', 'heat flux ice to ocean (fbot)' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'fhocn_h',2,'Ct','conserve','','','', 'heat flux ice to ocn (cpl)' , 'W/m^2' ,0,0,0,0,0,0,0,0
+                'strairx_h',2,'Bu_x','conserve','strairy_h','Bu_y','', 'atm/ice stress (x)' , 'N/m^2' ,0,0,0,0,0,0,0,0
+                'strairy_h',2,'Bu_y','conserve','strairx_h','Bu_x','', 'atm/ice stress (y)' , 'N/m^2' ,0,0,0,0,0,0,0,0
+                'divu_h',2,'Ct', 'bilinear' ,'','','', 'strain rate (divergence)' , '%/day' ,0,0,0,0,0,0,0,0
+                'shear_h',2,'Ct', 'bilinear' ,'','','', 'strain rate (shear)' , '%/day' ,0,0,0,0,0,0,0,0
+                'dvidtt_h',2,'Ct', 'bilinear' ,'','','', 'volume tendency thermo' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'dvidtd_h',2,'Ct', 'bilinear' ,'','','', 'volume tendency dynamics' , 'cm/day' ,0,0,0,0,0,0,0,0
+                'daidtt_h',2,'Ct', 'bilinear' ,'','','', 'area tendency thermo' , '%/day' ,0,0,0,0,0,0,0,0
+                'daidtd_h',2,'Ct', 'bilinear' ,'','','', 'area tendency dynamics' , '%/day' ,0,0,0,0,0,0,0,0
+                'mlt_onset_h',2,'Ct', 'bilinear' ,'','','', 'melt onset date' , 'day of year' ,0,0,0,0,0,0,0,0
+                'frz_onset_h',2,'Ct', 'bilinear' ,'','','', 'freeze onset date' , 'day of year' ,0,0,0,0,0,0,0,0
+                'sitemptop_h',2,'Ct', 'bilinear' ,'','','', 'sea ice surface temperature' , 'K' ,0,0,0,0,0,0,0,0
+                'sitempsnic_h',2,'Ct', 'bilinear' ,'','','', 'snow ice interface temperature' , 'K' ,0,0,0,0,0,0,0,0
+                'sitempbot_h',2,'Ct', 'bilinear' ,'','','', 'sea ice bottom temperature' , 'K' ,0,0,0,0,0,0,0,0
+                'apond_h',2,'Ct', 'bilinear' ,'','','', 'melt pond fraction of sea ice' , '1' ,0,0,0,0,0,0,0,0
+                'hpond_h',2,'Ct', 'bilinear' ,'','','', 'mean melt pond depth over sea ice' , 'm' ,0,0,0,0,0,0,0,0
+                'ipond_h',2,'Ct', 'bilinear' ,'','','', 'mean pond ice thickness over sea ice' , 'm' ,0,0,0,0,0,0,0,0
+                'apeff_h',2,'Ct', 'bilinear' ,'','','', 'radiation-effective pond area fraction of sea ice' , '1' ,0,0,0,0,0,0,0,0
+                'uatm_h',2,'Ct', 'bilinear' ,'','','', 'atm velocity (x)' , 'm/s' ,0,0,0,0,0,0,0,0
+                'vatm_h',2,'Ct', 'bilinear' ,'','','', 'atm velocity (y)' , 'm/s' ,0,0,0,0,0,0,0,0
+
