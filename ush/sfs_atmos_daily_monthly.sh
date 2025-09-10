@@ -20,7 +20,7 @@
 ##########################################################################################
 
 firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
-lastfile=$(ls -v "${MEMDIR}"/sfs.t${CC}z.master.grb2f* | tail -1)
+lastfile=$(ls -v "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f* | tail -1)
 
 # get validation date of first file
 vt_init=$(wgrib2 "${firstfile}" -d 1 -vt)
@@ -99,8 +99,8 @@ do
 
   ### Make list of files for the whole month
   ### For instantaneous values, 6 hours less on the FIRST file, no need for acc time interval
-  list=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhi 6 $fhf)
-  listinst=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhiinst 6 $fhf)
+  list=$(seq -f "${MEMDIR}/sfs.t"${CC}"z.master.grb2f%03.0f" $fhi 6 $fhf)
+  listinst=$(seq -f "${MEMDIR}/sfs.t"${CC}"z.master.grb2f%03.0f" $fhiinst 6 $fhf)
   
   # month of loop for filename
   filemm="${months_in_year[$i]}"
@@ -141,7 +141,7 @@ do
   do
     start_hr=$((j-6))
     end_hr=$((j+24-6))
-    list_6hrly=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $start_hr 6 $end_hr)
+    list_6hrly=$(seq -f "${MEMDIR}/sfs.t"${CC}"z.master.grb2f%03.0f" $start_hr 6 $end_hr)
     # shellcheck disable=SC2086
     ${GMERGE} - ${list_6hrly} | wgrib2 - -match  "MSLET|PRMSL|PWAT|PRES:surface|TMP:2 m above|:TMP:surface|SPFH:2 m above|DPT:2 m above|UGRD:10 m above|VGRD:10 m above|HGT:(2|10|50|100|200|500|700|850|1000) mb|(PVORT|TMP):(450|550|650) K|(UGRD|VGRD):(2|10|50|100|200|500|600|700|850|925|1000) mb|SPFH:(100|200|300|500|600|700|850|925|1000) mb|VVEL:500 mb|TMP:(2|10|50|100|200|250|300|500|600|700|850|925|1000) mb|TOZNE|ICEC|ICETK|(TSOIL|SOILW):(0-0.1|0.1-0.4|0.4-1|1-2) m|WEASD|PEVPR|LAND|HGT:surface|CSDLF:surface|CSDSF:surface|CSUSF:surface|NDDSF:surface|VDDSF:surface|SOILM:0-0.2|TMP:1 hybrid" -fcst_ave 6hr "${OUTDIR}/inst.daily.${ENS}/daily_${end_hr}.grb"
   done
@@ -183,8 +183,8 @@ do
 
   ### Make list of files for the whole month
   ### For instantaneous values, 6 hours less on the FIRST file, no need for acc time interval
-  list=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhi 6 $fhf)
-  listinst=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhiinst 6 $fhf)
+  list=$(seq -f "${MEMDIR}/sfs.t"${CC}"z.master.grb2f%03.0f" $fhi 6 $fhf)
+  listinst=$(seq -f "${MEMDIR}/sfs.t"${CC}"z.master.grb2f%03.0f" $fhiinst 6 $fhf)
 
   # month of loop for filename
   filemm="${months_in_year[$i]}"
@@ -223,7 +223,7 @@ do
   do
     start_hr=$((j-6))
     end_hr=$((j+24-6)) 
-    list_6hrly=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $start_hr 6 $end_hr)
+    list_6hrly=$(seq -f "${MEMDIR}/sfs.t"${CC}"z.master.grb2f%03.0f" $start_hr 6 $end_hr)
     # shellcheck disable=SC2086
     ${GMERGE} - ${list_6hrly} | wgrib2 - -match  "MSLET|PRMSL|PWAT|PRES:surface|TMP:2 m above|:TMP:surface|SPFH:2 m above|DPT:2 m above|UGRD:10 m above|VGRD:10 m above|HGT:(2|10|50|100|200|500|700|850|1000) mb|(PVORT|TMP):(450|550|650) K|(UGRD|VGRD):(2|10|50|100|200|500|600|700|850|925|1000) mb|SPFH:(100|200|300|500|600|700|850|925|1000) mb|VVEL:500 mb|TMP:(2|10|50|100|200|250|300|500|600|700|850|925|1000) mb|TOZNE|ICEC|ICETK|(TSOIL|SOILW):(0-0.1|0.1-0.4|0.4-1|1-2) m|WEASD|PEVPR|LAND|HGT:surface|CSDLF:surface|CSDSF:surface|CSUSF:surface|NDDSF:surface|VDDSF:surface|SOILM:0-0.2|TMP:1 hybrid" -fcst_ave 6hr "${OUTDIR}/inst.daily.${ENS}/daily_${end_hr}.grb"
   done
