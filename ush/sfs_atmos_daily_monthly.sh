@@ -20,7 +20,7 @@
 ##########################################################################################
 
 firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
-lastfile=`ls -v ${MEMDIR}/sfs.t${CC}z.master.grb2f* | tail -1`
+lastfile=$(ls -v "${MEMDIR}"/sfs.t${CC}z.master.grb2f* | tail -1)
 
 # get validation date of first file
 vt_init=$(wgrib2 "${firstfile}" -d 1 -vt)
@@ -31,7 +31,7 @@ mm_init=${vt_init:11:2}
 
 # get dates and times of last file
 lastftimemsg=$(wgrib2 "${lastfile}" -d 1 -ftime2)
-lastftime=`echo "${lastftimemsg% hour fcst}"`
+lastftime=$(echo "${lastftimemsg% hour fcst}")
 lastfhr=${lastftime:4:4}
 vt_final=$(wgrib2 "${lastfile}" -d 1 -vt)
 mm_final=${vt_final:11:2}
@@ -47,7 +47,7 @@ months_in_year=("01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11" "12")
 start_idx=$((mm_init-1))
 
 # if the last file vt date ends on day 01, do not loop over it.
-if (( $dd_final == "01" )); then
+if (( dd_final == 01 )); then
   end_idx=$((mm_final-2))
 else
   end_idx=$((mm_final-1))
@@ -74,7 +74,7 @@ done
 
 ### If the end month is higher than start month, loop once. Otherwise loop twice for
 ### start month to end of year and beginning of year to start month
-if (( $start_idx < $end_idx )); then
+if (( start_idx < end_idx )); then
   end_loop_idx=$end_idx  # one loop, start to end month
 else
   end_loop_idx=$((${#months_in_year[@]}-1)) # there will be two loops, the first one from start month to end of year
@@ -164,7 +164,7 @@ done
 
 ### This second loop needs to be done if the end month is earlier
 ### than the start month or the same (e.g., full year run)
-if (( $start_idx==$end_idx )) || (( $end_idx < $start_idx )); then
+if (( start_idx==end_idx )) || (( end_idx < start_idx )); then
 
 # loop from start of calendar year to valid date month
 for (( i=0; i<end_idx+1; i++ ))
