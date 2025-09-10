@@ -99,8 +99,8 @@ do
 
   ### Make list of files for the whole month
   ### For instantaneous values, 6 hours less on the FIRST file, no need for acc time interval
-  list=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" $fhi 6 $fhf)
-  listinst=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" $fhiinst 6 $fhf)
+  list=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" "${fhi}" 6 "${fhf}")
+  listinst=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" "${fhiinst}" 6 "${fhf}")
   
   # month of loop for filename
   filemm="${months_in_year[$i]}"
@@ -137,7 +137,7 @@ do
   rm "${OUTDIR}/inst.monthly.${ENS}/OUT.grb"
 
   # daily averages for instantaneous variables
-  for j in $(seq $fhi 24 $fhf)
+  for j in $(seq "${fhi}" 24 "${fhf}")
   do
     start_hr=$((j-6))
     end_hr=$((j+24-6))
@@ -183,8 +183,8 @@ do
 
   ### Make list of files for the whole month
   ### For instantaneous values, 6 hours less on the FIRST file, no need for acc time interval
-  list=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" $fhi 6 $fhf)
-  listinst=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" $fhiinst 6 $fhf)
+  list=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" "${fhi}" 6 "${fhf}")
+  listinst=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" "${fhiinst}" 6 "${fhf}")
 
   # month of loop for filename
   filemm="${months_in_year[$i]}"
@@ -219,7 +219,7 @@ do
   rm "${OUTDIR}/inst.monthly.${ENS}/OUT.grb"
 
   # daily averages for instantaneous variables
-  for j in $(seq $fhi 24 $fhf)
+  for j in $(seq "${fhi}" 24 "${fhf}")
   do
     start_hr=$((j-6))
     end_hr=$((j+24-6)) 
