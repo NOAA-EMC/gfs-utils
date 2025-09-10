@@ -20,7 +20,7 @@
 ##########################################################################################
 
 firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
-lastfile=$(ls -v "${MEMDIR}"/sfs.t${CC}z.master.grb2f* | tail -1)
+lastfile=$(ls -v "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f* | tail -1)
 
 # get validation date of first file
 vt_init=$(wgrib2 "${firstfile}" -d 1 -vt)
