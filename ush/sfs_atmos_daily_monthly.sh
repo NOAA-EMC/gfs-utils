@@ -31,7 +31,7 @@ mm_init=${vt_init:11:2}
 
 # get dates and times of last file
 lastftimemsg=$(wgrib2 "${lastfile}" -d 1 -ftime2)
-lastftime=$(echo "${lastftimemsg% hour fcst}")
+lastftime="${lastftimemsg% hour fcst}"
 lastfhr=${lastftime:4:4}
 vt_final=$(wgrib2 "${lastfile}" -d 1 -vt)
 mm_final=${vt_final:11:2}
