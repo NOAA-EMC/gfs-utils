@@ -9,7 +9,7 @@
 # Thank you for your contribution
 
 # overwrite MACHINE_ID if in container
-if [[ -d /opt/spack-stack && -v SINGULARITY_CONTAINER ]]; then
+if [[ -v SINGULARITY_CONTAINER ]]; then
   # We are in a container
   MACHINE_ID=container
 fi
@@ -50,12 +50,6 @@ if [[ ${MACHINE_ID} == "UNKNOWN" ]]; then
       "aws" | "google" | "azure") MACHINE_ID=noaacloud ;;
       *) PW_CSP="UNKNOWN"
    esac
-fi
-
-# overwrite MACHINE_ID if in container
-if [[ -d /opt/spack-stack && -v SINGULARITY_CONTAINER ]]; then
-  # We are in a container
-  MACHINE_ID=container
 fi
 
 # Overwrite auto-detect with MACHINE if set
