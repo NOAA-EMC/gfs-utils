@@ -20,7 +20,12 @@
 ##########################################################################################
 
 firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
-lastfile=$(find "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f* | sort -V | tail -1)
+
+if [[ -s "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f1002 ]]; then
+  lastfile=$(find "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f???? | sort -V | tail -1)
+else
+  lastfile=$(find "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f??? | sort -V | tail -1)
+fi
 
 # get validation date of first file
 vt_init=$(wgrib2 "${firstfile}" -d 1 -vt)
