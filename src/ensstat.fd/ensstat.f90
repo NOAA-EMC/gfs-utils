@@ -425,7 +425,7 @@ do j=2,maxgrd
   if(grid(j).lt.dmin) dmin=grid(j)
 enddo
 
-print*, 'Irec ndata   Maximun    Minimum   Example'
+print*, 'Irec ndata   Maximum    Minimum   Example(8601)'
 print '(i3,i8,3f10.2)',ivar,maxgrd,dmax,dmin,grid(8601)
 
 print *, '   '
