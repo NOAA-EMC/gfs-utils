@@ -31,6 +31,11 @@ program ens_avgspr_g2
 ! modified by:
 !   Xianwu Xue 05/11/2018
 !      added 'navg_min' from namelist to determine the minimum members
+!   Bo Cui     09/16/2025
+!      adjust SPFH, impose a low bound of 0 for SPFH average                        
+!      added ipd9 (forecast time) to distinguish between two APCP (with interval vs. accumulated)
+!      Comment out the lines with "call gtbits" to make the code more flexible for variables 
+!      with large decimal scale factors, such as 12 in SPFH.
 !$$$
 
 use grib_mod
@@ -59,7 +64,7 @@ real  weight(nmemd)
 
 integer     maxgrd,iret,jret,icount,i,ipdtnum_out
 
-integer     ipd1,ipd2,ipd3,ipd10,ipd11,ipd12,ipdn
+integer     ipd1,ipd2,ipd3,ipd9,ipd10,ipd11,ipd12,ipdn
 
 integer     iunit,lfipg(nmemd),icfipg(nmemd)
 integer     nfiles,nenspost,iskip(nmemd),tfiles,ifile
@@ -194,6 +199,7 @@ if(nfiles.gt.2) then
       ipd1=gfldo%ipdtmpl(1)
       ipd2=gfldo%ipdtmpl(2)
       ipd3=gfldo%ipdtmpl(3)
+      ipd9=gfldo%ipdtmpl(9)
       ipd10=gfldo%ipdtmpl(10)
       ipd11=gfldo%ipdtmpl(11)
       ipd12=gfldo%ipdtmpl(12)
@@ -211,7 +217,7 @@ if(nfiles.gt.2) then
 
           iids=-9999;ipdt=-9999; igdt=-9999
           idisc=-1;  ipdtn=-1;   igdtn=-1
-          ipdt(1)=ipd1; ipdt(2)=ipd2; ipdt(10)=ipd10; ipdt(11)=ipd11; ipdt(12)=ipd12
+          ipdt(1)=ipd1; ipdt(2)=ipd2; ipdt(9)=ipd9; ipdt(10)=ipd10; ipdt(11)=ipd11; ipdt(12)=ipd12
           igdtn=-1; ipdtn=ipdn
           call init_parm(ipdtn,ipdt,igdtn,igdt,idisc,iids)
           call getgb2(icfipg(imem),0,jskp,jdisc,jids,jpdtn,jpdt,jgdtn,jgdt,unpack,jskp,gfld,iret)
@@ -256,6 +262,19 @@ if(nfiles.gt.2) then
 
         print *, 'ens_avg(8601)= ',ens_avg(8601)
         print *, 'ens_spr(8601)= ',ens_spr(8601)
+        print *, '   '
+
+        ! adjust SPFH, impose a low bound of 0 for SPFH average
+        
+        if(ipd1.eq.1.and.ipd2.eq.0) then
+          print*, 'Before Adjusted SPFH Forecast '; print *, ' '
+          call message(ens_avg,maxgrd,icount)
+          do ij=1,maxgrd
+            if(ens_avg(ij).lt.0.0) ens_avg(ij)=0.0
+          enddo
+          print*, 'After Adjusted SPFH Forecast '; print *, ' '
+          call message(ens_avg,maxgrd,icount)
+        endif
 
         print *, '   '
         print *, '----- Output ensemble average and spread for Current Time ------'
@@ -320,13 +339,13 @@ if(nfiles.gt.2) then
         ! get the number of bits
         ! gfldo%idrtmpl(3) : GRIB2 DRT 5.40 decimal scale factor
 
-        write(6,*) 'gfldo%idrtmpl(3)=',gfldo%idrtmpl(3)
+        ! write(6,*) 'gfldo%idrtmpl(3)=',gfldo%idrtmpl(3)
 
-        call gtbits(0,gfldo%idrtmpl(3),maxgrd,0,ens_avg,gmin,gmax,nbit)
+        !call gtbits(0,gfldo%idrtmpl(3),maxgrd,0,ens_avg,gmin,gmax,nbit)
 
       ! gfldo%idrtmpl(4) : GRIB2 DRT 5.40 number of bits
 
-        gfldo%idrtmpl(4)=nbit
+        !gfldo%idrtmpl(4)=nbit
 
         gfldo%fld(1:maxgrd)=ens_avg(1:maxgrd)
 
@@ -342,11 +361,11 @@ if(nfiles.gt.2) then
         ! get the number of bits
         ! gfldo%idrtmpl(3) : GRIB2 DRT 5.40 decimal scale factor
 
-        call gtbits(0,gfldo%idrtmpl(3),maxgrd,0,ens_spr,gmin,gmax,nbit)
+        !call gtbits(0,gfldo%idrtmpl(3),maxgrd,0,ens_spr,gmin,gmax,nbit)
 
       ! gfldo%idrtmpl(4) : GRIB2 DRT 5.40 number of bits
 
-        gfldo%idrtmpl(4)=nbit
+        !gfldo%idrtmpl(4)=nbit
 
         gfldo%fld(1:maxgrd)=ens_spr(1:maxgrd)
 
@@ -387,5 +406,30 @@ call errmsg('There is not Enough Files Input, Stop!')
 !call errexit(1)
 
 stop
+end
+
+subroutine message(grid,maxgrd,ivar)
+    
+! print data information
+    
+implicit none        
+    
+integer    ivar,maxgrd,j
+real       grid(maxgrd),dmin,dmax
+    
+dmin=grid(1)
+dmax=grid(1)
+
+do j=2,maxgrd
+  if(grid(j).gt.dmax) dmax=grid(j)
+  if(grid(j).lt.dmin) dmin=grid(j)
+enddo
+
+print*, 'Irec ndata   Maximun    Minimum   Example'
+print '(i3,i8,3f10.2)',ivar,maxgrd,dmax,dmin,grid(8601)
+
+print *, '   '
+
+return
 end
 
