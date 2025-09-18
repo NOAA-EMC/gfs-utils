@@ -360,7 +360,6 @@ if(nfiles.gt.2) then
         ! get the number of bits
         ! gfldo%idrtmpl(3) : GRIB2 DRT 5.40 decimal scale factor
 
-        !call gtbits(0,gfldo%idrtmpl(3),maxgrd,0,ens_spr,gmin,gmax,nbit)
 
       ! gfldo%idrtmpl(4) : GRIB2 DRT 5.40 number of bits
 
