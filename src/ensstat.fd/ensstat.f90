@@ -75,7 +75,6 @@ character*255 cfipg(nmemd)
 character*255 cfopg1,cfopg2
 
 real    gmin,gmax
-integer nbit
 
 integer :: navg_min = 10
 
@@ -336,15 +335,10 @@ if(nfiles.gt.2) then
         gfldo%ipdtmpl(16)=0      ! code table 4.7, 0=unweighted mean of all Members
         gfldo%ipdtmpl(17)=inum   ! template 4.2, number of forecast in the ensemble
 
-        ! get the number of bits
         ! gfldo%idrtmpl(3) : GRIB2 DRT 5.40 decimal scale factor
 
         ! write(6,*) 'gfldo%idrtmpl(3)=',gfldo%idrtmpl(3)
 
-
-      ! gfldo%idrtmpl(4) : GRIB2 DRT 5.40 number of bits
-
-        !gfldo%idrtmpl(4)=nbit
 
         gfldo%fld(1:maxgrd)=ens_avg(1:maxgrd)
 
@@ -356,14 +350,6 @@ if(nfiles.gt.2) then
 
         gfldo%ipdtmpl(16)=2        ! code table 4.7, 2=standard deviation w.r.t cluster mean
         gfldo%ipdtmpl(17)=inum     ! template 4.2, number of forecast in the ensemble
-
-        ! get the number of bits
-        ! gfldo%idrtmpl(3) : GRIB2 DRT 5.40 decimal scale factor
-
-
-      ! gfldo%idrtmpl(4) : GRIB2 DRT 5.40 number of bits
-
-        !gfldo%idrtmpl(4)=nbit
 
         gfldo%fld(1:maxgrd)=ens_spr(1:maxgrd)
 
