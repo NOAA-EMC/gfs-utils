@@ -267,13 +267,13 @@ if(nfiles.gt.2) then
         ! adjust SPFH, impose a low bound of 0 for SPFH average
         
         if(ipd1.eq.1.and.ipd2.eq.0) then
-          print*, 'Before Adjusted SPFH Forecast '; print *, ' '
-          call message(ens_avg,maxgrd,icount)
+          ! print*, 'Before Adjusted SPFH Forecast '; print *, ' '
+          ! call message(ens_avg,maxgrd,icount)
           do ij=1,maxgrd
             if(ens_avg(ij).lt.0.0) ens_avg(ij)=0.0
           enddo
-          print*, 'After Adjusted SPFH Forecast '; print *, ' '
-          call message(ens_avg,maxgrd,icount)
+          ! print*, 'After Adjusted SPFH Forecast '; print *, ' '
+          ! call message(ens_avg,maxgrd,icount)
         endif
 
         print *, '   '
