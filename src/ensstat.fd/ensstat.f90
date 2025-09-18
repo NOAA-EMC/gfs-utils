@@ -341,7 +341,6 @@ if(nfiles.gt.2) then
 
         ! write(6,*) 'gfldo%idrtmpl(3)=',gfldo%idrtmpl(3)
 
-        !call gtbits(0,gfldo%idrtmpl(3),maxgrd,0,ens_avg,gmin,gmax,nbit)
 
       ! gfldo%idrtmpl(4) : GRIB2 DRT 5.40 number of bits
 
