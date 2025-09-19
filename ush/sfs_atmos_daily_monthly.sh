@@ -21,6 +21,12 @@
 
 firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
 
+if [[ -s "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f1002 ]]; then
+  lastfile=$(find "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f???? | sort -V | tail -1)
+else
+  lastfile=$(find "${MEMDIR}"/sfs.t"${CC}"z.master.grb2f??? | sort -V | tail -1)
+fi
+
 # get validation date of first file
 vt_init=$(wgrib2 "${firstfile}" -d 1 -vt)
 vt_date=${vt_init:7:10}  # for filename
@@ -28,14 +34,29 @@ yy_init=${vt_init:7:4}
 yy_init_next=$((yy_init+1))
 mm_init=${vt_init:11:2}
 
+# get dates and times of last file
+lastftimemsg=$(wgrib2 "${lastfile}" -d 1 -ftime2)
+lastftime="${lastftimemsg% hour fcst}"
+lastfhr=${lastftime:4:4}
+vt_final=$(wgrib2 "${lastfile}" -d 1 -vt)
+mm_final=${vt_final:11:2}
+dd_final=${vt_final:13:2}
+
 # set filenames for valid date year and following year
 filename_start="${ENS}.${vt_date}.${yy_init}"
 filename_start_next="${ENS}.${vt_date}.${yy_init_next}"
 filename_end=".grib.${CC}Z.grb2"
 
-#### Set index for finding month of validation date for loops
+#### Set indexes for finding months of validation date for loops
 months_in_year=("01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11" "12")
 start_idx=$((mm_init-1))
+
+# if the last file vt date ends on day 01, do not loop over it.
+if (( dd_final == 01 )); then
+  end_idx=$((mm_final-2))
+else
+  end_idx=$((mm_final-1))
+fi
 
 #### check for leap year
 itime=$(wgrib2 -t "${firstfile}"|head -1|cut -d= -f2)
@@ -56,10 +77,18 @@ do
   fi 
 done
 
+### If the end month is higher than start month, loop once. Otherwise loop twice for
+### start month to end of year and beginning of year to start month
+if (( start_idx < end_idx )); then
+  end_loop_idx=$end_idx  # one loop, start to end month
+else
+  end_loop_idx=$((${#months_in_year[@]}-1)) # there will be two loops, the first one from start month to end of year
+fi
+
 daysf=0   # day no. at end of month
 
-# loop from valid date month to end of calendar year
-for (( i=start_idx; i<${#months_in_year[@]}; i++ ))
+# loop from valid date start month to end of calendar year OR end month
+for (( i=start_idx; i<end_loop_idx+1; i++ ))
 do
   daysf=$((daysf+month_days_in_year[i]))
   daysi=$((daysf-month_days_in_year[i]))
@@ -68,10 +97,15 @@ do
   fhiinst=$((fhi-6))   # initial fhr for start of month (inst values)
   fhf=$((daysf*24))    # final fhr for end of month
 
+  # make sure the last fhr exists
+  if [ "$fhf" -gt "$lastfhr" ]; then
+    fhf=$lastfhr
+  fi
+
   ### Make list of files for the whole month
   ### For instantaneous values, 6 hours less on the FIRST file, no need for acc time interval
-  list=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhi 6 $fhf)
-  listinst=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhiinst 6 $fhf)
+  list=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" "${fhi}" 6 "${fhf}")
+  listinst=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" "${fhiinst}" 6 "${fhf}")
   
   # month of loop for filename
   filemm="${months_in_year[$i]}"
@@ -108,11 +142,11 @@ do
   rm "${OUTDIR}/inst.monthly.${ENS}/OUT.grb"
 
   # daily averages for instantaneous variables
-  for j in $(seq $fhi 24 $fhf)
+  for j in $(seq "${fhi}" 24 "${fhf}")
   do
     start_hr=$((j-6))
     end_hr=$((j+24-6))
-    list_6hrly=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $start_hr 6 $end_hr)
+    list_6hrly=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" $start_hr 6 $end_hr)
     # shellcheck disable=SC2086
     ${GMERGE} - ${list_6hrly} | wgrib2 - -match  "MSLET|PRMSL|PWAT|PRES:surface|TMP:2 m above|:TMP:surface|SPFH:2 m above|DPT:2 m above|UGRD:10 m above|VGRD:10 m above|HGT:(2|10|50|100|200|500|700|850|1000) mb|(PVORT|TMP):(450|550|650) K|(UGRD|VGRD):(2|10|50|100|200|500|600|700|850|925|1000) mb|SPFH:(100|200|300|500|600|700|850|925|1000) mb|VVEL:500 mb|TMP:(2|10|50|100|200|250|300|500|600|700|850|925|1000) mb|TOZNE|ICEC|ICETK|(TSOIL|SOILW):(0-0.1|0.1-0.4|0.4-1|1-2) m|WEASD|PEVPR|LAND|HGT:surface|CSDLF:surface|CSDSF:surface|CSUSF:surface|NDDSF:surface|VDDSF:surface|SOILM:0-0.2|TMP:1 hybrid" -fcst_ave 6hr "${OUTDIR}/inst.daily.${ENS}/daily_${end_hr}.grb"
   done
@@ -133,8 +167,12 @@ do
 
 done
 
+### This second loop needs to be done if the end month is earlier
+### than the start month or the same (e.g., full year run)
+if (( start_idx==end_idx )) || (( end_idx < start_idx )); then
+
 # loop from start of calendar year to valid date month
-for (( i=0; i<start_idx; i++ ))
+for (( i=0; i<end_idx+1; i++ ))
 do
   daysf=$((daysf+month_days_in_year[i]))
   daysi=$((daysf-month_days_in_year[i]))
@@ -143,10 +181,15 @@ do
   fhiinst=$((fhi-6))   # initial fhr for start of month (inst values)      
   fhf=$((daysf*24))    # final fhr for end of month   
 
+  # make sure the last fhr exists
+  if [ "$fhf" -gt "$lastfhr" ]; then
+    fhf=$lastfhr
+  fi
+
   ### Make list of files for the whole month
   ### For instantaneous values, 6 hours less on the FIRST file, no need for acc time interval
-  list=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhi 6 $fhf)
-  listinst=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $fhiinst 6 $fhf)
+  list=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" "${fhi}" 6 "${fhf}")
+  listinst=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" "${fhiinst}" 6 "${fhf}")
 
   # month of loop for filename
   filemm="${months_in_year[$i]}"
@@ -181,11 +224,11 @@ do
   rm "${OUTDIR}/inst.monthly.${ENS}/OUT.grb"
 
   # daily averages for instantaneous variables
-  for j in $(seq $fhi 24 $fhf)
+  for j in $(seq "${fhi}" 24 "${fhf}")
   do
     start_hr=$((j-6))
     end_hr=$((j+24-6)) 
-    list_6hrly=$(seq -f "${MEMDIR}/sfs.t00z.master.grb2f%03.0f" $start_hr 6 $end_hr)
+    list_6hrly=$(seq -f "${MEMDIR}/sfs.t${CC}z.master.grb2f%03.0f" $start_hr 6 $end_hr)
     # shellcheck disable=SC2086
     ${GMERGE} - ${list_6hrly} | wgrib2 - -match  "MSLET|PRMSL|PWAT|PRES:surface|TMP:2 m above|:TMP:surface|SPFH:2 m above|DPT:2 m above|UGRD:10 m above|VGRD:10 m above|HGT:(2|10|50|100|200|500|700|850|1000) mb|(PVORT|TMP):(450|550|650) K|(UGRD|VGRD):(2|10|50|100|200|500|600|700|850|925|1000) mb|SPFH:(100|200|300|500|600|700|850|925|1000) mb|VVEL:500 mb|TMP:(2|10|50|100|200|250|300|500|600|700|850|925|1000) mb|TOZNE|ICEC|ICETK|(TSOIL|SOILW):(0-0.1|0.1-0.4|0.4-1|1-2) m|WEASD|PEVPR|LAND|HGT:surface|CSDLF:surface|CSDSF:surface|CSUSF:surface|NDDSF:surface|VDDSF:surface|SOILM:0-0.2|TMP:1 hybrid" -fcst_ave 6hr "${OUTDIR}/inst.daily.${ENS}/daily_${end_hr}.grb"
   done
@@ -206,3 +249,4 @@ do
 
 done
 
+fi  # end of if block for checking end month vs. start month
