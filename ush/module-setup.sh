@@ -41,10 +41,8 @@ elif [[ ${MACHINE_ID} == wcoss2 ]]; then
 
 elif [[ ${MACHINE_ID} == container ]] ; then
     # We are in a container
-    if ( ! eval module help > /dev/null 2>&1 ) ; then
-        # shellcheck disable=1091
-        source /usr/lmod/lmod/init/bash
-    fi
+    # Always source the lmod init script to override the system module paths and instead use the container modules
+    source /usr/lmod/lmod/init/bash
     module purge
 
 elif [[ ${MACHINE_ID} == gaeac6 ]]; then

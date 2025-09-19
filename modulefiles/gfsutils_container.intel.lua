@@ -2,16 +2,21 @@ help([[
 Build environment for GFS utilities in a container 
 ]])
 
-prepend_path("MODULEPATH", "/opt/spack-stack/spack-stack-1.8.0/envs/unified-env/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/opt/spack-stack/spack-stack-1.9.2/envs/unified-env/install/modulefiles/Core")
 
-local stack_intel_ver=os.getenv("stack_intel_ver") or "2021.10.0"
-local stack_impi_ver=os.getenv("stack_impi_ver") or "2021.12.1"
-local cmake_ver=os.getenv("cmake_ver") or "3.27.9"
+stack_oneapi_ver=os.getenv("stack_oneapi_ver") or "2024.2.0"
+stack_impi_ver=os.getenv("stack_impi_ver") or "2021.13"
 
-load(pathJoin("stack-intel", stack_intel_ver))
+load(pathJoin("stack-oneapi", stack_oneapi_ver))
 load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
-load(pathJoin("cmake", cmake_ver))
 
 load("gfsutils_common")
+
+setenv("CC", "mpiicx")
+setenv("CXX", "mpiicpx")
+setenv("FC", "mpiifort")
+setenv("I_MPI_CC", "icx")
+setenv("I_MPI_CXX", "icpx")
+setenv("I_MPI_F90", "ifort")
 
 whatis("Description: GFS utilities environment in container with Intel Compilers")
