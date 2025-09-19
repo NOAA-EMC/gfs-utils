@@ -2,7 +2,6 @@ list(APPEND fortran_src
   ensstat.f90
   init_parm.f90
   printinfr.f90
-  gtbits.f90
   isrchne.f90
   EPDF.f
   SORTMM.f
