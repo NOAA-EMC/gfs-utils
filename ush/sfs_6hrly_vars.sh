@@ -23,8 +23,8 @@ declare -a vars=( "DLWRF:surface" "DSWRF:surface" "ULWRF:surface" "USWRF:surface
 ":LFTX:surface" ":CAPE:surface" ":RH:2 m above" ":HLCY:3000-0 m above" "(MAXUW|MAXVW)" ) 
 
 declare -a filevars=( "dlwrfsfc" "dswrfsfc" "ulwrfsfc" "uswrfsfc" "ulwrftoa" "lhtflsfc" "shtflsfc" "prmsl" "prate" "tmp2m" "tmax2m" "tmin2m" "dpt2m" "hgt200mb" "hgt500mb" "hgt700mb" "hgt850mb" "spfh500mb" "spfh700mb" "spfh850mb" 
-"spfh925mb" "tmp50mb" "tmp200mb" "tmp500mb" "tmp700mb" "tmp850mb" "tcdc" "icec" "tsoil10cm" "soilm" "watr" "weasd" "land" "hgtsfc" "wind10m" "wind200mb" "wind500mb" "wind700mb" "wind850mb" "wind925mb" "flux" 
-"lftxsfc" "capesfc" "rh2m" "hlcy3000m" "maxwind10m" )
+"spfh925mb" "tmp50mb" "tmp200mb" "tmp500mb" "tmp700mb" "tmp850mb" "tcdc" "icec" "tsoil0_10cm" "soilm" "watr" "weasd" "land" "hgtsfc" "wind10m" "wind200mb" "wind500mb" "wind700mb" "wind850mb" "wind925mb" "flux" 
+"lftxsfc" "capesfc" "rh2m" "hlcy3000_0m" "maxwind10m" )
 
 # get validation date of first file
 firstfile="${MEMDIR}/sfs.t${CC}z.master.grb2f000"
