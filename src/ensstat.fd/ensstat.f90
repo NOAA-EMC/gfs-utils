@@ -37,6 +37,7 @@ program ens_avgspr_g2
 !      Comment out the lines with "call gtbits" to make the code more flexible for variables 
 !      with large decimal scale factors, such as 12 in SPFH.
 !      Skip variable total accumulated precipitation (APCP) 
+!      update nmemd the total number of ensemble input files expected,including future addition
 !$$$
 
 use grib_mod
@@ -57,8 +58,8 @@ integer,dimension(200) :: jids,jpdt,jgdt,iids,ipdt,igdt
 integer jskp,jdisc,jpdtn,jgdtn,idisc,ipdtn,igdtn
 common /param/jskp,jdisc,jids,jpdtn,jpdt,jgdtn,jgdt
 
-integer     nmemd,nmvar,nvar,ivar,im,imem,n,inum 
-parameter   (nmemd=62,nmvar=50)
+integer     nmemd,nvar,ivar,im,imem,n,inum 
+parameter   (nmemd=100)
 
 real, allocatable :: fgrid(:,:),fst(:),ens_avg(:),ens_spr(:)
 real  weight(nmemd)
@@ -203,13 +204,16 @@ if(nfiles.gt.2) then
       ipd10=gfldo%ipdtmpl(10)
       ipd11=gfldo%ipdtmpl(11)
       ipd12=gfldo%ipdtmpl(12)
-      ipd30=gfldo%ipdtmpl(30)
       ipdn=gfldo%ipdtnum
 
       ! print forecast hour
 
       print *, '   '; print *,' Forecast Hour is        ', ipd9
-      print *, '   '; print *,' Length of Time Range is ', ipd30
+
+      if(ipd1.eq.1.and.ipd2.eq.8) then
+        ipd30=gfldo%ipdtmpl(30)
+        print *, '   '; print *,' Length of Time Range is ', ipd30
+      endif
       print *, '   '
 
       ! loop over NAEFS members, get operational ensemble forecast
