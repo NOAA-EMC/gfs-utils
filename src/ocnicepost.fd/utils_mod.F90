@@ -114,7 +114,7 @@ contains
 
     if (debug)write(logunit,'(a)')'enter '//trim(subname)
     ! obtain vector pairs
-    do n = 1,dims(3)
+    do n = 1,nflds
        if (trim(vars(n)%var_grid) == 'Cu') then
           allocate(vecpair(dims(1)*dims(2),dims(3),2)); vecpair = 0.0
           call getvecpair(trim(filesrc), trim(wgtsdir), cosrot, sinrot, &
