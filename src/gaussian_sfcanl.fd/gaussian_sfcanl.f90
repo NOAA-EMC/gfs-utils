@@ -40,7 +40,7 @@
 
  integer, parameter :: num_tiles = 6
 
- integer :: itile, jtile, igaus, jgaus
+ integer :: itile, jtile, igaus, jgaus, imp_physics, landsfcmdl
 
  integer :: idate(8)
 
@@ -126,7 +126,7 @@
  real, parameter           :: fill = 0.0
  real(kind=8), allocatable :: s(:)
 
- namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst
+ namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst, imp_physics, landsfcmdl
 
  call w3tagb('GAUSSIAN_SFCANL',2018,0179,0055,'NP20')
 
@@ -758,6 +758,12 @@
 
  error = nf90_put_att(ncid, nf90_global, 'jm', jgaus)
  call netcdf_err(error, 'DEFINING JM ATTRIBUTE')
+
+ error = nf90_put_att(ncid, nf90_global, 'imp_physics', imp_physics)
+ call netcdf_err(error, 'DEFINING IMP_PHYSICS ATTRIBUTE')
+
+ error = nf90_put_att(ncid, nf90_global, 'landsfcmdl', landsfcmdl)
+ call netcdf_err(error, 'DEFINING LANDSFCMDL ATTRIBUTE')
 
 ! variables
 
