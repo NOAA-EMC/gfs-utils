@@ -23,12 +23,12 @@ monthlyaccvars="(ACPCP|APCP|NCPCP|PRATE|LHTFL|SHTFL|UFLX|VFLX|CDUVB|DLWRF|USWRF|
 
 for file in "${OUTDIR}/acc.daily.${ENS}"/*; do
   filename=${file##*/}
-  filesuffix=`echo "${filename}" | cut -d '.' -f 4-10`
+  filesuffix=$(echo "${filename}" | cut -d '.' -f 4-10)
   wgrib2 "${file}" -match "${monthlyaccvars}" -fcst_ave 24hr "${OUTDIR}/acc.monthly.${ENS}/acc.monthly.${filesuffix}"
 done
 
 for file in "${OUTDIR}/inst.daily.${ENS}"/*; do
   filename=${file##*/}
-  filesuffix=`echo "${filename}" | cut -d '.' -f 4-10`
+  filesuffix=$(echo "${filename}" | cut -d '.' -f 4-10)
   wgrib2 "${file}" -match "${monthlyinstvars}" -fcst_ave 24hr "${OUTDIR}/inst.monthly.${ENS}/inst.monthly.${filesuffix}"
 done
