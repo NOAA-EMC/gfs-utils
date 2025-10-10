@@ -164,11 +164,11 @@
           error=nf90_open(trim(fnsig),nf90_nowrite,ncid)
           error=nf90_get_att(ncid,nf90_global,"ak",vdummy)
            do k = 1, levs+1
-            vcoord(k,1)=vdummy(levs-k+1)
+            vcoord(k,1)=vdummy(levs-k+2)
            enddo
           error=nf90_get_att(ncid,nf90_global,"bk",vdummy)
            do k = 1, levs+1
-            vcoord(k,2)=vdummy(levs-k+1)
+            vcoord(k,2)=vdummy(levs-k+2)
            enddo
           error=nf90_inq_varid(ncid, "time", id_var)
           error=nf90_get_var(ncid, id_var, nfhour)
@@ -378,7 +378,7 @@
           end do
         end do
       do k=2,levs+1
-         kk=levs-k+1
+         kk=levs-k+2
         do j=1,jm
           do i=1,im
             zint(i,j,k) = zint(i,j,k-1) - delpz(i,j,kk)
@@ -544,7 +544,7 @@
      +          dum2d(im/2,jm/4,8),dum2d(im/2,jm/3,8)
         if(debugprint)
      +   print*,'evaporation latent heat net flux stn 000692)= ',
-     +          dum2d(2239,441,8)
+     +          dum2d(22,41,8)
 
 ! total precip
        if ( nf .le. nend1 ) then
@@ -657,8 +657,8 @@
         rdum=rlon(np)
         if(rdum<0.)rdum=rdum+360.
 
-        do j=1,jm-1
-         do i=1,im-1
+        do j=4,jm-3
+         do i=4,im-3
           if((rdum>=gdlon(i,j) .and. rdum<=gdlon(i+1,j)) .and.
      +    (rlat(np)<=gdlat(i,j).and.rlat(np)>=gdlat(i,j+1)) ) then
               if(landwater(np) == 2)then
