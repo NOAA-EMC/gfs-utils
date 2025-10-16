@@ -38,6 +38,8 @@ case $(hostname -f) in
   ufe1[0-6]) MACHINE_ID=ursa ;; ### ursa10-16
   uecflow01) MACHINE_ID=ursa ;; ### ursaecflow01
 
+  derecho[1-8]) MACHINE_ID=derecho ;; ### derecho1-8
+
   Orion-login-[1-4].HPC.MsState.Edu) MACHINE_ID=orion ;; ### orion1-4
 
   [Hh]ercules-login-[1-4].[Hh][Pp][Cc].[Mm]s[Ss]tate.[Ee]du) MACHINE_ID=hercules ;; ### hercules1-4
@@ -90,6 +92,9 @@ elif [[ -d /gpfs/f5 ]]; then
 elif [[ -d /gpfs/f6 ]]; then
   # We are on GAEAC6.
   MACHINE_ID=gaeac6
+elif [[ -d /glade/u ]]; then
+  # We are on DERECHO.
+  MACHINE_ID=derecho
 else
   echo WARNING: UNKNOWN PLATFORM 1>&2
 fi
