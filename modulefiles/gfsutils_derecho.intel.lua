@@ -7,15 +7,16 @@ prepend_path("MODULEPATH", "/lustre/desc1/scratch/epicufsrt/contrib/modulefiles_
 prepend_path("MODULEPATH", "/glade/work/epicufsrt/contrib/spack-stack/derecho/spack-stack-1.9.2/envs/ue-oneapi-2024.2.1/install/modulefiles/Core")
 
 local stack_oneapi_ver=os.getenv("stack_oneapi_ver") or "2024.2.1"
-local stack_intel_oneapi_mpi_ver=os.getenv("stack_intel_oneapi_mpi_ver") or "2021.13"
-
 load(pathJoin("stack-oneapi", stack_oneapi_ver))
-load(pathJoin("stack-intel-oneapi-mpi", stack_intel_oneapi_mpi_ver))
+
+stack_impi_ver=os.getenv("stack_cray_mpich_ver") or "8.1.29"
+load(pathJoin("stack-cray-mpich", stack_cray_mpich_ver))
 
 load("gfsutils_common")
 
-setenv("CC","mpiicc")
-setenv("CXX","mpiicpc")
-setenv("FC","mpiifort")
+setenv("CC","mpicc")
+setenv("CXX","mpic++")
+setenv("FC","mpifort")
+setenv("F90","mpifort")
 
 whatis("Description: GFS utilities environment on Derecho with oneapi Compilers")
