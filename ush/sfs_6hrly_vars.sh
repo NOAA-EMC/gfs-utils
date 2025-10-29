@@ -2,8 +2,7 @@
 
 ######################################################################################
 
-# GENERATE 6-HOURLY GRIB2 FILES ON INTERPOLATED 360-x181 LAT-LON  GRID 
-# FOR SELECT SFS VARIABLES
+# GENERATE 6-HOURLY GRIB2 FILES FOR SELECTED SFS VARIABLES.
 
 # THIS SCRIPT READS ALL GRIB2 FILES FOR A GIVEN SFS FORECAST PERIOD TO GENERATE
 # A SINGLE FILE PER VARIABLE WITH ALL 6-HOURLY FORECASTS
@@ -40,11 +39,7 @@ for (( i=0; i<${#vars[@]}; i++)); do
 
    # shellcheck disable=SC2046
    # shellcheck disable=SC2002
-  cat $(eval "ls -v ${MEMDIR}/*") | wgrib2 - -match "${var}" -grib "${OUTDIR}/IN.grb"
-
-  # interpolate: bilinear for all except PRATE which uses budget
-  wgrib2 "${OUTDIR}/IN.grb" -if ':PRATE:' -new_grid_interpolation budget -fi -new_grid_winds earth -new_grid latlon 0:360:1 90:181:-1 "${OUTDIR}/${filename}"
-  rm "${OUTDIR}/IN.grb"
+  cat $(eval "ls -v ${MEMDIR}/*") | wgrib2 - -match "${var}" -grib "${OUTDIR}/${filename}"
 
 done
 
