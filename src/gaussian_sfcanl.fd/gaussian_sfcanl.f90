@@ -363,6 +363,14 @@
    enddo
  enddo
 
+ do i = 1, igaus*jgaus
+   if(gaussian_data%hice(i) > 0.0) then
+     gaussian_data%tsea(i)  = gaussian_data%tisfc(i)
+     gaussian_data%stc(i,1) = 0.75 * gaussian_data%tsea(i) + 0.25 * 271.2
+     gaussian_data%stc(i,2) = 0.25 * gaussian_data%tsea(i) + 0.75 * 271.2
+   end if
+ end do
+
  deallocate(col, row, s)
 
  deallocate(tile_data%orog)
