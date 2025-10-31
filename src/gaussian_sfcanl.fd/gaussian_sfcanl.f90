@@ -364,10 +364,17 @@
  enddo
 
  do i = 1, igaus*jgaus
-   if(gaussian_data%hice(i) > 0.0) then
-     gaussian_data%tsea(i)  = gaussian_data%tisfc(i)
+   if((gaussian_data%hice(i)  > 0.0 .or. gaussian_data%slmask(i) /= 1)            .and. &
+      ((gaussian_data%stc(i,1) > 199.999 .and. gaussian_data%stc(i,1) < 200.001)  .or.  &
+       (gaussian_data%stc(i,1) > 271.199 .and. gaussian_data%stc(i,1) < 271.201)) .and. &
+      gaussian_data%stc(i,1) == gaussian_data%stc(i,2)) then
+
+     gaussian_data%tsea(i)  = min(gaussian_data%tisfc(i),273.15)
      gaussian_data%stc(i,1) = 0.75 * gaussian_data%tsea(i) + 0.25 * 271.2
      gaussian_data%stc(i,2) = 0.25 * gaussian_data%tsea(i) + 0.75 * 271.2
+     gaussian_data%stc(i,3) = gaussian_data%stc(i,2)
+     gaussian_data%stc(i,4) = gaussian_data%stc(i,2)
+
    end if
  end do
 
