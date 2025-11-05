@@ -363,6 +363,16 @@
    enddo
  enddo
 
+! When UFS uses the CICE seaice component, the ice temperatures (stored in the
+!  stc variable) are set to constant values (either 200K or 271.2K). This causes
+!  issues for downstream models using these ice temperatures.
+! The following block assigns an interpolated temperature calculated from CICE
+!  ice surface temperature and the fixed ice lower boundary temperature (271.2) 
+!  to grids with the following:
+!    - ice thickness > 0
+!    - land mask /= 1  (not equal to land)
+!    - constant temperature of 200K or 271.2K in both ice layers
+
  do i = 1, igaus*jgaus
    if((gaussian_data%hice(i)  > 0.0 .or. gaussian_data%slmask(i) /= 1)            .and. &
       ((gaussian_data%stc(i,1) > 199.999 .and. gaussian_data%stc(i,1) < 200.001)  .or.  &
