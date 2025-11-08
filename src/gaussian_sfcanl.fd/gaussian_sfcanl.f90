@@ -198,76 +198,10 @@
 
  call read_data_anl
 
- ! Read and add soil incrments to sfcanl if settings require it
- ! based on the SoilDA increment codes by Clara Draper, Yuan Xue, Tseganeh Gichamo
+ ! Read and add soil incrments to sfcanl if settings require it 
  if (add_soil_inc) then
     sfc_inc_file = "./sfc_inc"
-    allocate(stc_inc(6, lsoil, itile, jtile))
-    allocate(slc_inc(6, lsoil, itile, jtile))
-    allocate(smp(itile*jtile))
-    allocate(slc_new(itile*jtile))
-    allocate(soiltype(itile*jtile))
-    allocate(slc_updated(itile*jtile))
-
-    call read_soil_increments(sfc_inc_file, lsoil, itile, jtile, stc_inc, slc_inc)
-   
-    call set_soilveg_noahmp(maxsmc, bb, satpsi)
-
-    dz(1) = -zsoil(1)
-    do k = 2, 4
-      dz(k) = -zsoil(k) + zsoil(k-1) 
-    enddo 
-
-    !Mask: The regridded soil incrementes have 0 values where mask=non-land/snow
-    do i=1, 6
-      istart = itile*jtile * (i-1) + 1
-      iend   = istart + itile*jtile - 1      
-      
-      soiltype = nint(tile_data%stype(istart:iend))  !tile_data%stype(ijtile*num_tiles))
-
-      do k=1, lsoil  
-
-        slc_updated = .false.   !Note stc_updated is tracked through stc_inc > 0
-
-        !skip background frozen cells for slc update
-        where(tile_data%stc(istart:iend,k) .gt. con_t0c .and. tile_data%smc(istart:iend,k) - tile_data%slc(istart:iend,k) .le. 0.001)
-         tile_data%slc(istart:iend,k) = max(tile_data%slc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0) !ensure >=0
-         tile_data%smc(istart:iend,k) = max(tile_data%smc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0)
-         slc_updated = .true.
-        end where
-
-        tile_data%stc(istart:iend,k) = tile_data%stc(istart:iend,k) + reshape(stc_inc(i,k,:,:), (/itile*jtile/))
-        
-        !recompute supercool liquid water,smc_anl remain unchanged
-        !processing only locations with stc change (non-zero increments)
-        where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
-         smp = con_hfus*(con_t0c-tile_data%stc(istart:iend,k))/(con_g*tile_data%stc(istart:iend,k)) !(m)
-        end where
-        do j=1, itile*jtile         
-         slc_new(j) = maxsmc(soiltype(j))*(smp(j)/satpsi(soiltype(j)))**(-1./bb(soiltype(j)))
-        enddo
-        where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
-         tile_data%slc(istart:iend,k) = max( min(slc_new, tile_data%smc(istart:iend,k)), 0.0 )
-        end where
-
-        !if temp > tfreeze, melt all soil ice (if any). Use updated stc, not background
-        where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .ge. con_t0c )then 
-          tile_data%slc(istart:iend,k) = tile_data%smc(istart:iend,k)
-        end where
-
-        ! apply SM bounds
-        where(slc_updated .and. abs(reshape(slc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.000001)
-          ! noah-mp minimum is 1 mm per layer (in SMC)
-          ! no need to maintain frozen amount, would be v. small.         
-          tile_data%slc(istart:iend,k) = max(tile_data%slc(istart:iend,k), 0.001/dz(k))
-          tile_data%smc(istart:iend,k) = max(tile_data%smc(istart:iend,k), 0.001/dz(k))
-        end where 
-        
-      enddo       
-    enddo
-
-    deallocate(stc_inc, slc_inc)
-    deallocate(smp, slc_new, soiltype, slc_updated)
+    call add_soil_increments(sfc_inc_file, lsoil, itile, jtile)
  endif 
 
 !------------------------------------------------------------------------------
@@ -1814,16 +1748,65 @@
 
    real, parameter       :: con_t0c = 273.16, con_hfus=0.3336e06, con_g=9.80616 ! Tmelt, latent heat of fusion(J/kg),grav. accl
 
-    call read_soil_increments(sfc_inc_file, lsoil, itile, jtile, stc_inc, slc_inc)
+   call read_soil_increments(sfc_inc_file, lsoil, itile, jtile, stc_inc, slc_inc)
 
-    call set_soilveg_noahmp(maxsmc, bb, satpsi)
+   call set_soilveg_noahmp(maxsmc, bb, satpsi)
 
-    dz(1) = -zsoil(1)
-    do k = 2, 4
-      dz(k) = -zsoil(k) + zsoil(k-1)
-    enddo
+   dz(1) = -zsoil(1)
+   do k = 2, 4
+     dz(k) = -zsoil(k) + zsoil(k-1)
+   enddo
 
+   !Mask: The regridded soil incrementes have 0 values where mask=non-land/snow
+   do i=1, num_tiles
+     istart = itile*jtile * (i-1) + 1
+     iend   = istart + itile*jtile - 1
 
+     soiltype = nint(tile_data%stype(istart:iend))  !tile_data%stype(ijtile*num_tiles))
+
+     do k=1, lsoil
+
+       slc_updated = .false.   !Note stc_updated is tracked through stc_inc > 0
+
+       !skip background frozen cells for slc update
+       where(tile_data%stc(istart:iend,k) .gt. con_t0c .and. tile_data%smc(istart:iend,k) - tile_data%slc(istart:iend,k) .le. 0.001)
+        tile_data%slc(istart:iend,k) = max(tile_data%slc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0) !ensure >=0
+        tile_data%smc(istart:iend,k) = max(tile_data%smc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0)
+        slc_updated = .true.
+       end where
+
+       tile_data%stc(istart:iend,k) = tile_data%stc(istart:iend,k) + reshape(stc_inc(i,k,:,:), (/itile*jtile/))
+
+       !recompute supercool liquid water,smc_anl remain unchanged
+       !processing only locations with stc change (non-zero increments)
+       where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
+        smp = con_hfus*(con_t0c-tile_data%stc(istart:iend,k))/(con_g*tile_data%stc(istart:iend,k)) !(m)
+       end where
+       do j=1, itile*jtile
+        slc_new(j) = maxsmc(soiltype(j))*(smp(j)/satpsi(soiltype(j)))**(-1./bb(soiltype(j)))
+       enddo
+       where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
+        tile_data%slc(istart:iend,k) = max( min(slc_new, tile_data%smc(istart:iend,k)), 0.0 )
+       end where
+
+       !if temp > tfreeze, melt all soil ice (if any). Use updated stc, not background
+       where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .ge. con_t0c )then
+         tile_data%slc(istart:iend,k) = tile_data%smc(istart:iend,k)
+       end where
+
+       ! apply SM bounds
+       where(slc_updated .and. abs(reshape(slc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.000001)
+         ! noah-mp minimum is 1 mm per layer (in SMC)
+         ! no need to maintain frozen amount, would be v. small.
+         tile_data%slc(istart:iend,k) = max(tile_data%slc(istart:iend,k), 0.001/dz(k))
+         tile_data%smc(istart:iend,k) = max(tile_data%smc(istart:iend,k), 0.001/dz(k))
+       end where
+
+     enddo  !lsoil
+
+   enddo  !num tiles
+   
+   return   
 
  end subroutine add_soil_increments
 
