@@ -102,7 +102,7 @@
  end type sfc_data
  
  type(sfc_data) :: tile_data, gaussian_data
-
+ 
  end module io
 
 !------------------------------------------------------------------------------
@@ -118,7 +118,7 @@
 
  character(len=12)       :: weightfile
 
- integer                 :: i, error, ncid, id_ns, n_s
+ integer                 :: i, error, ncid, id_ns, n_s, k
  integer                 :: id_col, id_row, id_s, n
  integer                 :: yy, mm, dd, hh
  integer, allocatable    :: col(:), row(:)
@@ -126,7 +126,12 @@
  real, parameter           :: fill = 0.0
  real(kind=8), allocatable :: s(:)
 
- namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst, imp_physics, landsfcmdl
+ logical                   :: add_soil_inc = .false.
+ integer                   :: lsoil = 2
+ char(len=64)              :: sfc_inc_file
+
+
+ namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst, imp_physics, landsfcmdl, add_soil_inc, lsoil
 
  call w3tagb('GAUSSIAN_SFCANL',2018,0179,0055,'NP20')
 
@@ -192,6 +197,78 @@
 !------------------------------------------------------------------------------
 
  call read_data_anl
+
+ ! Read and add soil incrments to sfcanl if settings require it
+ ! based on the SoilDA increment codes by Clara Draper, Yuan Xue, Tseganeh Gichamo
+ if (add_soil_inc) then
+    sfc_inc_file = "./sfc_inc"
+    allocate(stc_inc(6, lsoil, itile, jtile))
+    allocate(slc_inc(6, lsoil, itile, jtile))
+    allocate(smp(itile*jtile))
+    allocate(slc_new(itile*jtile))
+    allocate(soiltype(itile*jtile))
+    allocate(slc_updated(itile*jtile))
+
+    call read_soil_increments(sfc_inc_file, lsoil, itile, jtile, stc_inc, slc_inc)
+   
+    call set_soilveg_noahmp(maxsmc, bb, satpsi)
+
+    dz(1) = -zsoil(1)
+    do k = 2, 4
+      dz(k) = -zsoil(k) + zsoil(k-1) 
+    enddo 
+
+    !Mask: The regridded soil incrementes have 0 values where mask=non-land/snow
+    do i=1, 6
+      istart = itile*jtile * (i-1) + 1
+      iend   = istart + itile*jtile - 1      
+      
+      soiltype = nint(tile_data%stype(istart:iend))  !tile_data%stype(ijtile*num_tiles))
+
+      do k=1, lsoil  
+
+        slc_updated = .false.   !Note stc_updated is tracked through stc_inc > 0
+
+        !skip background frozen cells for slc update
+        where(tile_data%stc(istart:iend,k) .gt. con_t0c .and. tile_data%smc(istart:iend,k) - tile_data%slc(istart:iend,k) .le. 0.001)
+         tile_data%slc(istart:iend,k) = max(tile_data%slc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0) !ensure >=0
+         tile_data%smc(istart:iend,k) = max(tile_data%smc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0)
+         slc_updated = .true.
+        end where
+
+        tile_data%stc(istart:iend,k) = tile_data%stc(istart:iend,k) + reshape(stc_inc(i,k,:,:), (/itile*jtile/))
+        
+        !recompute supercool liquid water,smc_anl remain unchanged
+        !processing only locations with stc change (non-zero increments)
+        where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
+         smp = con_hfus*(con_t0c-tile_data%stc(istart:iend,k))/(con_g*tile_data%stc(istart:iend,k)) !(m)
+        end where
+        do j=1, itile*jtile         
+         slc_new(j) = maxsmc(soiltype(j))*(smp(j)/satpsi(soiltype(j)))**(-1./bb(soiltype(j)))
+        enddo
+        where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
+         tile_data%slc(istart:iend,k) = max( min(slc_new, tile_data%smc(istart:iend,k)), 0.0 )
+        end where
+
+        !if temp > tfreeze, melt all soil ice (if any). Use updated stc, not background
+        where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .ge. con_t0c )then 
+          tile_data%slc(istart:iend,k) = tile_data%smc(istart:iend,k)
+        end where
+
+        ! apply SM bounds
+        where(slc_updated .and. abs(reshape(slc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.000001)
+          ! noah-mp minimum is 1 mm per layer (in SMC)
+          ! no need to maintain frozen amount, would be v. small.         
+          tile_data%slc(istart:iend,k) = max(tile_data%slc(istart:iend,k), 0.001/dz(k))
+          tile_data%smc(istart:iend,k) = max(tile_data%smc(istart:iend,k), 0.001/dz(k))
+        end where 
+        
+      enddo       
+    enddo
+
+    deallocate(stc_inc, slc_inc)
+    deallocate(smp, slc_new, soiltype, slc_updated)
+ endif 
 
 !------------------------------------------------------------------------------
 ! Interpolate tiled data to gaussian grid.
@@ -1621,7 +1698,136 @@
 
  end subroutine read_data_anl
 
-!-------------------------------------------------------------------------------------------
+ subroutine read_soil_increments(sfc_inc_file, nk, nx, ny, stc_inc, slc_inc)
+
+   character(len=*), intent(in) :: sfc_inc_file
+   integer, intent(in)          :: ny, nx, nk  ! nk number of soil layer with increment
+   real(kind=kind_phys), intent(out) :: stc_inc(6, nk, nx, ny), slc_inc(6, nk, nx, ny)
+   
+   integer  :: i, it
+   logical  :: exists
+   integer  :: ncid, status, varid, dimid, dimlen
+   character(len=500)  :: fname
+   character(len=2)    :: tile_str
+
+   character(len=32), dimension(4) :: stc_vars = [character(len=32) :: 'soilt1_inc', 'soilt2_inc', 'soilt3_inc', 'soilt4_inc']
+   character(len=32), dimension(4) :: slc_vars = [character(len=32) :: 'slc1_inc', 'slc2_inc', 'slc3_inc', 'slc4_inc']
+      
+   do it=1, 6
+
+     write(tile_str, '(I0)') it
+     fname = trim(sfc_inc_file)//".tile"//trim(tile_str)//".nc"
+     inquire (file=trim(fname), exist=exists)
+     if (exists) then
+        status = nf90_open(trim(fname), NF90_NOWRITE, ncid)  ! open the file
+        call netcdf_err(status, ' opening file '//trim(fname))
+     else
+        print*, 'Warning in gaussian_sfcanl, soil inc files do not exist: '//trim(fname)
+        call errexit(-1)
+        !print*, 'all increments will be set to zero'
+        !return 
+     endif
+  
+     ! var stored as soilt1_inc(yaxis_1, xaxis_1)
+     status = nf90_inq_dimid(ncid, "yaxis_1", dimid)
+     CALL netcdf_err(status, 'reading dim yaxis_1 from '//trim(fname))
+     status = nf90_inquire_dimension(ncid, dimid, len = dimlen)
+     CALL netcdf_err(status, 'reading dim length yaxis_1 from '//trim(fname))
+     if (ny /= dimlen) then
+        print*, 'Error in gaussian_sfcanl, incrment and forecast dimenstions do not match'
+        call errexit(-1)
+     endif
+  
+     do i = 1, nk
+        status = nf90_inq_varid(ncid, trim(stc_vars(i)), varid)
+        CALL netcdf_err(status, 'reading varid for '//trim(stc_vars(i)))
+        status = nf90_get_var(ncid, varid, stc_inc(it, i,:,:), start = (/1, 1/), count = (/nx, ny/))
+        call netcdf_err(status, 'reading values for '//trim(stc_vars(i)))
+  
+        status = nf90_inq_varid(ncid, trim(slc_vars(i)), varid)
+        CALL netcdf_err(status, 'reading varid for '//trim(slc_vars(i)))
+        status = nf90_get_var(ncid, varid, slc_inc(it, i,:,:), start = (/1, 1/), count = (/nx, ny/))
+        call netcdf_err(status, 'reading values for '//trim(slc_vars(i)))
+     enddo
+     
+     status =nf90_close(ncid)
+     call netcdf_err(status, 'closing file '//trim(fname))
+
+   enddo
+   !set too small increments to zero
+   where(abs(stc_inc) < 0.0001) stc_inc = 0.0
+   where(abs(slc_inc) < 0.000001) slc_inc = 0.0
+
+ end subroutine read_soil_increments
+
+!> @brief Noah-MP related parameters extracted from noahmp_table.f
+!> soil type STATSGO and vegetation type IBGP assumed 
+!! @param[out] maxsmc Maximum soil moisture for each soil type
+!! @param[out] bb B exponent for each soil type
+!! @param[out] satpsi Saturated matric potential for each soil type
+
+!> copied from https://github.com/ufs-community/UFS_UTILS/sorc/lsm_routines.fd/noah.fd/set_soilveg_snippet.f90
+!> @authors Yuan Xue and Clara Draper
+!!
+ subroutine set_soilveg_noahmp(maxsmc, bb, satpsi)
+
+   implicit none
+  
+   real, dimension(30), intent(out)  :: maxsmc, bb, satpsi
+    
+     ! set soil-dependent params (STATSGO is the only option for UFS, 07/13/2023)
+     maxsmc= (/0.339, 0.421, 0.434, 0.476, 0.484,&
+       &   0.439, 0.404, 0.464, 0.465, 0.406, 0.468, 0.468,                    &
+       &   0.439, 1.000, 0.200, 0.421, 0.468, 0.200,                           &
+       &   0.339, 0.339, 0.000, 0.000, 0.000, 0.000,                           &
+       &  0.000, 0.000, 0.000, 0.000, 0.000, 0.000/)
+     bb= (/2.79,  4.26, 4.74, 5.33, 3.86,  5.25,&
+       &    6.77,  8.72,  8.17, 10.73,  10.39, 11.55,                          &
+       &    5.25,  0.0,  2.79, 4.26,  11.55,  2.79,                            &
+       &    2.79,  0.00,  0.00, 0.00,  0.00,  0.00,                            &
+       &    0.00,  0.00,  0.00, 0.00,  0.00,  0.00/)
+     satpsi= (/0.069, 0.036, 0.141, 0.759, 0.955, &
+       &   0.355, 0.135, 0.617, 0.263, 0.098, 0.324, 0.468,                    &
+       &   0.355, 0.00, 0.069, 0.036, 0.468, 0.069,                            &
+       &   0.069, 0.00, 0.00, 0.00, 0.00, 0.00,                                &
+       &   0.00, 0.00, 0.00, 0.00, 0.00, 0.00/)
+
+ end subroutine set_soilveg_noahmp
+
+ ! based on the SoilDA increment codes by Clara Draper, Yuan Xue, Tseganeh Gichamo
+ subroutine add_soil_increments(sfc_inc_file, lsoil, itile, jtile)
+   
+   implicit none
+
+   char(len=*), intent(in)   :: sfc_inc_file
+   integer, intent(in)       :: lsoil, itile, jtile
+
+   real(kind=8)          :: stc_inc(6, lsoil, itile, jtile), slc_inc(6, lsoil, itile, jtile)
+   real                  :: maxsmc(30), bb(30), satpsi(30)
+   real                  :: smp(itile*jtile), slc_new(itile*jtile)
+   integer               :: soiltype(itile*jtile)
+   logical               :: slc_updated(itile*jtile)
+   real                  :: zsoil(4) = (/ -0.1, -0.4, -1.0, -2.0 /)
+   real                  :: dz(4) ! layer thickness
+
+   integer               :: istart, iend
+
+   real, parameter       :: con_t0c = 273.16, con_hfus=0.3336e06, con_g=9.80616 ! Tmelt, latent heat of fusion(J/kg),grav. accl
+
+    call read_soil_increments(sfc_inc_file, lsoil, itile, jtile, stc_inc, slc_inc)
+
+    call set_soilveg_noahmp(maxsmc, bb, satpsi)
+
+    dz(1) = -zsoil(1)
+    do k = 2, 4
+      dz(k) = -zsoil(k) + zsoil(k-1)
+    enddo
+
+
+
+ end subroutine add_soil_increments
+
+ !-------------------------------------------------------------------------------------------
 ! Netcdf error routine.
 !-------------------------------------------------------------------------------------------
 
