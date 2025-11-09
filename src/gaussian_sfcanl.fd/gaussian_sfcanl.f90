@@ -128,10 +128,10 @@
 
  logical                   :: add_soil_inc = .false.
  integer                   :: lsoil = 2
- char(len=64)              :: sfc_inc_file
+ char(len=512)             :: sfc_inc_file = "./sfc_inc"
 
 
- namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst, imp_physics, landsfcmdl, add_soil_inc, lsoil
+ namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst, imp_physics, landsfcmdl, add_soil_inc, lsoil, sfc_inc_file
 
  call w3tagb('GAUSSIAN_SFCANL',2018,0179,0055,'NP20')
 
@@ -199,10 +199,7 @@
  call read_data_anl
 
  ! Read and add soil incrments to sfcanl if settings require it 
- if (add_soil_inc) then
-    sfc_inc_file = "./sfc_inc"
-    call add_soil_increments(sfc_inc_file, lsoil, itile, jtile)
- endif 
+ if (add_soil_inc) call add_soil_increments(sfc_inc_file, lsoil, itile, jtile)
 
 !------------------------------------------------------------------------------
 ! Interpolate tiled data to gaussian grid.
