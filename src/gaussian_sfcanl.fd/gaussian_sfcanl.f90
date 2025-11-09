@@ -128,7 +128,7 @@
 
  logical                   :: add_soil_inc = .false.
  integer                   :: lsoil_incr = 2
- char(len=512)             :: sfc_inc_file = "./sfc_inc"
+ character(len=512)        :: sfc_inc_file = "./sfc_inc"
 
 
  namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst, imp_physics, landsfcmdl, add_soil_inc, lsoil_incr, sfc_inc_file
@@ -1630,10 +1630,14 @@
  end subroutine read_data_anl
 
  subroutine read_soil_increments(sfc_inc_file, nk, nx, ny, stc_inc, slc_inc)
+   
+   use netcdf
+
+   implicit none
 
    character(len=*), intent(in) :: sfc_inc_file
    integer, intent(in)          :: ny, nx, nk  ! nk number of soil layer with increment
-   real(kind=kind_phys), intent(out) :: stc_inc(6, nk, nx, ny), slc_inc(6, nk, nx, ny)
+   real, intent(out)            :: stc_inc(6, nk, nx, ny), slc_inc(6, nk, nx, ny)
    
    integer  :: i, it
    logical  :: exists
@@ -1726,14 +1730,17 @@
  end subroutine set_soilveg_noahmp
 
  ! based on the SoilDA increment codes by Clara Draper, Yuan Xue, Tseganeh Gichamo
- subroutine add_soil_increments(sfc_inc_file, lsoil, itile, jtile)
+ subroutine add_soil_increments(sfc_inc_file, lsoil)   !, itile, jtile, num_tiles, lsoil)
    
+   use io
+
    implicit none
 
-   char(len=*), intent(in)   :: sfc_inc_file
-   integer, intent(in)       :: lsoil, itile, jtile
+   character(len=*), intent(in)   :: sfc_inc_file
+   integer, intent(in)            :: lsoil  !, itile, jtile, num_tiles
+   !real, intent(inout)   :: stc_t(itile*jtile*num_tiles,lsoil), slc_t(itile*jtile*num_tiles,lsoil), smc_t(itile*jtile*num_tiles,lsoil)
 
-   real(kind=8)          :: stc_inc(6, lsoil, itile, jtile), slc_inc(6, lsoil, itile, jtile)
+   real                  :: stc_inc(6, lsoil, itile, jtile), slc_inc(6, lsoil, itile, jtile)
    real                  :: maxsmc(30), bb(30), satpsi(30)
    real                  :: smp(itile*jtile), slc_new(itile*jtile)
    integer               :: soiltype(itile*jtile)
@@ -1741,7 +1748,7 @@
    real                  :: zsoil(4) = (/ -0.1, -0.4, -1.0, -2.0 /)
    real                  :: dz(4) ! layer thickness
 
-   integer               :: istart, iend
+   integer               :: i, j, k, istart, iend
 
    real, parameter       :: con_t0c = 273.16, con_hfus=0.3336e06, con_g=9.80616 ! Tmelt, latent heat of fusion(J/kg),grav. accl
 
@@ -1767,8 +1774,8 @@
 
        !skip background frozen cells for slc update
        where(tile_data%stc(istart:iend,k) .gt. con_t0c .and. tile_data%smc(istart:iend,k) - tile_data%slc(istart:iend,k) .le. 0.001)
-        tile_data%slc(istart:iend,k) = max(tile_data%slc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0) !ensure >=0
-        tile_data%smc(istart:iend,k) = max(tile_data%smc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0)
+        tile_data%slc(istart:iend,k) = max(tile_data%slc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0.0) !ensure >=0
+        tile_data%smc(istart:iend,k) = max(tile_data%smc(istart:iend,k) + reshape(slc_inc(i,k,:,:), (/itile*jtile/)), 0.0)
         slc_updated = .true.
        end where
 
@@ -1787,7 +1794,7 @@
        end where
 
        !if temp > tfreeze, melt all soil ice (if any). Use updated stc, not background
-       where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .ge. con_t0c )then
+       where(abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .ge. con_t0c )
          tile_data%slc(istart:iend,k) = tile_data%smc(istart:iend,k)
        end where
 
