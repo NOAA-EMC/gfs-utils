@@ -148,6 +148,9 @@
    call errexit(56)
  endif
  close (41)
+ 
+ ! print namelist?
+ print*, setup
 
  idate = 0
  idate(1) = yy
