@@ -149,8 +149,8 @@
  endif
  close (41)
  
- ! print namelist?
- print*, setup
+ ! print namelist
+ write(6, setup)
 
  idate = 0
  idate(1) = yy
@@ -1650,7 +1650,10 @@
 
    character(len=32), dimension(4) :: stc_vars = [character(len=32) :: 'soilt1_inc', 'soilt2_inc', 'soilt3_inc', 'soilt4_inc']
    character(len=32), dimension(4) :: slc_vars = [character(len=32) :: 'slc1_inc', 'slc2_inc', 'slc3_inc', 'slc4_inc']
-      
+ 
+   print*,'' 
+   print*, "start reading soil increments"
+
    do it=1, 6
 
      write(tile_str, '(I0)') it
@@ -1695,6 +1698,8 @@
    !set too small increments to zero
    where(abs(stc_inc) < 0.0001) stc_inc = 0.0
    where(abs(slc_inc) < 0.000001) slc_inc = 0.0
+ 
+   print*, "done reading soil increments"
 
  end subroutine read_soil_increments
 
@@ -1755,6 +1760,9 @@
 
    real, parameter       :: con_t0c = 273.16, con_hfus=0.3336e06, con_g=9.80616 ! Tmelt, latent heat of fusion(J/kg),grav. accl
 
+   print*, ''
+   print*, "gaussian sfcanal: start adding soil increments"
+
    call read_soil_increments(sfc_inc_file, lsoil, itile, jtile, stc_inc, slc_inc)
 
    call set_soilveg_noahmp(maxsmc, bb, satpsi)
@@ -1812,6 +1820,8 @@
      enddo  !lsoil
 
    enddo  !num tiles
+
+   print*, "gaussian sfcanal: finished adding soil increments"
    
    return   
 
