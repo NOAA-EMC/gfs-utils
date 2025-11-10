@@ -202,7 +202,7 @@
  call read_data_anl
 
  ! Read and add soil incrments to sfcanl if settings require it 
- if (add_soil_inc) call add_soil_increments(sfc_inc_file, lsoil_incr, itile, jtile)
+ if (add_soil_inc) call add_soil_increments(sfc_inc_file, lsoil_incr)
 
 !------------------------------------------------------------------------------
 ! Interpolate tiled data to gaussian grid.
@@ -1651,11 +1651,9 @@
    character(len=32), dimension(4) :: stc_vars = [character(len=32) :: 'soilt1_inc', 'soilt2_inc', 'soilt3_inc', 'soilt4_inc']
    character(len=32), dimension(4) :: slc_vars = [character(len=32) :: 'slc1_inc', 'slc2_inc', 'slc3_inc', 'slc4_inc']
  
-   print*,'' 
    print*, "start reading soil increments"
 
    do it=1, 6
-
      write(tile_str, '(I0)') it
      fname = trim(sfc_inc_file)//".tile"//trim(tile_str)//".nc"
      inquire (file=trim(fname), exist=exists)
@@ -1822,7 +1820,8 @@
    enddo  !num tiles
 
    print*, "gaussian sfcanal: finished adding soil increments"
-   
+   print*, ''
+
    return   
 
  end subroutine add_soil_increments
