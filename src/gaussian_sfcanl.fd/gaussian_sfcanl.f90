@@ -130,7 +130,6 @@
  integer                   :: lsoil_incr = 2
  character(len=512)        :: sfc_inc_file = "./sfc_inc"
 
-
  namelist /setup/ yy, mm, dd, hh, igaus, jgaus, donst, imp_physics, landsfcmdl, add_soil_inc, lsoil_incr, sfc_inc_file
 
  call w3tagb('GAUSSIAN_SFCANL',2018,0179,0055,'NP20')
