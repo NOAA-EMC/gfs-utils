@@ -102,7 +102,6 @@
  end type sfc_data
  
  type(sfc_data) :: tile_data, gaussian_data
- 
  end module io
 
 !------------------------------------------------------------------------------
