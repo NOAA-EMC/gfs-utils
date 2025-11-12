@@ -1659,10 +1659,8 @@
         status = nf90_open(trim(fname), NF90_NOWRITE, ncid)  ! open the file
         call netcdf_err(status, ' opening file '//trim(fname))
      else
-        print*, 'Warning in gaussian_sfcanl, soil inc files do not exist: '//trim(fname)
+        print*, 'Error in gaussian_sfcanl, soil inc files do not exist: '//trim(fname)
         call errexit(-1)
-        !print*, 'all increments will be set to zero'
-        !return 
      endif
   
      ! var stored as soilt1_inc(yaxis_1, xaxis_1)
