@@ -1732,15 +1732,14 @@
  end subroutine set_soilveg_noahmp
 
  ! based on the SoilDA increment codes by Clara Draper, Yuan Xue, Tseganeh Gichamo
- subroutine add_soil_increments(sfc_inc_file, lsoil)   !, itile, jtile, num_tiles, lsoil)
+ subroutine add_soil_increments(sfc_inc_file, lsoil)  
    
    use io
 
    implicit none
 
    character(len=*), intent(in)   :: sfc_inc_file
-   integer, intent(in)            :: lsoil  !, itile, jtile, num_tiles
-   !real, intent(inout)   :: stc_t(itile*jtile*num_tiles,lsoil), slc_t(itile*jtile*num_tiles,lsoil), smc_t(itile*jtile*num_tiles,lsoil)
+   integer, intent(in)            :: lsoil  
 
    real                  :: stc_inc(6, lsoil, itile, jtile), slc_inc(6, lsoil, itile, jtile)
    real                  :: maxsmc(30), bb(30), satpsi(30)
