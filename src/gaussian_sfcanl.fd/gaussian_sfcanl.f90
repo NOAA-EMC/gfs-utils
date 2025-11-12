@@ -1766,7 +1766,6 @@
      dz(k) = -zsoil(k) + zsoil(k-1)
    enddo
 
-   !Mask: The regridded soil incrementes have 0 values where mask=non-land/snow
    do i=1, num_tiles
      istart = itile*jtile * (i-1) + 1
      iend   = istart + itile*jtile - 1
