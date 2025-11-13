@@ -1685,7 +1685,7 @@
         call netcdf_err(status, 'reading values for '//trim(slc_vars(i)))
      enddo
      
-     status =nf90_close(ncid)
+     status = nf90_close(ncid)
      call netcdf_err(status, 'closing file '//trim(fname))
 
    enddo
