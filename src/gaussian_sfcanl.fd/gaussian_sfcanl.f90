@@ -1651,6 +1651,11 @@
  
    print*, "start reading soil increments"
 
+   if (nk > 4) then 
+        print*, 'Error in gaussian_sfcanl read soil increments: the requested number of soil layers ', nk, is ' larger than 4'
+        call errexit(-1)
+   endif
+
    do it=1, 6
      write(tile_str, '(I0)') it
      fname = trim(sfc_inc_file)//".tile"//trim(tile_str)//".nc"
