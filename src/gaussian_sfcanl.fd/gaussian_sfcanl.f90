@@ -1773,7 +1773,7 @@
      soiltype = nint(tile_data%stype(istart:iend))  !tile_data%stype(ijtile*num_tiles))
      vegtype  = nint(tile_data%vtype(istart:iend))
 
-     !Mask: The regridded soil incrementes have 0 values where mask=non-land/snow
+     !Mask: The regridded soil increments have 0 values where mask=non-land/snow
      land_mask = .false.
      where((soiltype .gt. 0) .and. (vegtype .ne. lnd_ice) .and. (.not.(tile_data%sheleg(istart:iend) .gt. 0.001)) )
        land_mask = .true.
