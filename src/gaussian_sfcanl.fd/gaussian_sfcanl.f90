@@ -1674,7 +1674,7 @@
      status = nf90_inquire_dimension(ncid, dimid, len = dimlen)
      CALL netcdf_err(status, 'reading dim length yaxis_1 from '//trim(fname))
      if (ny /= dimlen) then
-        print*, 'Error in gaussian_sfcanl, incrment and forecast dimensions do not match'
+        print*, 'Error in gaussian_sfcanl, increment and forecast dimensions do not match'
         call errexit(-1)
      endif
   
