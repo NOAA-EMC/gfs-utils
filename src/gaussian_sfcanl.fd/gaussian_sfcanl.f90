@@ -148,7 +148,7 @@
  close (41)
  
  ! print namelist
- write(6, setup)
+ write(6, nml=setup)
 
  idate = 0
  idate(1) = yy
