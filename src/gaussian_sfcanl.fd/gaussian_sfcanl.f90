@@ -1803,7 +1803,7 @@
         smp = con_hfus*(con_t0c-tile_data%stc(istart:iend,k))/(con_g*tile_data%stc(istart:iend,k)) !(m)
        end where
        do j=1, itile*jtile
-        if (soiltype(j) >= 1 .and. soiltype(j) <= 30) then
+        if (apply_increments_mask(j) .and. soiltype(j) <= 30) then                  !>> soiltype <=30 to ensure array size is not accidentally exceeded
           slc_new(j) = maxsmc(soiltype(j))*(smp(j)/satpsi(soiltype(j)))**(-1./bb(soiltype(j)))
         else
           slc_new(j) = 0.0
