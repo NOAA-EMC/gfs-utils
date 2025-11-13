@@ -199,7 +199,7 @@
 
  call read_data_anl
 
- ! Read and add soil incrments to sfcanl if settings require it 
+ ! Read and add soil increments to sfcanl if settings require it 
  if (add_soil_inc) call add_soil_increments(sfc_inc_file, lsoil_incr)
 
 !------------------------------------------------------------------------------
@@ -1669,7 +1669,7 @@
      status = nf90_inquire_dimension(ncid, dimid, len = dimlen)
      CALL netcdf_err(status, 'reading dim length yaxis_1 from '//trim(fname))
      if (ny /= dimlen) then
-        print*, 'Error in gaussian_sfcanl, incrment and forecast dimenstions do not match'
+        print*, 'Error in gaussian_sfcanl, incrment and forecast dimensions do not match'
         call errexit(-1)
      endif
   
