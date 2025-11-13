@@ -1698,7 +1698,7 @@
  end subroutine read_soil_increments
 
 !> @brief Noah-MP related parameters extracted from noahmp_table.f
-!> soil type STATSGO and vegetation type IBGP assumed 
+!> soil type STATSGO and vegetation type IGBP assumed 
 !! @param[out] maxsmc Maximum soil moisture for each soil type
 !! @param[out] bb B exponent for each soil type
 !! @param[out] satpsi Saturated matric potential for each soil type
