@@ -7,5 +7,3 @@
      'vvel_1',2, 'Bu_y', 'bilinear', 'uvel_1', 'Bu_x', 'VICE', 'V-Component of Ice Drift', 'm/s',10,2,7,0,2,5,1,0
    'frzmlt_1',2, 'Ct', 'conserve', '', '', 'FRZMLTPOT', 'freeze/melt potential', 'W m-2',10,2,7,0,2,27,1,0
    'albsni_1',2, 'Ct', 'bilinear', '', '', 'ALBDOICE', 'Albedo', 'Numeric',10,2,7,0,2,14,1,0
-'mlt_onset_1',2, 'Ct', 'bilinear', '', '', 'MLTDATE', 'melt onset date', 'Numeric',10,2,7,0,2,28,1,0
-'frz_onset_1',2, 'Ct', 'bilinear', '', '', 'FRZDATE', 'freeze onset date', 'Numeric',10,2,7,0,2,29,1,0
