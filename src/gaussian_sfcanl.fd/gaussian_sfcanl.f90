@@ -117,7 +117,7 @@
 
  character(len=12)       :: weightfile
 
- integer                 :: i, error, ncid, id_ns, n_s, k
+ integer                 :: i, error, ncid, id_ns, n_s
  integer                 :: id_col, id_row, id_s, n
  integer                 :: yy, mm, dd, hh
  integer, allocatable    :: col(:), row(:)
