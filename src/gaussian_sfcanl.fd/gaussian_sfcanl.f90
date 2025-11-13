@@ -1809,6 +1809,9 @@
           slc_new(j) = 0.0
         end if
        enddo
+       where(apply_increments_mask .and. soiltype(j) <= 30 .and. abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
+        slc_new = maxsmc(soiltype)*(smp/satpsi(soiltype))**(-1./bb(soiltype))
+       end where
        where(apply_increments_mask .and. abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
         tile_data%slc(istart:iend,k) = max( min(slc_new, tile_data%smc(istart:iend,k)), 0.0 )
        end where
