@@ -1707,7 +1707,6 @@
 !! @param[out] maxsmc Maximum soil moisture for each soil type
 !! @param[out] bb B exponent for each soil type
 !! @param[out] satpsi Saturated matric potential for each soil type
-
 !> copied from https://github.com/ufs-community/UFS_UTILS/sorc/lsm_routines.fd/noah.fd/set_soilveg_snippet.f90
 !> @authors Yuan Xue and Clara Draper
 !!
@@ -1753,9 +1752,7 @@
    logical               :: slc_updated(itile*jtile), apply_increments_mask(itile*jtile)
    real                  :: zsoil(4) = (/ -0.1, -0.4, -1.0, -2.0 /)
    real                  :: dz(4) ! layer thickness
-
-   integer               :: i, j, k, istart, iend, ix, jy
-
+   integer               :: i, j, k, istart, iend
    real, parameter       :: con_t0c = 273.16, con_hfus=0.3336e06, con_g=9.80616 ! Tmelt, latent heat of fusion(J/kg),grav. accl
    integer, parameter    :: lnd_ice=15
 
