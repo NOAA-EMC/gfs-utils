@@ -1652,7 +1652,7 @@
    print*, "start reading soil increments"
 
    if (nk > 4) then 
-        print*, 'Error in gaussian_sfcanl read soil increments: the requested number of soil layers ', nk, is ' larger than 4'
+        print*, 'Error in gaussian_sfcanl read soil increments: the requested number of soil layers ', nk, ' is larger than 4'
         call errexit(-1)
    endif
 
@@ -1754,7 +1754,7 @@
    real                  :: zsoil(4) = (/ -0.1, -0.4, -1.0, -2.0 /)
    real                  :: dz(4) ! layer thickness
 
-   integer               :: i, j, k, istart, iend
+   integer               :: i, j, k, istart, iend, ix, jy
 
    real, parameter       :: con_t0c = 273.16, con_hfus=0.3336e06, con_g=9.80616 ! Tmelt, latent heat of fusion(J/kg),grav. accl
    integer, parameter    :: lnd_ice=15
@@ -1780,7 +1780,7 @@
 
      !Mask: The regridded soil increments have 0 values where mask=non-land/snow
      apply_increments_mask = .false.
-     where((soiltype .gt. 0) .and. (vegtype .ne. lnd_ice) .and. (.not.(tile_data%sheleg(istart:iend) .gt. 0.001)) )
+     where((soiltype .gt. 0) .and. (soiltype .le. 30) .and. (vegtype .ne. lnd_ice) .and. (.not.(tile_data%sheleg(istart:iend) .gt. 0.001)) )
        apply_increments_mask = .true.
      end where
 
@@ -1801,18 +1801,7 @@
        !processing only locations with stc change (non-zero increments)
        where(apply_increments_mask .and. abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
         smp = con_hfus*(con_t0c-tile_data%stc(istart:iend,k))/(con_g*tile_data%stc(istart:iend,k)) !(m)
-       end where
-       do j=1, itile*jtile
-        if (apply_increments_mask(j) .and. soiltype(j) <= 30) then                  !>> soiltype <=30 to ensure array size is not accidentally exceeded
-          slc_new(j) = maxsmc(soiltype(j))*(smp(j)/satpsi(soiltype(j)))**(-1./bb(soiltype(j)))
-        else
-          slc_new(j) = 0.0
-        end if
-       enddo
-       where(apply_increments_mask .and. soiltype(j) <= 30 .and. abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
         slc_new = maxsmc(soiltype)*(smp/satpsi(soiltype))**(-1./bb(soiltype))
-       end where
-       where(apply_increments_mask .and. abs(reshape(stc_inc(i,k,:,:), (/itile*jtile/))) .gt. 0.0001 .and. tile_data%stc(istart:iend,k) .lt. con_t0c )
         tile_data%slc(istart:iend,k) = max( min(slc_new, tile_data%smc(istart:iend,k)), 0.0 )
        end where
 
