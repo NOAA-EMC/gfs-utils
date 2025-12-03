@@ -18,17 +18,19 @@
 
  use input_data
  use setup
+ use ip_mod, only: ipolates
 
  implicit none
 
  integer                       :: iret
  integer                       :: ip, ipopt(20)
- integer                       :: km, count_target
- integer                       :: no, ij_target
- logical*1, allocatable        :: bitmap_source(:), bitmap_target(:)
+ integer                       :: num_fields
+ integer, allocatable          :: ibi(:), ibo(:)
+ logical*1, allocatable        :: bitmap_input(:,:), bitmap_output(:,:)
  real, allocatable             :: tref_source_interp(:)
+ real, allocatable             :: data_input(:,:), data_output(:,:)
+ real, allocatable             :: rlat_output(:), rlon_output(:)
  real, allocatable             :: rlat_target_deg(:), rlon_target_deg(:)
- real, allocatable             :: rlat_source_deg(:), rlon_source_deg(:)
 
 !---------------------------------------------------------------------------------
 ! Set up interpolation
@@ -37,18 +39,26 @@
  ip = 0        ! bilinear interpolation
  ipopt = 0
 
- km = 1        ! number of fields to interpolate (just tref)
- no = ij_target
+ num_fields = 1        ! number of fields to interpolate (just tref)
 
 !---------------------------------------------------------------------------------
-! Set up bitmaps (no missing values)
+! Set up bitmaps and input/output arrays (no missing values)
 !---------------------------------------------------------------------------------
 
- allocate(bitmap_source(ij_source))
- bitmap_source = .true.
+ allocate(ibi(num_fields))
+ ibi = 0 ! no bitmap
+ allocate(ibo(num_fields))
+ ibo = 0 ! no bitmap
+ allocate(bitmap_input(ij_source,num_fields))
+ bitmap_input = .true.
+ allocate(bitmap_output(ij_target,num_fields))
+ bitmap_output = .true.
 
- allocate(bitmap_target(ij_target))
- bitmap_target = .false.
+ allocate(data_input(ij_source,num_fields))
+ data_input(:,1) = tref_source
+
+ allocate(data_output(ij_target,num_fields))
+ data_output = 0.0
 
 !---------------------------------------------------------------------------------
 ! Allocate array for interpolated source tref
@@ -58,46 +68,31 @@
  tref_source_interp = 0.0
 
 !---------------------------------------------------------------------------------
-! Convert lat/lon from radians to degrees if necessary
-! (module_ncio typically returns degrees, but check)
+! Allocate lat/lon arrays
 !---------------------------------------------------------------------------------
 
- allocate(rlat_source_deg(ij_source))
- allocate(rlon_source_deg(ij_source))
- allocate(rlat_target_deg(ij_target))
- allocate(rlon_target_deg(ij_target))
-
- rlat_source_deg = rlat_source
- rlon_source_deg = rlon_source
- rlat_target_deg = rlat_target
- rlon_target_deg = rlon_target
+ allocate(rlat_output(ij_target))
+ rlat_output = 0.0
+ allocate(rlon_output(ij_target))
+ rlon_output = 0.0
 
 !---------------------------------------------------------------------------------
 ! Perform interpolation using IPOLATES
 !---------------------------------------------------------------------------------
-
-#ifdef IP_V4
- print*,"INTERPOLATE TREF FROM SOURCE TO TARGET GRID USING IPOLATES (V4)"
- call ipolates(ip, ipopt, kgds_source, kgds_target, &
-               ij_source, ij_target, km, &
-               bitmap_source, tref_source, &
-               no, rlat_target_deg, rlon_target_deg, &
-               tref_source_interp, iret)
-#else
- print*,"INTERPOLATE TREF FROM SOURCE TO TARGET GRID USING IPOLATES"
- call ipolates(ip, ipopt, kgds_source, kgds_target, &
-               ij_source, ij_target, km, &
-               bitmap_source, tref_source, &
-               count_target, &
-               rlat_target_deg, rlon_target_deg, &
-               bitmap_target, tref_source_interp, iret)
-#endif
+ call ipolates(ip, ipopt, kgds_source, kgds_target, ij_source, ij_target, &
+               num_fields, ibi, bitmap_input, data_input, &
+               ij_target, rlat_output, rlon_output, ibo, bitmap_output, &
+               data_output, iret)
 
  if (iret /= 0) then
    print*,"FATAL ERROR IN IPOLATES. IRET IS: ", iret
    stop
  endif
 
+
+ if (iret == 0) then
+   tref_source_interp = data_output(:,num_fields)
+ endif
  print*,'MAX/MIN INTERPOLATED SOURCE TREF: ',maxval(tref_source_interp), minval(tref_source_interp)
 
 !---------------------------------------------------------------------------------
@@ -113,10 +108,11 @@
 ! Clean up
 !---------------------------------------------------------------------------------
 
- deallocate(bitmap_source, bitmap_target)
+ deallocate(ibi, ibo)
+ deallocate(bitmap_input, bitmap_output)
+ deallocate(data_input, data_output)
  deallocate(tref_source_interp)
- deallocate(rlat_source_deg, rlon_source_deg)
- deallocate(rlat_target_deg, rlon_target_deg)
+ deallocate(rlat_output, rlon_output)
 
  end subroutine interpolate_to_target
 
