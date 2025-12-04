@@ -56,8 +56,6 @@
  tref_highres = reshape(work2d,(/ij_input/))
  print*,'MAX/MIN HIGH RES TREF: ',maxval(tref_highres), minval(tref_highres)
 
- deallocate(work2d)
-
  print*,"CLOSE FILE"
  call close_dataset(indset)
  deallocate(work2d)
