@@ -4,6 +4,7 @@ input_data.f90
 interp.F90
 output_data.f90
 setup.f90
+utils.f90
 )
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")

@@ -4,9 +4,44 @@
 
  private
 
+ integer, public                   :: kgds_output(200)
+
+! data on the output grid.
+ real, allocatable, public         :: tref_interp(:)
+ real, allocatable, public         :: rlat_output(:)
+ real, allocatable, public         :: rlon_output(:)
+
+ public                            :: set_output_grid
  public                            :: write_output_data
 
  contains
+
+ subroutine set_output_grid
+
+!-------------------------------------------------------------------
+! Set grid specs on the output grid.
+!-------------------------------------------------------------------
+
+ use setup
+ use input_data
+ use utils
+
+ implicit none
+
+
+ print*
+ print*,"OUTPUT GRID I/J DIMENSIONS: ", i_output, j_output
+
+!-------------------------------------------------------------------
+! Set the grib 1 grid description section, which is needed
+! by the IPOLATES library.
+!-------------------------------------------------------------------
+
+ kgds_output = 0
+
+ call calc_kgds(i_output, j_output, kgds_output)
+
+ end subroutine set_output_grid
 
  subroutine write_output_data
 
@@ -17,7 +52,6 @@
  use netcdf
  use input_data
  use setup
- use interp
 
  implicit none
 
@@ -57,15 +91,15 @@
  endif
 
 !-------------------------------------------------------------------
-! Define dimensions (add 2 to j_target for poles at -90 and 90)
+! Define dimensions (add 2 to j_output for poles at -90 and 90)
 !-------------------------------------------------------------------
 
- j_extended = j_target + 2
+ j_extended = j_output + 2
 
  iret = nf90_def_dim(ncid, lat_name, j_extended, lat_dimid)
  if (iret /= nf90_noerr) stop 'ERROR defining lat dimension'
 
- iret = nf90_def_dim(ncid, lon_name, i_target, lon_dimid)
+ iret = nf90_def_dim(ncid, lon_name, i_output, lon_dimid)
  if (iret /= nf90_noerr) stop 'ERROR defining lon dimension'
 
 !-------------------------------------------------------------------
@@ -117,15 +151,15 @@
 ! Write coordinate variables
 !-------------------------------------------------------------------
 
- allocate(out2d(i_target,j_target))
+ allocate(out2d(i_output,j_output))
 
  print*,"WRITE LAT"
- out2d = reshape(rlat_target, (/i_target,j_target/))
+ out2d = reshape(rlat_output, (/i_output,j_output/))
  
 ! Create extended latitude array with -90 at beginning and 90 at end
  allocate(lat_extended(j_extended))
  lat_extended(1) = -90.0
- lat_extended(2:j_target+1) = out2d(1,:)*rad2deg
+ lat_extended(2:j_output+1) = out2d(1,:)*rad2deg
  lat_extended(j_extended) = 90.0
  
  iret = nf90_put_var(ncid, lat_varid, lat_extended)
@@ -134,7 +168,7 @@
  deallocate(lat_extended)
 
  print*,"WRITE LON"
- out2d = reshape(rlon_target, (/i_target,j_target/))
+ out2d = reshape(rlon_output, (/i_output,j_output/))
  iret = nf90_put_var(ncid, lon_varid, out2d(1,:)*rad2deg)
  if (iret /= nf90_noerr) stop 'ERROR writing lon'
 
@@ -144,25 +178,25 @@
 
  print*,"WRITE DTF"
  deallocate(out2d)
- allocate(out2d(i_target,j_extended))
+ allocate(out2d(i_output,j_extended))
  
 ! Fill with dummy value (0.0) at poles
  out2d(:,1) = 0.0
- out2d(:,2:j_target+1) = reshape(dtf, (/i_target,j_target/))
+ out2d(:,2:j_output+1) = reshape(tref_interp, (/i_output,j_output/))
  out2d(:,j_extended) = 0.0
  
- count = (/ i_target, j_extended /)
+ count = (/ i_output, j_extended /)
  start = (/ 1, 1 /)
  
  iret = nf90_put_var(ncid, dtf_varid, out2d, start, count)
  if (iret /= nf90_noerr) stop 'ERROR writing dtf'
 
  print*,"WRITE MSK"
- allocate(msk2d(i_target,j_extended))
+ allocate(msk2d(i_output,j_extended))
  
 ! Fill with dummy value (0) at poles
  msk2d(:,1) = 0
- msk2d(:,2:j_target+1) = reshape(msk_target, (/i_target,j_target/))
+ msk2d(:,2:j_output+1) = reshape(slmsk_lowres, (/i_output,j_output/))
  msk2d(:,j_extended) = 0
  
  iret = nf90_put_var(ncid, msk_varid, msk2d, start, count)
@@ -176,10 +210,12 @@
  if (iret /= nf90_noerr) stop 'ERROR closing file'
 
  deallocate(out2d, msk2d)
- deallocate(dtf)
- deallocate(msk_target)
+ deallocate(tref_interp)
+ deallocate(slmsk_lowres)
 
  print*,"*** SUCCESS writing dtf file ", trim(output_file), "!"
+
+ return
 
  end subroutine write_output_data
 

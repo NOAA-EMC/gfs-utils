@@ -8,13 +8,10 @@
  character(len=300), public       :: sfcf006_file
  character(len=300), public       :: output_file
 
- integer, public  :: i_target
- integer, public  :: j_target
- integer, public  :: ij_target
-
- integer, public  :: i_source
- integer, public  :: j_source
- integer, public  :: ij_source
+ integer, public  :: i_output
+ integer, public  :: j_output
+ integer                , public  :: ij_output
+ logical, public :: cld_amt
 
  public                           :: program_setup
 
@@ -27,7 +24,7 @@
  integer                           :: istat
  character(len=500)                :: filenamelist
 
- namelist /tref_calc_setup/ sfcanl_file, sfcf006_file, output_file
+ namelist /tref_calc_setup/ i_output, j_output, sfcanl_file, sfcf006_file, output_file
 
  print*
  call getarg(1,filenamelist)
@@ -44,6 +41,8 @@
    print*,"FATAL ERROR READING NAMELIST FILE. ISTAT IS: ",istat
    stop
  endif
+
+ ij_output = i_output * j_output
 
  close(43)
 
