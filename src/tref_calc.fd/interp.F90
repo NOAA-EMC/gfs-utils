@@ -22,7 +22,7 @@
 
  implicit none
 
- integer                       :: iret
+ integer                       :: iret, numpts
  integer                       :: ip, ipopt(20)
  integer                       :: num_fields
  integer, allocatable          :: ibi(:), ibo(:)
@@ -55,7 +55,8 @@
  bitmap_output = .true.
 
  allocate(data_input(ij_source,num_fields))
- data_input(:,1) = tref_source
+ data_input(:,1) = tref_source(:)
+ deallocate(tref_source)
 
  allocate(data_output(ij_target,num_fields))
  data_output = 0.0
@@ -81,7 +82,7 @@
 !---------------------------------------------------------------------------------
  call ipolates(ip, ipopt, kgds_source, kgds_target, ij_source, ij_target, &
                num_fields, ibi, bitmap_input, data_input, &
-               ij_target, rlat_output, rlon_output, ibo, bitmap_output, &
+               numpts, rlat_output, rlon_output, ibo, bitmap_output, &
                data_output, iret)
 
  if (iret /= 0) then

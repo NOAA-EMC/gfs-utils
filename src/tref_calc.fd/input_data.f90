@@ -149,40 +149,28 @@
 
  end subroutine read_input_data
 
- subroutine calc_kgds(im, jm, kgds)
-!------------------------------------------------------------------
-! Create the grib 1 grid description section for a global
-! gaussian grid.
-!------------------------------------------------------------------
+  subroutine calc_kgds(idim, jdim, kgds)
 
  implicit none
 
- integer, intent(in)               :: im, jm
- integer, intent(inout)            :: kgds(200)
+ integer, intent(in)  :: idim, jdim
 
- integer                           :: kscan=0, nscan=0, jm2
- real                              :: dx, dy
- real, parameter                   :: PI=3.14159265358979323
+ integer, intent(out)                 :: kgds(200)
 
- kgds=0
-
- kgds(1)=4          ! oct 6, type of grid (gaussian)
- kgds(2)=im         ! oct 7-8, # pts on latitude circle
- jm2 = jm/2
- kgds(3)=jm2        ! oct 9-10, # pts on longitude meridian
- kgds(4)=90000      ! oct 11-13, lat of origin
- kgds(5)=0          ! oct 14-16, lon of origin
- kgds(6)=128        ! oct 17, resolution flag
- kgds(7)=-90000     ! oct 18-20, lat of extreme point
- dx = float(360*1000)/float(im)
- kgds(8)=nint(dx)   ! oct 21-23, lon of extreme point
- dy = float(jm2)
- kgds(9)=nint(dy)   ! oct 24-25, number of circles pole to equator
- kgds(10)=0         ! oct 26-27, not used
- kgds(11)=kscan     ! oct 28, scanning mode flag
- kgds(12) = nscan   ! oct 29-32, not used
- kgds(20)=255       ! oct 5, not used
- kgds(21) = jm      ! full number of latitude points
+ kgds     = 0
+ kgds(1)  = 4                       ! OCT 6 - TYPE OF GRID (GAUSSIAN)
+ kgds(2)  = idim                    ! OCT 7-8 - # PTS ON LATITUDE CIRCLE
+ kgds(3)  = jdim                    ! OCT 9-10 - # PTS ON LONGITUDE CIRCLE
+ kgds(4)  = 90000                   ! OCT 11-13 - LAT OF ORIGIN
+ kgds(5)  = 0                       ! OCT 14-16 - LON OF ORIGIN
+ kgds(6)  = 128                     ! OCT 17 - RESOLUTION FLAG
+ kgds(7)  = -90000                  ! OCT 18-20 - LAT OF EXTREME POINT
+ kgds(8)  = nint(-360000./idim)     ! OCT 21-23 - LON OF EXTREME POINT
+ kgds(9)  = nint((360.0 / float(idim))*1000.0)
+                                          ! OCT 24-25 - LONGITUDE DIRECTION INCR.
+ kgds(10) = jdim/2                  ! OCT 26-27 - NUMBER OF CIRCLES POLE TO EQUATOR
+ kgds(12) = 255                     ! OCT 29 - RESERVED
+ kgds(20) = 255                     ! OCT 5  - NOT USED, SET TO 255
 
  end subroutine calc_kgds
 
