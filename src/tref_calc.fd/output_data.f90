@@ -60,12 +60,11 @@
  integer                           :: lat_varid, lon_varid
  integer                           :: dtf_varid, msk_varid
  integer, dimension(2)             :: start, count, dimids
- real, allocatable                 :: out2d(:,:)
- integer, allocatable              :: msk2d(:,:)
+ real, allocatable                 :: out2d(:,:), out2dflip(:,:)
+ integer, allocatable              :: msk2d(:,:), msk2dflip(:,:)
  real, allocatable                 :: lat_extended(:)
  integer                           :: j_extended
- real, parameter                   :: rad2deg = 57.2957795130823
- integer                           :: iret
+ integer                           :: iflip, iret
 
  character (len = *), parameter :: lat_name = "latitude"
  character (len = *), parameter :: lon_name = "longitude"
@@ -159,7 +158,8 @@
 ! Create extended latitude array with -90 at beginning and 90 at end
  allocate(lat_extended(j_extended))
  lat_extended(1) = -90.0
- lat_extended(2:j_output+1) = out2d(1,:)*rad2deg
+ lat_extended(2:j_output+1) = out2d(1, j_output:1:-1)
+
  lat_extended(j_extended) = 90.0
  
  iret = nf90_put_var(ncid, lat_varid, lat_extended)
@@ -169,7 +169,7 @@
 
  print*,"WRITE LON"
  out2d = reshape(rlon_output, (/i_output,j_output/))
- iret = nf90_put_var(ncid, lon_varid, out2d(1,:)*rad2deg)
+ iret = nf90_put_var(ncid, lon_varid, out2d(1,j_output:1:-1))
  if (iret /= nf90_noerr) stop 'ERROR writing lon'
 
 !-------------------------------------------------------------------
@@ -178,7 +178,7 @@
 
  print*,"WRITE DTF"
  deallocate(out2d)
- allocate(out2d(i_output,j_extended))
+ allocate(out2d(i_output,j_extended), out2dflip(i_output,j_extended))
  
 ! Fill with dummy value (0.0) at poles
  out2d(:,1) = 0.0
@@ -188,18 +188,26 @@
  count = (/ i_output, j_extended /)
  start = (/ 1, 1 /)
  
- iret = nf90_put_var(ncid, dtf_varid, out2d, start, count)
+ do iflip=1,i_output
+   out2dflip(iflip,:) = out2d(iflip, j_extended:1:-1)
+ enddo
+
+ iret = nf90_put_var(ncid, dtf_varid, out2dflip, start, count)
  if (iret /= nf90_noerr) stop 'ERROR writing dtf'
 
  print*,"WRITE MSK"
- allocate(msk2d(i_output,j_extended))
+ allocate(msk2d(i_output,j_extended),msk2dflip(i_output,j_extended))
  
 ! Fill with dummy value (0) at poles
- msk2d(:,1) = 0
+ msk2d(:,1) = 1
  msk2d(:,2:j_output+1) = reshape(slmsk_lowres, (/i_output,j_output/))
- msk2d(:,j_extended) = 0
+ msk2d(:,j_extended) = 1
  
- iret = nf90_put_var(ncid, msk_varid, msk2d, start, count)
+ do iflip=1,i_output
+   msk2dflip(iflip,:) = msk2d(iflip, j_extended:1:-1)
+ enddo
+
+ iret = nf90_put_var(ncid, msk_varid, int(msk2dflip, kind=1), start, count)
  if (iret /= nf90_noerr) stop 'ERROR writing msk'
 
 !-------------------------------------------------------------------
