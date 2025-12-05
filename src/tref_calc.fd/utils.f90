@@ -127,9 +127,9 @@
 !C$$$
       REAL ZS(IM),PS(IM),P(IM,KM),T(IM,KM),Q(IM,KM)
       REAL ZSNEW(IM),PSNEW(IM)
-      PARAMETER(BETA=-6.5E-3,EPSILON=1.E-9)
-      PARAMETER(G=9.80665,RD=287.05,RV=461.50)
-      PARAMETER(GOR=G/RD,FV=RV/RD-1.)
+      real, parameter :: BETA = -6.5E-3, EPSILON = 1.E-9
+      real, parameter :: G = 9.80665, RD = 287.05, RV = 461.50
+      real, parameter :: GOR = G/RD, FV = RV/RD-1.
       REAL ZU(IM)
       FTV(AT,AQ)=AT*(1+FV*AQ)
       FGAM(APU,ATVU,APD,ATVD)=-GOR*LOG(ATVD/ATVU)/LOG(APD/APU)
