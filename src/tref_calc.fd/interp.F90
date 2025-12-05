@@ -32,7 +32,7 @@
  logical                 :: same_grid
 
  real, allocatable       :: data_input(:,:)
- real, allocatable       :: data_output(:,:), crot(:), srot(:)
+ real, allocatable       :: data_output(:,:)
 
  same_grid=.true.
  do i = 1, 11
