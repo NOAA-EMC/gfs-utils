@@ -18,7 +18,7 @@
  use input_data
  use setup
 #ifdef IP_V4
- use ip_mod, only: ipolates, ipolatev
+ use ip_mod, only: ipolates
 #endif
 
  implicit none
@@ -100,7 +100,10 @@
                num_fields, ibi, bitmap_input, data_input,  &
                numpts, rlat_output, rlon_output, ibo, bitmap_output, &
                data_output, iret)
- if (iret /= 0) goto 89
+ if (iret /= 0)
+   print*,"FATAL ERROR IN IPOLATES. IRET IS: ", iret
+   call errexit(23)
+ end if 
 
  allocate(tref_interp(ij_output))
  tref_interp = data_output(:,num_fields) - tref_lowres(:)
@@ -111,10 +114,6 @@
  endif
 
  return
-
- 89 continue
- print*,"FATAL ERROR IN IPOLATES. IRET IS: ", iret
- call errexit(23)
 
  end subroutine gaus_to_gaus
 

@@ -45,7 +45,7 @@
 
  ij_input = i_input * j_input
 
-  print*
+ print*
  print*,"READ TREF FROM input FILE"
  call read_vardata(indset, 'tref', work2d)
 
