@@ -36,80 +36,80 @@
 
  same_grid=.true.
  do i = 1, 11
-   if (kgds_input(i) /= kgds_output(i)) then
-     same_grid=.false.
-     exit
-   endif
+  if (kgds_input(i) /= kgds_output(i)) then
+    same_grid=.false.
+    exit
+  endif
  enddo
 
  if (same_grid) then
 
-   print*
-   print*,'INPUT AND OUTPUT GRIDS ARE THE SAME.'
-   print*,'NO HORIZ INTERPOLATION REQUIRED.'
+    print*
+    print*,'INPUT AND OUTPUT GRIDS ARE THE SAME.'
+    print*,'NO HORIZ INTERPOLATION REQUIRED.'
 
-   allocate(tref_interp(ij_output))
-   tref_interp = tref_highres
-   
-   
-   deallocate(tref_highres)
+    allocate(tref_interp(ij_output))
+    tref_interp = tref_highres
+    
+    
+    deallocate(tref_highres)
 
- else
+  else
 
-   print*
-   print*,'INTERPOLATE DATA TO OUTPUT GRID'
+    print*
+    print*,'INTERPOLATE DATA TO OUTPUT GRID'
 
 
- ip    = 0   ! bilinear
- ipopt = 0
+    ip    = 0   ! bilinear
+    ipopt = 0
 
-!----------------------------------------------------------------------------------
-! Do 2-D fields first
-!----------------------------------------------------------------------------------
+    !----------------------------------------------------------------------------------
+    ! Do 2-D fields first
+    !----------------------------------------------------------------------------------
 
- num_fields = 1
+    num_fields = 1
 
- allocate(ibi(num_fields))
- ibi = 0 ! no bitmap
- allocate(ibo(num_fields))
- ibo = 0 ! no bitmap
+    allocate(ibi(num_fields))
+    ibi = 0 ! no bitmap
+    allocate(ibo(num_fields))
+    ibo = 0 ! no bitmap
 
- allocate(bitmap_input(ij_input,num_fields))
- bitmap_input = .true.
- allocate(bitmap_output(ij_output,num_fields))
- bitmap_output = .true.
+    allocate(bitmap_input(ij_input,num_fields))
+    bitmap_input = .true.
+    allocate(bitmap_output(ij_output,num_fields))
+    bitmap_output = .true.
 
- allocate(rlat_output(ij_output))
- rlat_output = 0.0
- allocate(rlon_output(ij_output))
- rlon_output = 0.0
+    allocate(rlat_output(ij_output))
+    rlat_output = 0.0
+    allocate(rlon_output(ij_output))
+    rlon_output = 0.0
 
-!----------------
-! Tref
-!----------------
+    !----------------
+    ! Tref
+    !----------------
 
- allocate(data_input(ij_input,num_fields))
- data_input(:,num_fields) = tref_highres(:)
- deallocate(tref_highres)
+    allocate(data_input(ij_input,num_fields))
+    data_input(:,num_fields) = tref_highres(:)
+    deallocate(tref_highres)
 
- allocate(data_output(ij_output,num_fields))
- data_output = 0
+    allocate(data_output(ij_output,num_fields))
+    data_output = 0
 
- print*,"INTERPOLATE TREF"
- call ipolates(ip, ipopt, kgds_input, kgds_output, ij_input, ij_output,&
-               num_fields, ibi, bitmap_input, data_input,  &
-               numpts, rlat_output, rlon_output, ibo, bitmap_output, &
-               data_output, iret)
- if (iret /= 0)
-   print*,"FATAL ERROR IN IPOLATES. IRET IS: ", iret
-   call errexit(23)
- end if 
+    print*,"INTERPOLATE TREF"
+    call ipolates(ip, ipopt, kgds_input, kgds_output, ij_input, ij_output,&
+                  num_fields, ibi, bitmap_input, data_input,  &
+                  numpts, rlat_output, rlon_output, ibo, bitmap_output, &
+                  data_output, iret)
+    if (iret /= 0) then
+      print*,"FATAL ERROR IN IPOLATES. IRET IS: ", iret
+      call errexit(23)
+    endif
 
- allocate(tref_interp(ij_output))
- tref_interp = data_output(:,num_fields) - tref_lowres(:)
- 
+    allocate(tref_interp(ij_output))
+    tref_interp = data_output(:,num_fields) - tref_lowres(:)
 
- deallocate (ibi, ibo, bitmap_input, bitmap_output)
+
+    deallocate (ibi, ibo, bitmap_input, bitmap_output)
 
  endif
 
