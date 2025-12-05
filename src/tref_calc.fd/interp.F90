@@ -51,8 +51,6 @@
    allocate(tref_interp(ij_output))
    tref_interp = tref_highres
    
-   ! Set values to 0 where absolute value is greater than 1
-   where (abs(tref_interp) > 1.0) tref_interp = 0.0
    
    deallocate(tref_highres)
 
@@ -107,8 +105,6 @@
  allocate(tref_interp(ij_output))
  tref_interp = data_output(:,num_fields) - tref_lowres(:)
  
- ! Set values to 0 where absolute value is greater than 1
- where (abs(tref_interp) > 1.0) tref_interp = 0.0
 
  deallocate (ibi, ibo, bitmap_input, bitmap_output)
 
