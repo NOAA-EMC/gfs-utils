@@ -30,11 +30,9 @@
 
  implicit none
 
- integer :: vlev,rvlev
  type(Dataset) :: indset
  type(Dimension) :: ncdim
  real, allocatable                            :: work2d(:,:)
- integer iret
 
  print*
  print*,"OPEN INPUT FILE: ",trim(sfcanl_file)
