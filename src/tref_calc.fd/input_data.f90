@@ -16,7 +16,6 @@
  real, allocatable, public                    :: tref_lowres(:)
  integer, allocatable, public                 :: slmsk_lowres(:)
 
- real  :: missing_value=1.e30
 
  public                                       :: read_input_data
 
