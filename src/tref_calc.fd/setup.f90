@@ -11,7 +11,6 @@
  integer, public  :: i_output
  integer, public  :: j_output
  integer                , public  :: ij_output
- logical, public :: cld_amt
 
  public                           :: program_setup
 
