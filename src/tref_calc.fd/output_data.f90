@@ -62,6 +62,7 @@
  integer, dimension(2)             :: start, count, dimids
  real, allocatable                 :: out2d(:,:), out2dflip(:,:)
  integer, allocatable              :: msk2d(:,:), msk2dflip(:,:)
+ integer(1), allocatable           :: mskbyte(:,:)
  real, allocatable                 :: lat_extended(:)
  integer                           :: j_extended
  integer                           :: iflip, iret
@@ -169,7 +170,7 @@
 
  print*,"WRITE LON"
  out2d = reshape(rlon_output, (/i_output,j_output/))
- iret = nf90_put_var(ncid, lon_varid, out2d(1,j_output:1:-1))
+ iret = nf90_put_var(ncid, lon_varid, out2d(:,1))
  if (iret /= nf90_noerr) stop 'ERROR writing lon'
 
 !-------------------------------------------------------------------
@@ -199,15 +200,18 @@
  allocate(msk2d(i_output,j_extended),msk2dflip(i_output,j_extended))
  
 ! Fill with dummy value (0) at poles
- msk2d(:,1) = 1
+ msk2d(:,1) = 2
  msk2d(:,2:j_output+1) = reshape(slmsk_lowres, (/i_output,j_output/))
  msk2d(:,j_extended) = 1
  
  do iflip=1,i_output
    msk2dflip(iflip,:) = msk2d(iflip, j_extended:1:-1)
  enddo
+ 
+ allocate(mskbyte(i_output, j_extended))
+ mskbyte = int(msk2dflip, kind=1)
 
- iret = nf90_put_var(ncid, msk_varid, int(msk2dflip, kind=1), start, count)
+ iret = nf90_put_var(ncid, msk_varid, mskbyte, start, count)
  if (iret /= nf90_noerr) stop 'ERROR writing msk'
 
 !-------------------------------------------------------------------
