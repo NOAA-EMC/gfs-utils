@@ -15,3 +15,4 @@
        'so',3,'Ct' , 'bilinear' , '', '','','Sea Water Salinity','psu',0,0,0,0,0,0,0,0
        'uo',3,'Cu' , 'bilinear' , 'vo' , 'Cv','','Sea Water X Velocity','m s-1',0,0,0,0,0,0,0,0
        'vo',3,'Cv' , 'bilinear' , 'uo' , 'Cu','','Sea Water Y Velocity','m s-1',0,0,0,0,0,0,0,0
+     'ePBL',2,'Ct' , 'bilinear' , '', '','','Surface boundary layer depth','m',0,0,0,0,0,0,0,0
