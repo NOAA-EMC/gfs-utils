@@ -1,6 +1,7 @@
 ! variable name, dimension, grid location, remapping method, vector pair, grid location of vector pair,gb2 varname,discription,unit,gc1,gc2,gc3,gc4,gc5,gc6,gc7,gc8
       'SSH',2,'Ct' , 'bilinear' , '', '','','Sea Surface Height','m',0,0,0,0,0,0,0,0
       'SST',2,'Ct' , 'bilinear' , '', '','','Sea Surface Temperature','degC',0,0,0,0,0,0,0,0
+    'speed',2,'Ct' , 'bilinear' , '', '','','Sea Surface Speed','m s-1',0,0,0,0,0,0,0,0
   'MLD_003',2,'Ct' , 'bilinear' , '', '','','Mixed layer depth (delta rho = 0.03)','m',0,0,0,0,0,0,0,0
  'MLD_0125',2,'Ct' , 'bilinear' , '', '','','Mixed layer depth (delta rho = 0.125)','m',0,0,0,0,0,0,0,0
    'latent',2,'Ct' , 'conserve' , '', '','','Latent heat flux into ocean due to fusion and evaporation (negative means ocean heat loss)','W m-2',0,0,0,0,0,0,0,0
