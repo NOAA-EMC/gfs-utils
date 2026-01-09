@@ -254,12 +254,6 @@ if(nfiles.gt.2) then
       print *, '   '; print *,' variable has member',inum; print *, '   '
       if(inum.gt.navg_min) then
 
-        ! Skip variables total accumulated APCP               
-
-        if(ipd1.eq.1.and.ipd2.eq.8.and.ipd9.eq.0.and.ipd30.gt.0) then
-           print *, '   '; print *,' Skip variables total accumulated APCP '; print *, '   '
-        else
-
         print *, '   '; print *,  ' Combined Ensemble Data Example at Point 8601 '
         write (*,'(10f8.1)') (fgrid(8601,i),i=1,inum)
         print *, '   '
@@ -376,7 +370,6 @@ if(nfiles.gt.2) then
         call putgb2(icfopg2,gfldo,jret)
         call printinfr(gfldo,icount)
 
-        endif   ! skip toral accumulated APCP variable
         ! end of probability forecast calculation
 
       endif   ! inum.gt.navg_min
