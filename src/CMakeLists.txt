@@ -10,6 +10,7 @@ add_subdirectory(syndat_qctropcy.fd)
 add_subdirectory(syndat_maksynrc.fd)
 add_subdirectory(syndat_getjtbul.fd)
 add_subdirectory(supvit.fd)
+add_subdirectory(tref_calc.fd)
 
 add_subdirectory(mkgfsawps.fd)
 add_subdirectory(overgridid.fd)

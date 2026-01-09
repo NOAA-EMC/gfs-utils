@@ -1,7 +1,6 @@
 ! variable name, dimension, grid location, remapping method, vector pair, grid location of vector pair,gb2 varname,discription,unit,gc1,gc2,gc3,gc4,gc5,gc6,gc7,gc8
       'SSH',2,'Ct' , 'bilinear' , '', '','','Sea Surface Height','m',0,0,0,0,0,0,0,0
       'SST',2,'Ct' , 'bilinear' , '', '','','Sea Surface Temperature','degC',0,0,0,0,0,0,0,0
-      'SSS',2,'Ct' , 'bilinear' , '', '','','Sea Surface Salinity','psu',0,0,0,0,0,0,0,0
     'speed',2,'Ct' , 'bilinear' , '', '','','Sea Surface Speed','m s-1',0,0,0,0,0,0,0,0
   'MLD_003',2,'Ct' , 'bilinear' , '', '','','Mixed layer depth (delta rho = 0.03)','m',0,0,0,0,0,0,0,0
  'MLD_0125',2,'Ct' , 'bilinear' , '', '','','Mixed layer depth (delta rho = 0.125)','m',0,0,0,0,0,0,0,0
@@ -9,20 +8,12 @@
  'sensible',2,'Ct' , 'conserve' , '', '','','Sensible heat flux into ocean','W m-2',0,0,0,0,0,0,0,0
        'SW',2,'Ct' , 'conserve' , '', '','','Shortwave radiation flux into ocean','W m-2',0,0,0,0,0,0,0,0
        'LW',2,'Ct' , 'conserve' , '', '','','Longwave radiation flux into ocean','W m-2',0,0,0,0,0,0,0,0
-'LwLatSens',2,'Ct' , 'conserve' , '', '','','Combined longwave, latent, and sensible heating at ocean surface','W m-2',0,0,0,0,0,0,0,0
- 'Heat_PmE',2,'Ct' , 'conserve' , '', '','','Heat flux into ocean from mass flux into ocean','W m-2',0,0,0,0,0,0,0,0
       'SSU',2,'Cu' , 'bilinear' , 'SSV'  , 'Cv','','Sea Surface Zonal Velocity','m s-1',0,0,0,0,0,0,0,0
       'SSV',2,'Cv' , 'bilinear' , 'SSU'  , 'Cu','','Sea Surface Meridional Velocity','m s-1',0,0,0,0,0,0,0,0
      'taux',2,'Cu' , 'conserve' , 'tauy' , 'Cv','','Zonal surface stress from ocean interactions with atmos and ice','Pa',0,0,0,0,0,0,0,0
      'tauy',2,'Cv' , 'conserve' , 'taux' , 'Cu','','Meridional surface stress ocean interactions with atmos and ice','Pa',0,0,0,0,0,0,0,0
-     'tob', 2,'Ct' , 'bilinear' , '', '','','Sea Water Potential Temperature at Sea Floor','degC',0,0,0,0,0,0,0,0
      'temp',3,'Ct' , 'bilinear' , '', '','','Potential Temperature','degC',0,0,0,0,0,0,0,0
        'so',3,'Ct' , 'bilinear' , '', '','','Sea Water Salinity','psu',0,0,0,0,0,0,0,0
        'uo',3,'Cu' , 'bilinear' , 'vo' , 'Cv','','Sea Water X Velocity','m s-1',0,0,0,0,0,0,0,0
        'vo',3,'Cv' , 'bilinear' , 'uo' , 'Cu','','Sea Water Y Velocity','m s-1',0,0,0,0,0,0,0,0
-   'frazil',2,'Ct' , 'conserve' , '', '','','Heat from frazil formation','W m-2',0,0,0,0,0,0,0,0
      'ePBL',2,'Ct' , 'bilinear' , '', '','','Surface boundary layer depth','m',0,0,0,0,0,0,0,0
-     'evap',2,'Ct' , 'conserve' , '', '','','Evaporation/condensation at ocean surface (evaporation is negative)','kg m-2 s-1',0,0,0,0,0,0,0,0
-    'lprec',2,'Ct' , 'conserve' , '', '','','Liquid precipitation into ocean','kg m-2 s-1',0,0,0,0,0,0,0,0
-  'lrunoff',2,'Ct' , 'conserve' , '', '','','Liquid runoff (rivers) into ocean','kg m-2 s-1',0,0,0,0,0,0,0,0
-    'fprec',2,'Ct' , 'conserve' , '', '','','Frozen precipitation into ocean','kg m-2 s-1',0,0,0,0,0,0,0,0

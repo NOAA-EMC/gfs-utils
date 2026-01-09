@@ -1,0 +1,234 @@
+ module output_data
+
+ implicit none
+
+ private
+
+ integer, public                   :: kgds_output(200)
+
+! data on the output grid.
+ real, allocatable, public         :: tref_interp(:)
+ real, allocatable, public         :: rlat_output(:)
+ real, allocatable, public         :: rlon_output(:)
+
+ public                            :: set_output_grid
+ public                            :: write_output_data
+
+ contains
+
+ subroutine set_output_grid
+
+!-------------------------------------------------------------------
+! Set grid specs on the output grid.
+!-------------------------------------------------------------------
+
+ use setup
+ use input_data
+ use utils
+
+ implicit none
+
+
+ print*
+ print*,"OUTPUT GRID I/J DIMENSIONS: ", i_output, j_output
+
+!-------------------------------------------------------------------
+! Set the grib 1 grid description section, which is needed
+! by the IPOLATES library.
+!-------------------------------------------------------------------
+
+ kgds_output = 0
+
+ call calc_kgds(i_output, j_output, kgds_output)
+
+ end subroutine set_output_grid
+
+ subroutine write_output_data
+
+!-------------------------------------------------------------------
+! Write dtf to a netcdf file matching write_tf_inc_nc format.
+!-------------------------------------------------------------------
+
+ use netcdf
+ use input_data
+ use setup
+
+ implicit none
+
+ integer                           :: ncid
+ integer                           :: lat_dimid, lon_dimid
+ integer                           :: lat_varid, lon_varid
+ integer                           :: dtf_varid, msk_varid
+ integer, dimension(2)             :: start, count, dimids
+ real, allocatable                 :: out2d(:,:), out2dflip(:,:)
+ integer, allocatable              :: msk2d(:,:), msk2dflip(:,:)
+ integer(1), allocatable           :: mskbyte(:,:)
+ real, allocatable                 :: lat_extended(:)
+ integer                           :: j_extended
+ integer                           :: iflip, iret
+
+ character (len = *), parameter :: lat_name = "latitude"
+ character (len = *), parameter :: lon_name = "longitude"
+ character (len = *), parameter :: dtf_name = "dtf"
+ character (len = *), parameter :: msk_name = "msk"
+ character (len = *), parameter :: units = "units"
+ character (len = *), parameter :: dtf_units = "kelvin"
+ character (len = *), parameter :: msk_units = "none"
+ character (len = *), parameter :: lat_units = "degrees_north"
+ character (len = *), parameter :: lon_units = "degrees_east"
+
+!-------------------------------------------------------------------
+! Create output file
+!-------------------------------------------------------------------
+
+ print*
+ print*,'CREATE OUTPUT FILE: ',trim(output_file)
+ 
+ iret = nf90_create(trim(output_file), cmode=ior(nf90_clobber,nf90_64bit_offset), ncid=ncid)
+ if (iret /= nf90_noerr) then
+   print*,'ERROR creating file: ',trim(nf90_strerror(iret))
+   stop
+ endif
+
+!-------------------------------------------------------------------
+! Define dimensions (add 2 to j_output for poles at -90 and 90)
+!-------------------------------------------------------------------
+
+ j_extended = j_output + 2
+
+ iret = nf90_def_dim(ncid, lat_name, j_extended, lat_dimid)
+ if (iret /= nf90_noerr) stop 'ERROR defining lat dimension'
+
+ iret = nf90_def_dim(ncid, lon_name, i_output, lon_dimid)
+ if (iret /= nf90_noerr) stop 'ERROR defining lon dimension'
+
+!-------------------------------------------------------------------
+! Define coordinate variables
+!-------------------------------------------------------------------
+
+ iret = nf90_def_var(ncid, lat_name, nf90_real, lat_dimid, lat_varid)
+ if (iret /= nf90_noerr) stop 'ERROR defining lat variable'
+
+ iret = nf90_def_var(ncid, lon_name, nf90_real, lon_dimid, lon_varid)
+ if (iret /= nf90_noerr) stop 'ERROR defining lon variable'
+
+!-------------------------------------------------------------------
+! Assign units to coordinate variables
+!-------------------------------------------------------------------
+
+ iret = nf90_put_att(ncid, lat_varid, units, lat_units)
+ if (iret /= nf90_noerr) stop 'ERROR defining lat units'
+
+ iret = nf90_put_att(ncid, lon_varid, units, lon_units)
+ if (iret /= nf90_noerr) stop 'ERROR defining lon units'
+
+!-------------------------------------------------------------------
+! Define dtf variable
+!-------------------------------------------------------------------
+
+ dimids = (/ lon_dimid, lat_dimid /)
+
+ iret = nf90_def_var(ncid, dtf_name, nf90_double, dimids, dtf_varid)
+ if (iret /= nf90_noerr) stop 'ERROR defining dtf variable'
+
+ iret = nf90_def_var(ncid, msk_name, nf90_byte, dimids, msk_varid)
+ if (iret /= nf90_noerr) stop 'ERROR defining msk variable'
+
+ iret = nf90_put_att(ncid, dtf_varid, units, dtf_units)
+ if (iret /= nf90_noerr) stop 'ERROR defining dtf units'
+
+ iret = nf90_put_att(ncid, msk_varid, units, msk_units)
+ if (iret /= nf90_noerr) stop 'ERROR defining msk units'
+
+!-------------------------------------------------------------------
+! End define mode
+!-------------------------------------------------------------------
+
+ iret = nf90_enddef(ncid)
+ if (iret /= nf90_noerr) stop 'ERROR ending define mode'
+
+!-------------------------------------------------------------------
+! Write coordinate variables
+!-------------------------------------------------------------------
+
+ allocate(out2d(i_output,j_output))
+
+ print*,"WRITE LAT"
+ out2d = reshape(rlat_output, (/i_output,j_output/))
+ 
+! Create extended latitude array with -90 at beginning and 90 at end
+ allocate(lat_extended(j_extended))
+ lat_extended(1) = -90.0
+ lat_extended(2:j_output+1) = out2d(1, j_output:1:-1)
+
+ lat_extended(j_extended) = 90.0
+ 
+ iret = nf90_put_var(ncid, lat_varid, lat_extended)
+ if (iret /= nf90_noerr) stop 'ERROR writing lat'
+ 
+ deallocate(lat_extended)
+
+ print*,"WRITE LON"
+ out2d = reshape(rlon_output, (/i_output,j_output/))
+ iret = nf90_put_var(ncid, lon_varid, out2d(:,1))
+ if (iret /= nf90_noerr) stop 'ERROR writing lon'
+
+!-------------------------------------------------------------------
+! Write dtf variable (with extended dimension for poles)
+!-------------------------------------------------------------------
+
+ print*,"WRITE DTF"
+ deallocate(out2d)
+ allocate(out2d(i_output,j_extended), out2dflip(i_output,j_extended))
+ 
+! Fill with dummy value (0.0) at poles
+ out2d(:,1) = 0.0
+ out2d(:,2:j_output+1) = reshape(tref_interp, (/i_output,j_output/))
+ out2d(:,j_extended) = 0.0
+ 
+ count = (/ i_output, j_extended /)
+ start = (/ 1, 1 /)
+ 
+ do iflip=1,i_output
+   out2dflip(iflip,:) = out2d(iflip, j_extended:1:-1)
+ enddo
+
+ iret = nf90_put_var(ncid, dtf_varid, out2dflip, start, count)
+ if (iret /= nf90_noerr) stop 'ERROR writing dtf'
+
+ print*,"WRITE MSK"
+ allocate(msk2d(i_output,j_extended),msk2dflip(i_output,j_extended))
+ 
+! Fill with dummy value (0) at poles
+ msk2d(:,1) = 2
+ msk2d(:,2:j_output+1) = reshape(slmsk_lowres, (/i_output,j_output/))
+ msk2d(:,j_extended) = 1
+ 
+ do iflip=1,i_output
+   msk2dflip(iflip,:) = msk2d(iflip, j_extended:1:-1)
+ enddo
+ 
+ allocate(mskbyte(i_output, j_extended))
+ mskbyte = int(msk2dflip, kind=1)
+
+ iret = nf90_put_var(ncid, msk_varid, mskbyte, start, count)
+ if (iret /= nf90_noerr) stop 'ERROR writing msk'
+
+!-------------------------------------------------------------------
+! Close file
+!-------------------------------------------------------------------
+
+ iret = nf90_close(ncid)
+ if (iret /= nf90_noerr) stop 'ERROR closing file'
+
+ deallocate(out2d, msk2d)
+ deallocate(tref_interp)
+ deallocate(slmsk_lowres)
+
+ print*,"*** SUCCESS writing dtf file ", trim(output_file), "!"
+
+ return
+
+ end subroutine write_output_data
+
+ end module output_data
