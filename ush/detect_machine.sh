@@ -40,6 +40,8 @@ case $(hostname -f) in
 
   derecho[1-8]) MACHINE_ID=derecho ;; ### derecho1-8
 
+  ip-*) MACHINE_ID=aws-ec2 ;; ### aws-ec2
+
   Orion-login-[1-4].HPC.MsState.Edu) MACHINE_ID=orion ;; ### orion1-4
 
   [Hh]ercules-login-[1-4].[Hh][Pp][Cc].[Mm]s[Ss]tate.[Ee]du) MACHINE_ID=hercules ;; ### hercules1-4
