@@ -65,30 +65,35 @@ contains
     character(len=20) :: subname = 'packarrays2d'
 
     fields=0.0
-
     if (debug)write(logunit,'(a)')'enter '//trim(subname)
-    ! obtain vector pairs and create packed arrays
+    ! obtain vector pairs
     do n = 1,nflds
-      if (len_trim(vars(n)%var_pair) == 0) then
-        call getfield(trim(filesrc), trim(vars(n)%var_name), dims=(/dims(1),dims(2)/), &
-               field=fields(:,n))
+       if (trim(vars(n)%var_grid) == 'Cu' .or. trim(vars(n)%var_grid) == 'Bu_x') then
+          allocate(vecpair(dims(1)*dims(2),2)); vecpair = 0.0
+          call getvecpair(trim(filesrc), trim(wgtsdir), cosrot, sinrot,   &
+               trim(vars(n)%var_name), trim(vars(n)%var_grid(1:2)), &
+               trim(vars(n)%var_pair), trim(vars(n)%var_pair_grid(1:2)),  &
+               dims=(/dims(1),dims(2)/), vecpair=vecpair)
+       end if
+    end do
 
-      else if (trim(vars(n)%var_grid) == 'Cu' .or. trim(vars(n)%var_grid) == 'Bu_x') then
-        allocate(vecpair(dims(1)*dims(2),2)); vecpair = 0.0
-        call getvecpair(trim(filesrc), trim(wgtsdir), cosrot, sinrot,   &
-                 trim(vars(n)%var_name), trim(vars(n)%var_grid(1:2)), &
-                 trim(vars(n)%var_pair), trim(vars(n)%var_pair_grid(1:2)),  &
-                 dims=(/dims(1),dims(2)/), vecpair=vecpair)
-        if (trim(vars(n)%var_grid) == 'Cu')fields(:,n) = vecpair(:,1)   ! ocn vectors
-        if (trim(vars(n)%var_grid) == 'Bu_x')fields(:,n) = vecpair(:,1) ! ice vectors
-        ! separate loop for y vector before vecpair deallocation
-!        do nn=1,nflds
-	  if (trim(vars(n)%var_grid) == 'Cv')fields(:,n) = vecpair(:,2)   ! ocn vectors
-          if (trim(vars(n)%var_grid) == 'Bu_y')fields(:,n) = vecpair(:,2) ! ice vectors
-!	enddo
-        deallocate(vecpair)
-      end if
-    enddo
+    ! create packed array
+    nn = 0
+    do n = 1,nflds
+       if (len_trim(vars(n)%var_pair) == 0) then
+          nn = nn + 1
+          call getfield(trim(filesrc), trim(vars(n)%var_name), dims=(/dims(1),dims(2)/), &
+               field=fields(:,nn))
+       else ! fill with vector pairs
+          nn = nn+1
+          ! ocn vectors
+          if (trim(vars(n)%var_grid) == 'Cu')fields(:,nn) = vecpair(:,1)
+          if (trim(vars(n)%var_grid) == 'Cv')fields(:,nn) = vecpair(:,2)
+          ! ice vectors
+          if (trim(vars(n)%var_grid) == 'Bu_x')fields(:,nn) = vecpair(:,1)
+          if (trim(vars(n)%var_grid) == 'Bu_y')fields(:,nn) = vecpair(:,2)
+       end if
+    end do
 
     if (debug)write(logunit,'(a)')'exit '//trim(subname)
   end subroutine packarrays2d
