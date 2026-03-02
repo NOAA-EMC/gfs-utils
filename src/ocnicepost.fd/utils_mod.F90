@@ -66,16 +66,6 @@ contains
 
     fields=0.0
     if (debug)write(logunit,'(a)')'enter '//trim(subname)
-    ! obtain vector pairs
-    do n = 1,nflds
-       if (trim(vars(n)%var_grid) == 'Cu' .or. trim(vars(n)%var_grid) == 'Bu_x') then
-          allocate(vecpair(dims(1)*dims(2),2)); vecpair = 0.0
-          call getvecpair(trim(filesrc), trim(wgtsdir), cosrot, sinrot,   &
-               trim(vars(n)%var_name), trim(vars(n)%var_grid(1:2)), &
-               trim(vars(n)%var_pair), trim(vars(n)%var_pair_grid(1:2)),  &
-               dims=(/dims(1),dims(2)/), vecpair=vecpair)
-       end if
-    end do
 
     ! create packed array
     nn = 0
@@ -85,13 +75,20 @@ contains
           call getfield(trim(filesrc), trim(vars(n)%var_name), dims=(/dims(1),dims(2)/), &
                field=fields(:,nn))
        else ! fill with vector pairs
-          nn = nn+1
-          ! ocn vectors
-          if (trim(vars(n)%var_grid) == 'Cu')fields(:,nn) = vecpair(:,1)
-          if (trim(vars(n)%var_grid) == 'Cv')fields(:,nn) = vecpair(:,2)
-          ! ice vectors
-          if (trim(vars(n)%var_grid) == 'Bu_x')fields(:,nn) = vecpair(:,1)
-          if (trim(vars(n)%var_grid) == 'Bu_y')fields(:,nn) = vecpair(:,2)
+          nn = nn + 1
+          if (trim(vars(n)%var_grid) == 'Cu' .or. trim(vars(n)%var_grid) == 'Bu_x') then
+            if(allocated(vecpair)) deallocate(vecpair)
+            allocate(vecpair(dims(1)*dims(2),2)); vecpair = 0.0
+            call getvecpair(trim(filesrc), trim(wgtsdir), cosrot, sinrot,   &
+               trim(vars(n)%var_name), trim(vars(n)%var_grid(1:2)), &
+               trim(vars(n)%var_pair), trim(vars(n)%var_pair_grid(1:2)),  &
+               dims=(/dims(1),dims(2)/), vecpair=vecpair)
+            if (trim(vars(n)%var_grid) == 'Cu')fields(:,nn) = vecpair(:,1)    ! ocn vectors
+            if (trim(vars(n)%var_grid) == 'Bu_x')fields(:,nn) = vecpair(:,1)  ! ice vectors
+          else  ! 'Cv' and 'Bu_y'
+            if (trim(vars(n)%var_grid) == 'Cv')fields(:,nn) = vecpair(:,2)    ! ocn vectors
+            if (trim(vars(n)%var_grid) == 'Bu_y')fields(:,nn) = vecpair(:,2)  ! ice vectors
+          endif
        end if
     end do
 
