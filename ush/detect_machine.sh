@@ -41,6 +41,8 @@ case $(hostname -f) in
   derecho[1-8]) MACHINE_ID=derecho ;; ### derecho1-8
 
   ip-*) MACHINE_ID=aws-ec2 ;; ### aws-ec2
+  compute-dy-*) MACHINE_ID=aws-ec2 ;; ### aws-ec2
+  processing-dy-*) MACHINE_ID=aws-ec2 ;; ### aws-ec2
 
   Orion-login-[1-4].HPC.MsState.Edu) MACHINE_ID=orion ;; ### orion1-4
 
@@ -97,6 +99,9 @@ elif [[ -d /gpfs/f6 ]]; then
 elif [[ -d /glade/u ]]; then
   # We are on DERECHO.
   MACHINE_ID=derecho
+elif [[ -d /opt/spack-stack && -d /lustre ]]; then
+  # We are on aws-ec2.
+  MACHINE_ID=aws-ec2
 else
   echo WARNING: UNKNOWN PLATFORM 1>&2
 fi
