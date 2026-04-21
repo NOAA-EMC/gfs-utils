@@ -92,12 +92,49 @@ c  OF THE RECORD (OLD NON-Y2K COMPLIANT FORM) OR IF A 4-DIGIT YEAR
 c  BEGINS IN COLUMN 20 (NEW Y2K COMPLIANT FORM) - TEST ON LOCATION OF
 c  LATITUDE BLANK CHARACTER TO FIND OUT ...
 
-         IF(INL1(26).EQ.' ') THEN
+c  Check TABs and replaced it with ' '  (added by Qingfu Liu)
+         DO J=1,80
+           IF(ichar(INL(J:J)).EQ.9)THEN
+              INL(J:J) = ' '
+           END IF
+         END DO
+         DO J=1,80
+           IF(ichar(INL(J:J)).EQ.13)THEN
+              INL(J:J) = ' '
+           END IF
+         END DO
+
+         IF(INL1(25).EQ.' '.or.INL1(26).EQ.' '.or.INL1(27).EQ.' ') THEN
 
 c ... THIS RECORD STILL CONTAINS THE OLD 2-DIGIT FORM OF THE YEAR -
 c ... THIS PROGRAM WILL NOW CONVERT THE RECORD TO A 4-DIGIT YEAR USING
 c      THE "WINDOWING" TECHNIQUE SINCE SUBSEQUENT LOGIC EXPECTS THIS
 
+          IF(INL(17:18).EQ.'20') THEN
+            DUMY2K(1:16) = INL(1:16)
+            DUMY2K(17:19) = '   '
+            DUMY2K(20:80) = INL(17:77)
+            INL= DUMY2K
+            PRINT *, ' '
+            PRINT *, '==> This is a record with a 4-digit year'
+            PRINT *, ' '
+          ELSE IF(INL(18:19).EQ.'20') THEN
+            DUMY2K(1:17) = INL(1:17)
+            DUMY2K(18:19) = '  '
+            DUMY2K(20:80) = INL(18:78)
+            INL= DUMY2K
+            PRINT *, ' '
+            PRINT *, '==> This is a record with a 4-digit year'
+            PRINT *, ' '
+          ELSE IF(INL(19:20).EQ.'20') THEN
+            DUMY2K(1:18) = INL(1:18)
+            DUMY2K(19:19) = ' '
+            DUMY2K(20:80) = INL(19:79)
+            INL= DUMY2K
+            PRINT *, ' '
+            PRINT *, '==> This is a record with a 4-digit year'
+            PRINT *, ' '
+          ELSE
             PRINT *, ' '
             PRINT *, '==> This is an old-format record with a 2-digit ',
      $       'year "',INL(20:21),'"'
@@ -114,7 +151,7 @@ c      THE "WINDOWING" TECHNIQUE SINCE SUBSEQUENT LOGIC EXPECTS THIS
             PRINT *, '==> 2-digit year converted to 4-digit year "',
      $       INL(20:23),'" via windowing technique'
             PRINT *, ' '
-
+          ENDIF
          ELSE 
 
 c ... THIS RECORD CONTAINS THE NEW 4-DIGIT FORM OF THE YEAR
