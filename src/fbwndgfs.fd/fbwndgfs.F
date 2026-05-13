@@ -88,12 +88,9 @@ C
 C
       REAL       ALAT(MAXSTN),ALON(MAXSTN)
       REAL       ISTN(MAXSTN),JSTN(MAXSTN)
-      REAL       ERAS(3),FHOUR
+      REAL       ERAS(3),FHOUR,FILL
       REAL       RFLD(NPTS),RINTRP(IMAX,JMAX)
       REAL       XPTS(NPTS),YPTS(NPTS),RLON(NPTS),RLAT(NPTS)
-
-      REAL(8) :: rFILL
-      REAL(8), DIMENSION(MAXSTN) :: rXPTS, rYPTS, rALON, rALAT
 C
 C...MAX NR STNS FOR READ-END SHOULD BE GT ACTUAL NR OF STNS ON STN FILE
       INTEGER    IELEV(MAXSTN),IRAS(3),KTAU(3)
@@ -399,21 +396,13 @@ C...NEXT DAY-OF-MONTH NOW STORED IN 'NDATE(3)'
 C...NEXT DAY PLUS 1 IN 'MDATE(3)'
 C
 C   CONVERT EARTH COORDINATES OF STATION TO GRID COORDINATES
-                  DO 105 J = 1,NRSTNS
-                     rXPTS(J) = XPTS(J)
-                     rYPTS(J) = YPTS(J)
-                     rALON(J) = ALON(J)
-                     rALAT(J) = ALAT(J)
-  105             CONTINUE
-C
-                  CALL GDSWZD_GRIB1(KGDS,-1,NRSTNS,rFILL,
-     &                    rXPTS,rYPTS,rALON,rALAT,IRET)
-C
                   DO 110 J = 1,NRSTNS
-                     ISTN(J) = rXPTS(J)
-                     JSTN(J) = rYPTS(J)
-                     ALON(J) = rALON(J)
-                     ALAT(J) = rALAT(J)
+C                     CALL GDSWIZ(KGDS,-1,1,FILL,XPTS(J),YPTS(J),
+C     &                    ALON(J),ALAT(J),IRET,0,DUM,DUM)
+                     CALL GDSWZD_GRIB1(KGDS,-1,1,FILL,XPTS(J),YPTS(J),
+     &                    ALON(J),ALAT(J),IRET)
+                     ISTN(J) = XPTS(J)
+                     JSTN(J) = YPTS(J)
 C                    PRINT 111,STNID(J),ALAT(J),ALON(J),ISTN(J),JSTN(J)
   111                FORMAT (3X,A3,2(2X,F8.2),2(2X,F8.3))
   110             CONTINUE
