@@ -40,6 +40,13 @@ case $(hostname -f) in
 
   derecho[1-8]) MACHINE_ID=derecho ;; ### derecho1-8
 
+  ip-*|compute-dy-*|processing-dy-*)
+    case ${PW_CSP:-} in
+      "aws" | "google" | "azure") MACHINE_ID=noaacloud ;;
+      *) MACHINE_ID=aws-ec2 ;;
+    esac
+    ;;
+
   Orion-login-[1-4].HPC.MsState.Edu) MACHINE_ID=orion ;; ### orion1-4
 
   [Hh]ercules-login-[1-4].[Hh][Pp][Cc].[Mm]s[Ss]tate.[Ee]du) MACHINE_ID=hercules ;; ### hercules1-4
@@ -95,6 +102,9 @@ elif [[ -d /gpfs/f6 ]]; then
 elif [[ -d /glade/u ]]; then
   # We are on DERECHO.
   MACHINE_ID=derecho
+elif [[ -f /sys/class/dmi/id/sys_vendor ]] && grep -q "EC2" /sys/class/dmi/id/sys_vendor; then
+  # We are on aws-ec2.
+  MACHINE_ID=aws-ec2
 else
   echo WARNING: UNKNOWN PLATFORM 1>&2
 fi
