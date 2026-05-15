@@ -102,7 +102,7 @@ elif [[ -d /gpfs/f6 ]]; then
 elif [[ -d /glade/u ]]; then
   # We are on DERECHO.
   MACHINE_ID=derecho
-elif [[ -d /opt/spack-stack && -d /lustre ]]; then
+elif [[ -f /sys/class/dmi/id/sys_vendor ]] && grep -q "EC2" /sys/class/dmi/id/sys_vendor; then
   # We are on aws-ec2.
   MACHINE_ID=aws-ec2
 else
