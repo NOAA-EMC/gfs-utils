@@ -38,6 +38,8 @@
 !   2023-03-28  Bo Cui  Fix compilation error with "-check all" for gfs_bufrsnd
 !   2024-08-08  Bo Cui  UPDATE TO HANDLE ONE FORECAST AT A TIME, REMOVE NEMSIO INPUT FILES
 !   2024-08-23  Bo Cui  Replace sigio_module with the simplified module modpr_module
+!   2026-06-06  Bo Cui  replace open file status from "new" to "replace" in bufr.f (automatically overwrite existing file)
+!   2026-06-06  Michael Barlage   Modify q2m  for GFS v17                            
 !                          
 !
 ! USAGE:    CALL PROGRAM meteorg
@@ -93,12 +95,14 @@
       real :: t,q,u,v,td,tlcl,plcl,qw,tw,xlat,xlon
       integer,dimension(npoint):: landwater
       integer,dimension(im,jm):: lwmask
+      real,dimension(im,jm):: lwmask_r
       real,dimension(im,jm)::  apcp, cpcp
       real,dimension(npoint,2+levs*3):: grids
       real,dimension(npoint) :: rlat,rlon,pmsl,ps,psn,elevstn
       real,dimension(im*jm) :: dum1d,dum1d2
-      real,dimension(im,jm) :: gdlat, hgt, gdlon
+      real,dimension(im,jm) :: gdlat, hgt, gdlon,shdmax,rvgtyp
       real,dimension(im,jm,15) :: dum2d
+      integer,dimension(im,jm) :: ivgtyp
       real,dimension(im,jm,levs) :: t3d, q3d, uh, vh,omega3d
       real,dimension(im,jm,levs) :: delpz
 !     real,dimension(im,jm,4) :: soilt3d
@@ -115,6 +119,7 @@
       real :: PREC,TSKIN,SR,randomno(1,2)
       real :: DOMR,DOMZR,DOMIP,DOMS
       real :: vcoord(levs+1,nvcoord),vdummy(levs+1)
+      integer :: land_model_flag
       real :: vcoordnems(levs+1,3,2)
       real :: rdum
       integer :: n3dfercld,iseedl
@@ -422,13 +427,27 @@
       if (fformat == 'netcdf') then
       VarName='land'
       Zreverse='no'
-       call read_netcdf(ncid,im,jm,1,VarName,lwmask,Zreverse,
+       call read_netcdf(ncid,im,jm,1,VarName,lwmask_r,Zreverse,
      &     error)
-        if (error /= 0) print*,'lwmask not found'
+        if (error /= 0) print*,'lwmask_r not found'
        endif
+
+        lwmask = nint(lwmask_r)
+
         if(debugprint)
      +   print*,'sample land mask= ',lwmask(im/2,jm/4),
      +          lwmask(im/2,jm/3)
+
+!      print*, '--- Debugging lwmask ---'
+!      print*, 'Max value: ', maxval(lwmask(:,:))
+!      print*, 'Min value: ', minval(lwmask(:,:))
+          
+       ! Count how many land points (value == 1) 
+
+       print*, 'Number of land points (1): ', count(lwmask(:,:) == 1)
+
+       print*,'sample land mask= ',lwmask(1500,172),lwmask(3046,1536)
+
 
 ! surface T
       if (fformat == 'netcdf') then
@@ -461,9 +480,68 @@
      &           Zreverse,error)
         if (error /= 0) print*,'spfh2m not found'
        endif
-        if(debugprint)
+        if(debugprint) 
      +   print*,'sample 2m Q= ',dum2d(im/2,jm/4,3),dum2d(im/2,jm/3,3),
      +          dum2d(im/2,jm/2,3)
+
+
+! GFSv17 adjustment for 2m Q, only for NoahMP land model
+
+      if (fformat == 'netcdf') then
+        error = nf90_get_att(ncid, nf90_global, "landsfcmdl",
+     +  land_model_flag)
+      endif
+
+
+!  maximum fractional coverage of green vegetation
+
+      if (land_model_flag==2) then
+
+        if (fformat == 'netcdf') then
+          VarName='shdmax'
+          Zreverse='no'
+           call read_netcdf(ncid,im,jm,1,VarName,shdmax,
+     +           Zreverse,error)
+          if (error /= 0) print*,'shdmax not found'
+        endif
+
+!       print*,'sample shdmax ',shdmax(1500,172),shdmax(3046,1536)
+
+        if (fformat == 'netcdf') then
+          VarName='vtype'
+          Zreverse='no'
+          call read_netcdf(ncid,im,jm,1,VarName,rvgtyp,
+     +           Zreverse,error)
+          if (error /= 0) print*,'vtype not found'
+          ivgtyp = nint(rvgtyp)
+        endif
+
+!       print*,'sample ivgtyp= ',ivgtyp(1500,172),ivgtyp(3046,1536)
+
+!       print*,'before 2m Q= ',dum2d(1500,172,3),dum2d(3046,1536,3) 
+
+
+! q3d(i,j,1) is the lowest model level because Zreverse='Yes' for q3d
+
+        do j=1,jm
+          do i=1,im
+           if(lwmask(i,j) == 1) then  ! only for land grids
+            if(ivgtyp(i,j)==13.or.ivgtyp(i,j)==16.or.
+     +    ivgtyp(i,j)==20) then
+              dum2d(i,j,3) = q3d(i,j,levs)
+            elseif(ivgtyp(i,j) /= 15) then
+              dum2d(i,j,3)=shdmax(i,j)*dum2d(i,j,3)+
+     +        (1.0-shdmax(i,j))*q3d(i,j,1)
+            end if
+           end if
+          enddo
+        enddo
+
+       endif  ! land_model_flag==2
+
+
+!      print*,'after 2m Q= ',dum2d(1500,172,3),dum2d(3046,1536,3) 
+
 
 ! U10
       if (fformat == 'netcdf') then
