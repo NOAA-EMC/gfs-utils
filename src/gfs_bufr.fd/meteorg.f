@@ -438,16 +438,6 @@
      +   print*,'sample land mask= ',lwmask(im/2,jm/4),
      +          lwmask(im/2,jm/3)
 
-!      print*, '--- Debugging lwmask ---'
-!      print*, 'Max value: ', maxval(lwmask(:,:))
-!      print*, 'Min value: ', minval(lwmask(:,:))
-          
-       ! Count how many land points (value == 1) 
-
-       print*, 'Number of land points (1): ', count(lwmask(:,:) == 1)
-
-       print*,'sample land mask= ',lwmask(2092,433),lwmask(2092,434)
-
 
 ! surface T
       if (fformat == 'netcdf') then
@@ -506,7 +496,7 @@
           if (error /= 0) print*,'shdmax not found'
         endif
 
-        print*,'sample shdmax ',shdmax(2092,433),shdmax(2092,434)
+!       print*,'sample shdmax ',shdmax(2092,433),shdmax(2092,434)
 
         if (fformat == 'netcdf') then
           VarName='vtype'
@@ -517,9 +507,9 @@
           ivgtyp = nint(rvgtyp)
         endif
 
-        print*,'sample ivgtyp= ',ivgtyp(2092,433),ivgtyp(2092,434)
+!       print*,'sample ivgtyp= ',ivgtyp(2092,433),ivgtyp(2092,434)
 
-        print*,'before 2m Q= ',dum2d(2092,433,3),dum2d(2092,434,3) 
+!       print*,'before 2m Q= ',dum2d(2092,433,3),dum2d(2092,434,3) 
 
 
 ! q3d(i,j,1) is the lowest model level because Zreverse='Yes' for q3d
@@ -541,7 +531,7 @@
        endif  ! land_model_flag==2
 
 
-       print*,'after 2m Q= ',dum2d(2092,433,3),dum2d(2092,434,3) 
+!      print*,'after 2m Q= ',dum2d(2092,433,3),dum2d(2092,434,3) 
 
 
 ! U10
