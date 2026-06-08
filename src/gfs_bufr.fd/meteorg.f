@@ -446,7 +446,7 @@
 
        print*, 'Number of land points (1): ', count(lwmask(:,:) == 1)
 
-       print*,'sample land mask= ',lwmask(1500,172),lwmask(3046,1536)
+       print*,'sample land mask= ',lwmask(2092,433),lwmask(2092,434)
 
 
 ! surface T
@@ -490,6 +490,7 @@
       if (fformat == 'netcdf') then
         error = nf90_get_att(ncid, nf90_global, "landsfcmdl",
      +  land_model_flag)
+        if (error /= 0) print*,'landsfcmdl not found'
       endif
 
 
@@ -505,7 +506,7 @@
           if (error /= 0) print*,'shdmax not found'
         endif
 
-!       print*,'sample shdmax ',shdmax(1500,172),shdmax(3046,1536)
+        print*,'sample shdmax ',shdmax(2092,433),shdmax(2092,434)
 
         if (fformat == 'netcdf') then
           VarName='vtype'
@@ -516,9 +517,9 @@
           ivgtyp = nint(rvgtyp)
         endif
 
-!       print*,'sample ivgtyp= ',ivgtyp(1500,172),ivgtyp(3046,1536)
+        print*,'sample ivgtyp= ',ivgtyp(2092,433),ivgtyp(2092,434)
 
-!       print*,'before 2m Q= ',dum2d(1500,172,3),dum2d(3046,1536,3) 
+        print*,'before 2m Q= ',dum2d(2092,433,3),dum2d(2092,434,3) 
 
 
 ! q3d(i,j,1) is the lowest model level because Zreverse='Yes' for q3d
@@ -528,7 +529,7 @@
            if(lwmask(i,j) == 1) then  ! only for land grids
             if(ivgtyp(i,j)==13.or.ivgtyp(i,j)==16.or.
      +    ivgtyp(i,j)==20) then
-              dum2d(i,j,3) = q3d(i,j,levs)
+              dum2d(i,j,3) = q3d(i,j,1)
             elseif(ivgtyp(i,j) /= 15) then
               dum2d(i,j,3)=shdmax(i,j)*dum2d(i,j,3)+
      +        (1.0-shdmax(i,j))*q3d(i,j,1)
@@ -540,7 +541,7 @@
        endif  ! land_model_flag==2
 
 
-!      print*,'after 2m Q= ',dum2d(1500,172,3),dum2d(3046,1536,3) 
+       print*,'after 2m Q= ',dum2d(2092,433,3),dum2d(2092,434,3) 
 
 
 ! U10
