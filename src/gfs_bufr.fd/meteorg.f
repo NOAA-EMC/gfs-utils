@@ -496,8 +496,6 @@
           if (error /= 0) print*,'shdmax not found'
         endif
 
-!       print*,'sample shdmax ',shdmax(2092,433),shdmax(2092,434)
-
         if (fformat == 'netcdf') then
           VarName='vtype'
           Zreverse='no'
@@ -506,10 +504,6 @@
           if (error /= 0) print*,'vtype not found'
           ivgtyp = nint(rvgtyp)
         endif
-
-!       print*,'sample ivgtyp= ',ivgtyp(2092,433),ivgtyp(2092,434)
-
-!       print*,'before 2m Q= ',dum2d(2092,433,3),dum2d(2092,434,3) 
 
 
 ! q3d(i,j,1) is the lowest model level because Zreverse='Yes' for q3d
@@ -529,9 +523,6 @@
         enddo
 
        endif  ! land_model_flag==2
-
-
-!      print*,'after 2m Q= ',dum2d(2092,433,3),dum2d(2092,434,3) 
 
 
 ! U10
