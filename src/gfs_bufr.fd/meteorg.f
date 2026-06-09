@@ -38,7 +38,7 @@
 !   2023-03-28  Bo Cui  Fix compilation error with "-check all" for gfs_bufrsnd
 !   2024-08-08  Bo Cui  UPDATE TO HANDLE ONE FORECAST AT A TIME, REMOVE NEMSIO INPUT FILES
 !   2024-08-23  Bo Cui  Replace sigio_module with the simplified module modpr_module
-!   2026-06-06  Bo Cui  replace open file status from "new" to "replace" in bufr.f (automatically overwrite existing file)
+!   2026-06-06  Bo Cui  replace open file status from "new" to "replace" in buff.f (automatically overwrite existing file)
 !   2026-06-06  Michael Barlage   Modify q2m  for GFS v17                            
 !                          
 !
