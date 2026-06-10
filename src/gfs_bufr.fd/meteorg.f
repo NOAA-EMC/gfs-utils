@@ -481,7 +481,6 @@
       if (fformat == 'netcdf') then
         error = nf90_get_att(ncid, nf90_global, "landsfcmdl",
      +  land_model_flag)
-        if (error /= 0) print*,'landsfcmdl not found'
         if (error /= 0) then
           print*,'landsfcmdl not found'
           land_model_flag = 0
