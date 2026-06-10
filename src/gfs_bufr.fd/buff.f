@@ -32,7 +32,7 @@ C       OPEN BUFR OUTPUT FILE.
           print *, ' fnbufr =', fnbufr
         endif
         open(unit=19,file=fnbufr,form='unformatted', 
-     &     status='new', iostat=ios)
+     &     status='replace', iostat=ios)
         IF ( ios .ne. 0 ) THEN
             WRITE (6,*) ' CANNOT open ', 19
             STOP
