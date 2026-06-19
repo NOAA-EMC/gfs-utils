@@ -44,6 +44,8 @@ find_package(sigio REQUIRED)
 find_package(g2 REQUIRED)
 find_package(bufr REQUIRED)
 find_package(landsfcutil REQUIRED)
+find_package(OpenMP COMPONENTS C) # for wgrib2
+find_package(g2c) # for wgrib2
 find_package(wgrib2 REQUIRED)
 # rdbfmsua.fd needs gempak and gfortran, but
 # make them optional and skip rdbfmsua building if they are not found.
