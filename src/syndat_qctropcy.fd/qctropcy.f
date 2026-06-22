@@ -11306,7 +11306,7 @@ C$$$
 C Convert DAYZ to real4 for W3EMC
       DAYZ_4 = REAL(DAYZ, KIND=4)
 
-      CALL W3MOVDAT((/DAYZ,0.,0.,0.,0./),(/1899,12,31,0,0,0,0,0/),JDAT)
+      CALL W3MOVDAT((/DAYZ_4,0.,0.,0.,0./),(/1899,12,31,0,0,0,0,0/),JDAT)
       IYR = JDAT(1)
       IMO = JDAT(2)
       IDA = JDAT(3)
