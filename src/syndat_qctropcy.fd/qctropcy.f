@@ -9848,7 +9848,9 @@ C$$$
 
       SAVE
 
-      DIMENSION IDAT(8),JDAT(6),RINC_4(5)
+      DIMENSION IDAT(8),JDAT(6)
+
+      REAL (KIND=4), DIMENSION(5) :: RINC_4
 
       EQUIVALENCE (IDAT(1),JW3YR),(IDAT(2),JW3MO),(IDAT(3),JW3DA),
      2            (IDAT(5),JW3HR),(IDAT(6),JW3MIN),(IDAT(7),JW3SEC)
@@ -11299,8 +11301,12 @@ C
 C$$$
       SUBROUTINE YTIME(IYR,DAYZ,IDATE,JUTC)
       DIMENSION JDAT(8)
+      REAL (KIND=4) DAYZ_4
 
-      CALL W3MOVDAT((/DAYZ,0.,0.,0.,0./),(/1899,12,31,0,0,0,0,0/),JDAT)
+C Convert DAYZ to real4 for W3EMC
+      DAYZ_4 = REAL(DAYZ, KIND=4)
+
+      CALL W3MOVDAT((/DAYZ_4,0.,0.,0.,0./),(/1899,12,31,0,0,0,0,0/),JDAT)
       IYR = JDAT(1)
       IMO = JDAT(2)
       IDA = JDAT(3)
