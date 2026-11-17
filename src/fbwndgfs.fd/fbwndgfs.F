@@ -915,7 +915,7 @@ C
 C
          SAVE
 C
-         DATA  WBLANK/Z'20'/
+         DATA  WBLANK/Z'2020202020202020'/
 C        DATA  WBLANK/Z''/
 C   
 C TEST VALUE OF NEXT.
