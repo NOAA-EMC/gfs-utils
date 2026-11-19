@@ -55,7 +55,7 @@ target_link_libraries(nemsio::nemsio INTERFACE w3emc::w3emc_d bacio::bacio_4)
 
 # Set compiler flags.
 if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel|IntelLLVM)$")
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -traceback")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -traceback -fpscomp logicals")
   set(CMAKE_Fortran_FLAGS_RELEASE "-O3")
   set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -check all -ftrapuv")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU)$")
