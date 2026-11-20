@@ -64,6 +64,10 @@ elif [[ ${MACHINE_ID} == noaacloud ]] ; then
     # We are on NOAA Cloud
     module purge
 
+elif [[ ${MACHINE_ID} == nimbus ]] ; then
+    # We are on Nimbus
+    module purge
+
 else
     echo "WARNING: UNKNOWN PLATFORM" 1>&2
 

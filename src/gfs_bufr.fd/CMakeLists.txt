@@ -28,7 +28,7 @@ list(APPEND fortran_src_free
   physcons.f
 )
 
-if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
+if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel|IntelLLVM)$")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -convert big_endian -fp-model source")
   set_source_files_properties(${fortran_src_free} PROPERTIES COMPILE_FLAGS "-free")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU)$")

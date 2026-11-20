@@ -20,7 +20,12 @@ source "${DIR_ROOT}/ush/detect_machine.sh"
 # Load modules
 source "${DIR_ROOT}/ush/module-setup.sh"
 module use "${DIR_ROOT}/modulefiles"
-module load "gfsutils_${MACHINE_ID}.${COMPILER}"
+gfs_module="gfsutils_${MACHINE_ID}.${COMPILER}"
+if [[ ! -f "${DIR_ROOT}/modulefiles/${gfs_module}.lua" ]]; then
+  echo "ERROR: ${DIR_ROOT}/modulefiles/${gfs_module}.lua does not exist" 1>&2
+  exit 1
+fi
+module load "${gfs_module}"
 module list
 
 # Collect BUILD Options
