@@ -906,8 +906,6 @@ C
          INTEGER       L
          INTEGER       N
          INTEGER       NEXT
-         INTEGER(kind=8) WBLANK
-         INTEGER(kind=8) IWORDS
 C
          CHARACTER * 1 LINE(*)
          CHARACTER * 1 NBLK(*)
@@ -915,8 +913,6 @@ C
 C
          SAVE
 C
-         DATA  WBLANK/Z'20'/
-C        DATA  WBLANK/Z''/
 C   
 C TEST VALUE OF NEXT.
 C
@@ -945,16 +941,9 @@ C FILL BLOCK WITH BLANK CHARACTERS IF NEXT EQUAL ZERO.
 C BLANK IS ASCII BLANK, 20 HEX, OR 32 DECIMAL
 C
          ELSE IF (NEXT.EQ.0) THEN
-           CALL W3FI01(LW)
-           IWORDS = N / LW
-           CALL XSTORE(NBLK,WBLANK,IWORDS)
-           IF (MOD(N,LW).NE.0) THEN
-             NWORDS = IWORDS * LW
-             IBYTES = N - NWORDS
-             DO I = 1,IBYTES
-               NBLK(NWORDS+I) = CHAR(32)
-             END DO
-           END IF
+           DO I = 1,N
+             NBLK(I) = CHAR(32)
+           END DO
          END IF 
 C
 C MOVE LINE INTO BLOCK.
