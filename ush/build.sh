@@ -46,31 +46,4 @@ make -j "${BUILD_JOBS:-8}" VERBOSE="${BUILD_VERBOSE:-}"
 make install
 set +x
 
-# Build rdbfmsua.x with makefile separately due to GEMPAK issues in cmake
-# Load modules
-source "${DIR_ROOT}/ush/module-setup.sh"
-module use "${DIR_ROOT}/modulefiles"
-if module load "rdbfmsua_${MACHINE_ID}.${COMPILER}" &> /dev/null; then
-  module list
-else
-  if [[ -f "${DIR_ROOT}/modulefiles/rdbfmsua_${MACHINE_ID}.${COMPILER}.lua" ]]; then
-    echo "WARNING: Unable to load modulefile for 'rdbfmsua' on '${MACHINE_ID}'."
-    set +e
-    module load "rdbfmsua_${MACHINE_ID}.${COMPILER}"
-    set -e
-  else
-    echo "${DIR_ROOT}/modulefiles/rdbfmsua_${MACHINE_ID}.${COMPILER}.lua does not exist!"
-  fi
-  echo "  Skipping building 'rdbfmsua.x'"
-  exit 0
-fi
-
-cd "${DIR_ROOT}/src/rdbfmsua.fd"
-export MACHINE_ID
-export COMPILER
-export PREFIX="${INSTALL_PREFIX}"
-make clean
-make VERBOSE="${BUILD_VERBOSE:-}"
-make install VERBOSE="${BUILD_VERBOSE:-}"
-
-exit
+exit 0
