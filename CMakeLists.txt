@@ -45,17 +45,13 @@ find_package(g2 REQUIRED)
 find_package(bufr REQUIRED)
 find_package(landsfcutil REQUIRED)
 find_package(wgrib2 REQUIRED)
-# rdbfmsua.fd needs gempak and gfortran, but
-# make them optional and skip rdbfmsua building if they are not found.
-find_package(gempak)
-find_package(gfortran)
 
 # See https://github.com/NOAA-EMC/NCEPLIBS-nemsio/pull/22
 target_link_libraries(nemsio::nemsio INTERFACE w3emc::w3emc_d bacio::bacio_4)
 
 # Set compiler flags.
-if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel)$")
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -traceback")
+if(CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel|IntelLLVM)$")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -traceback -fpscomp logicals")
   set(CMAKE_Fortran_FLAGS_RELEASE "-O3")
   set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -check all -ftrapuv")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU)$")
